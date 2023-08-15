@@ -1,4 +1,4 @@
-name: count_down_sound
+name: timer_count_down
 
 version: 2.2.2
 
@@ -8,10 +8,11 @@ description: >
 homepage: https://github.com/DizoftTeam/simple_count_down
 
 environment:
-    sdk: ">=2.12.0 <3.0.0"
+    sdk: ">=2.12.0"
     flutter: ">=1.10.0"
 
 dependencies:
+    audioplayers: ^5.1.0
     flutter:
         sdk: flutter
 

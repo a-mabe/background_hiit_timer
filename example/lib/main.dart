@@ -103,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Countdown(
               // controller: _controller,
               seconds: 5,
-              build: (_, double time) => Text(
+              build: (_, int time) => Text(
                 time.toString(),
                 style: TextStyle(
                   fontSize: 100,
