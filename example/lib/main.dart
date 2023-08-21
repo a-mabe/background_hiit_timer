@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:timer_count_down/timer_controller.dart';
-import 'package:timer_count_down/timer_count_down.dart';
+import 'package:background_timer/background_timer.dart';
+import 'package:background_timer/background_timer_controller.dart';
 
 void main() => runApp(MyApp());
 
@@ -46,8 +46,7 @@ class MyHomePage extends StatefulWidget {
 ///
 class _MyHomePageState extends State<MyHomePage> {
   // Controller
-  final CountdownController _controller =
-      new CountdownController(autoStart: true);
+  final CountdownController _controller = CountdownController(autoStart: true);
 
   @override
   Widget build(BuildContext context) {
@@ -111,11 +110,11 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               interval: Duration(milliseconds: 100),
               onFinished: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Timer is done!'),
-                  ),
-                );
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //   SnackBar(
+                //     content: Text('Timer is done!'),
+                //   ),
+                // );
               },
             ),
           ],
