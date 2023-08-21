@@ -9,7 +9,8 @@ environment:
 
 dependencies:
   audioplayers: ^5.1.0
-  device_info_plus: ^9.0.3
+  # device_info_plus: ^9.0.3
+  device_info_plus: ^8.0.0
   flutter:
     sdk: flutter
   flutter_background_service: ^5.0.1
