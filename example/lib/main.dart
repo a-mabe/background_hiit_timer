@@ -131,8 +131,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Countdown(
               controller: _controller,
-              workSeconds: 5,
-              restSeconds: 3,
+              workSeconds: 8,
+              restSeconds: 5,
               numberOfIntervals: 2,
               build: (_, int time) => Text(
                 time.toString(),

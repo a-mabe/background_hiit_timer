@@ -1,10 +1,7 @@
 import 'dart:async';
-import 'dart:ffi';
 import 'dart:io';
 import 'dart:ui';
-import './lifecycle_event_handler.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -12,8 +9,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:background_timer/background_timer_controller.dart';
 import 'package:audioplayers/audioplayers.dart';
 
+/// Possible interval states
+enum IntervalStates { start, work, rest, complete }
+
 ///
-/// Simple countdown timer.
+/// Background service countdown interval timer.
 ///
 class Countdown extends StatefulWidget {
   /// Length of the work interval
@@ -95,18 +95,11 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   // Current seconds
   late int _currentMicroSeconds;
 
+  /// Audio player controller
   final player = AudioPlayer();
 
   @override
   void initState() {
-    // _currentMicroSeconds = widget.seconds * _secondsFactor;
-    // Get ready 10 seconds
-
-    // WidgetsBinding.instance.addObserver(LifecycleEventHandler(
-    //   detachedCallBack: widget.,
-    //   resumeCallBack: FutureVoidCallback()
-    // ));
-
     super.initState();
 
     WidgetsBinding.instance.addObserver(this);
@@ -143,22 +136,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    final service = FlutterBackgroundService();
-
-    if (state == AppLifecycleState.detached) {
-      setState(() {
-        print("--- Stopping ---");
-        service.invoke("stopService");
-        print("Should be stopped");
-      });
-      // print("--- Stopping ---");
-      // service.invoke("stopService");
-      // print("Should be stopped");
-    }
-  }
-
   ///
   /// Then timer paused
   ///
@@ -190,14 +167,18 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   ///
   void _startTimer() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    await preferences.setInt("workSeconds", widget.workSeconds);
-    await preferences.setInt("restSeconds", widget.restSeconds);
-    await preferences.setString("halfwaySound", widget.halfwaySound);
-    await preferences.setString("endSound", widget.endSound);
-    await preferences.setString("countdownSound", widget.countdownSound);
-    await preferences.setString("workSound", widget.workSound);
-    await preferences.setString("restSound", widget.restSound);
-    await preferences.setInt("numberOfIntervals", widget.numberOfIntervals);
+
+    if (preferences.getInt("workSeconds") != widget.workSeconds) {
+      await preferences.setInt("workSeconds", widget.workSeconds);
+      await preferences.setInt("restSeconds", widget.restSeconds);
+      await preferences.setString("halfwaySound", widget.halfwaySound);
+      await preferences.setString("endSound", widget.endSound);
+      await preferences.setString("countdownSound", widget.countdownSound);
+      await preferences.setString("workSound", widget.workSound);
+      await preferences.setString("restSound", widget.restSound);
+      await preferences.setInt("numberOfIntervals", widget.numberOfIntervals);
+    }
+
     await initializeService();
   }
 
@@ -228,6 +209,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   Future<void> initializeService() async {
     final service = FlutterBackgroundService();
 
+    /// --- FOR BACKGROUND SERVICE NOTIFICATION CHANNEL ---
+
     /// OPTIONAL, using custom notification channel id
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'my_foreground', // id
@@ -254,9 +237,12 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
+    /// --- END FOR BACKGROUND SERVICE NOTIFICATION CHANNEL ---
+
     await service.configure(
       androidConfiguration: AndroidConfiguration(
-        // this will be executed when app is in foreground or background in separated isolate
+        // This will be executed when app is in foreground
+        // or background in separated isolate
         onStart: onStart,
 
         // auto start service
@@ -301,24 +287,11 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   }
 
   ///
-  ///
+  /// Run on service start
   ///
   @pragma('vm:entry-point')
   static void onStart(ServiceInstance service) async {
-    // Only available for flutter 3.0.0 and later
     DartPluginRegistrant.ensureInitialized();
-
-    // Countdown widget = Countdown(seconds: , build: build)
-
-    // For flutter prior to version 3.0.0
-    // We have to register the plugin manually
-
-    // SharedPreferences preferences = await SharedPreferences.getInstance();
-    // await preferences.setString("hello", "world");
-
-    /// OPTIONAL when use custom notification
-    // final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    // FlutterLocalNotificationsPlugin();
 
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
@@ -334,147 +307,170 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       service.stopSelf();
     });
 
+    /// Timer interval is half a second
     Duration interval = const Duration(microseconds: 500000);
 
+    /// Factor by microseconds
     const int secondsFactor = 1000000;
 
+    /// --- Grab shared preferences ---
     SharedPreferences preferences = await SharedPreferences.getInstance();
-
-    final String? halfwaySound = preferences.getString('halfwaySound');
-    final String? endSound = preferences.getString('endSound');
-    final String? countdownSound = preferences.getString('countdownSound');
     final String? workSound = preferences.getString('workSound');
+    final String? halfwaySound = preferences.getString('halfwaySound');
+    final String? countdownSound = preferences.getString('countdownSound');
     final String? restSound = preferences.getString('restSound');
+    final String? endSound = preferences.getString('endSound');
     final int? workSeconds = preferences.getInt("workSeconds");
     final int? restSeconds = preferences.getInt("restSeconds");
     int? numberOfIntervals = preferences.getInt("numberOfIntervals");
-    String? status = "start";
 
+    /// --- End grab shared preferences ---
+
+    /// First interval status is start
+    IntervalStates status = IntervalStates.start;
+
+    /// Audio player controller
     final player = AudioPlayer();
 
+    /// Start with blank audio
+    await player.play(AssetSource('audio/blank.mp3'));
+
+    /// 10 seconds * microseconds factor
     int? currentMicroSeconds = 10 * 1000000;
 
     Timer.periodic(interval, (timer) async {
-      print('FLUTTER BACKGROUND SERVICE: ------------');
-      print('FLUTTER BACKGROUND SERVICE: ${numberOfIntervals}');
-      print('FLUTTER BACKGROUND SERVICE: ${status}');
-      print('FLUTTER BACKGROUND SERVICE: ${currentMicroSeconds}');
-      print('FLUTTER BACKGROUND SERVICE: ------------');
-
-      if (status != "complete") {
+      /// If the timer has not been completed, then
+      /// deduct half a second from the timer
+      if (status != IntervalStates.complete) {
         currentMicroSeconds = (currentMicroSeconds! - interval.inMicroseconds);
       }
 
-      // if (numberOfIntervals! > 0) {
-      // Check if time is greater than 0
-      if (currentMicroSeconds! < 0) {
-        // Timer done, check the status and decrement interval
-        if (status == "start") {
-          // Start work
-          status = "work";
+      /// If there is no more time on the timer to deduct, then
+      /// calculate the next action.
+      if (currentMicroSeconds! < -500000) {
+        /// Determine timer status
+
+        /// If the status was start
+        if (status == IntervalStates.start) {
+          /// Switch to the work state
+          status = IntervalStates.work;
+
+          /// Update the current time to the work time
           currentMicroSeconds = workSeconds! * secondsFactor;
-          // Decrement intervals after each work session
-          numberOfIntervals = numberOfIntervals! - 1;
-        } else if (status == "work") {
-          // Start rest
-          status = "rest";
-          currentMicroSeconds = restSeconds! * secondsFactor;
-          // print('FLUTTER BACKGROUND SERVICE: Setting to rest seconds now.');
-          // print('FLUTTER BACKGROUND SERVICE: ${currentMicroSeconds}');
-        } else if (status == "rest") {
-          // Start work
-          status = "work";
-          currentMicroSeconds = workSeconds! * secondsFactor;
-          // Decrement intervals after each work session
+
+          /// Since we have changed intervals, decrement the
+          /// number of intervals at each work session
           numberOfIntervals = numberOfIntervals! - 1;
         }
 
-        // currentMicroSeconds = preferences.getInt('currentMicroSeconds');
-      } else {
-        // Check sound
-        //  Check halfway
-        if ((currentMicroSeconds! == ((workSeconds! * secondsFactor) / 2)) &&
-            halfwaySound != 'none' &&
-            status == "work") {
-          await player.play(AssetSource('audio/${halfwaySound}.mp3'));
-          print('FLUTTER BACKGROUND SERVICE: HALFWAY');
+        /// If the status was work
+        else if (status == IntervalStates.work) {
+          /// Switch to the rest state
+          status = IntervalStates.rest;
+
+          /// Update the current time to the rest time
+          currentMicroSeconds = restSeconds! * secondsFactor;
+        } else if (status == IntervalStates.rest) {
+          /// Switch to the work state
+          status = IntervalStates.work;
+
+          /// Update the current time to the work time
+          currentMicroSeconds = workSeconds! * secondsFactor;
+
+          /// Since we have changed intervals, decrement the
+          /// number of intervals at each work session
+          numberOfIntervals = numberOfIntervals! - 1;
         }
-        // Check 3, 2, 1
+      }
+
+      /// There is still more time to deduct from the timer, so
+      /// calculate if a sound effect should play
+      else {
+        /// Calculate half of the work time
+        int halfWorkSeconds = ((workSeconds! * secondsFactor) / 2).round();
+
+        /// Check if the halfway sound should play
+        if (currentMicroSeconds! == halfWorkSeconds &&
+            halfwaySound != 'none' &&
+            status == IntervalStates.work) {
+          await player.play(AssetSource('audio/$halfwaySound.mp3'));
+        }
+        // Check if the 3, 2, 1 sound should play
         else if ((currentMicroSeconds! - 500000) == 2500000 ||
             (currentMicroSeconds! - 500000) == 1500000 ||
             (currentMicroSeconds! - 500000) == 500000) {
           if (countdownSound != 'none') {
-            await player.play(AssetSource('audio/${countdownSound}.mp3'));
+            print("---------------------------------------- COUNTDOWN");
+            await player.play(AssetSource('audio/$countdownSound.mp3'));
           }
         }
-        // Check end
-        else if (currentMicroSeconds! == 0 && endSound != 'none') {
+
+        /// Check which end sound should play
+        else if (currentMicroSeconds! == 0) {
+          /// The whole timer is done, play the final sound
           if (numberOfIntervals == 0) {
-            // Play the end sound
-            status = "complete";
-            await player.play(AssetSource('audio/${endSound}.mp3'));
-            // Stop the service
-            print('FLUTTER BACKGROUND SERVICE: DONE');
-            // service.stopSelf();
+            /// Switch to the complete state
+            status = IntervalStates.complete;
+
+            /// Audio player controller
+            await player.play(AssetSource('audio/$endSound.mp3'));
+
             player.onPlayerStateChanged.listen(
               (it) {
                 switch (it) {
-                  case PlayerState.stopped:
-                    // service.stopSelf();
-                    break;
                   case PlayerState.completed:
                     service.stopSelf();
-                    // currentMicroSeconds = preferences.getInt('time');
                     break;
                   default:
                     break;
                 }
               },
             );
-          } else if (status == "rest" || status == "start") {
+          } else if (status == IntervalStates.work ||
+              status == IntervalStates.start) {
             // Play the work sound
-            await player.play(AssetSource('audio/${workSound}.mp3'));
-          } else if (status == "work") {
+            await player.play(AssetSource('audio/$workSound.mp3'));
+          } else if (status == IntervalStates.rest) {
             // Play the rest sound
-            await player.play(AssetSource('audio/${restSound}.mp3'));
+            await player.play(AssetSource('audio/$restSound.mp3'));
           }
-          // await player.play(AssetSource('audio/${endSound}.mp3'));
+          // await player.play(AssetSource('audio/$endSound.mp3'));
         }
       }
-      // }
 
-      // Send back data
+      String stringStatus = "";
+      switch (status) {
+        case IntervalStates.start:
+          stringStatus = "start";
+          break;
+        case IntervalStates.work:
+          stringStatus = "work";
+          break;
+        case IntervalStates.rest:
+          stringStatus = "rest";
+          break;
+        case IntervalStates.complete:
+          stringStatus = "complete";
+          break;
+        default:
+          break;
+      }
+
+      int time = 0;
+      if (currentMicroSeconds! > 0) {
+        time = (currentMicroSeconds! / secondsFactor).round();
+      }
+
+      // Send data back to the UI
       service.invoke(
         'update',
         {
-          "seconds": (currentMicroSeconds! / secondsFactor).round(),
+          "seconds": time,
           "microSeconds": currentMicroSeconds,
-          "status": status,
+          "status": stringStatus,
           "numberOfIntervals": numberOfIntervals
-          // "device": device,
         },
       );
-
-      // if (intervals == 0 && currentMicroSeconds! < 0) {
-      //   // await player.play(AssetSource('audio/${endSound}.mp3'));
-
-      //   player.onPlayerStateChanged.listen(
-      //     (it) {
-      //       switch (it) {
-      //         case PlayerState.stopped:
-      //           // service.stopSelf();
-      //           break;
-      //         case PlayerState.completed:
-      //           service.stopSelf();
-      //           // currentMicroSeconds = preferences.getInt('time');
-      //           break;
-      //         default:
-      //           break;
-      //       }
-      //     },
-      //   );
-      //   // service.stopSelf();
-      // }
     });
   }
 }
