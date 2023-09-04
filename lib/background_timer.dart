@@ -183,30 +183,40 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.setBool("pause", false);
+    await preferences.setInt("workSeconds", widget.workSeconds);
+    await preferences.setInt("restSeconds", widget.restSeconds);
+    await preferences.setString("halfwaySound", widget.halfwaySound);
+    await preferences.setString("endSound", widget.endSound);
+    await preferences.setString("countdownSound", widget.countdownSound);
+    await preferences.setString("workSound", widget.workSound);
+    await preferences.setString("restSound", widget.restSound);
+    await preferences.setInt("numberOfIntervals", widget.numberOfIntervals);
 
-    /// If the service is currently active, stop the active service
-    /// and start it again.
-    if (isActive) {
-      final service = FlutterBackgroundService();
-      service.invoke("stopService");
+    await initializeService();
 
-      await initializeService();
-    }
+    // /// If the service is currently active, stop the active service
+    // /// and start it again.
+    // if (isActive) {
+    //   final service = FlutterBackgroundService();
+    //   service.invoke("stopService");
 
-    /// If the service is not currently running, save data to
-    /// SharedPreferences and start the service.
-    else {
-      await preferences.setInt("workSeconds", widget.workSeconds);
-      await preferences.setInt("restSeconds", widget.restSeconds);
-      await preferences.setString("halfwaySound", widget.halfwaySound);
-      await preferences.setString("endSound", widget.endSound);
-      await preferences.setString("countdownSound", widget.countdownSound);
-      await preferences.setString("workSound", widget.workSound);
-      await preferences.setString("restSound", widget.restSound);
-      await preferences.setInt("numberOfIntervals", widget.numberOfIntervals);
+    //   await initializeService();
+    // }
 
-      await initializeService();
-    }
+    // /// If the service is not currently running, save data to
+    // /// SharedPreferences and start the service.
+    // else {
+    //   await preferences.setInt("workSeconds", widget.workSeconds);
+    //   await preferences.setInt("restSeconds", widget.restSeconds);
+    //   await preferences.setString("halfwaySound", widget.halfwaySound);
+    //   await preferences.setString("endSound", widget.endSound);
+    //   await preferences.setString("countdownSound", widget.countdownSound);
+    //   await preferences.setString("workSound", widget.workSound);
+    //   await preferences.setString("restSound", widget.restSound);
+    //   await preferences.setInt("numberOfIntervals", widget.numberOfIntervals);
+
+    //   await initializeService();
+    // }
   }
 
   @override
