@@ -181,6 +181,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     /// Set the timer to active
     isActive = true;
 
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.setBool("pause", false);
+
     /// If the service is currently active, stop the active service
     /// and start it again.
     if (isActive) {
@@ -193,8 +196,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     /// If the service is not currently running, save data to
     /// SharedPreferences and start the service.
     else {
-      SharedPreferences preferences = await SharedPreferences.getInstance();
-      await preferences.setBool("pause", false);
       await preferences.setInt("workSeconds", widget.workSeconds);
       await preferences.setInt("restSeconds", widget.restSeconds);
       await preferences.setString("halfwaySound", widget.halfwaySound);
