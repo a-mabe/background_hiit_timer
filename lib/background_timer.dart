@@ -246,7 +246,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           if (widget.onFinished != null) {
             widget.onFinished!();
             _onFinishedExecuted = true;
-            isActive = false;
           }
           widget.controller?.isCompleted = true;
         } else {
@@ -402,12 +401,13 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     await player.play(AssetSource('audio/blank.mp3'));
 
     /// 10 seconds * microseconds factor
-    int? currentMicroSeconds = 10 * secondsFactor;
+    int? currentMicroSeconds = 3 * secondsFactor;
 
     Timer.periodic(interval, (timer) async {
       // SharedPreferences prefs = await SharedPreferences.getInstance();
       preferences.reload();
       paused = preferences.getBool('pause');
+      print("--------------- $paused ---------------");
       if (!paused!) {
         /// If the timer has not been completed, then
         /// deduct half a second from the timer
