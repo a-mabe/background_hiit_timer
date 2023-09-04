@@ -258,6 +258,10 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         BackgroundTimerData backgroundTimerData = BackgroundTimerData(
             _currentMicroSeconds, _status, _numberOfIntervals);
 
+        print("-------------- $_currentMicroSeconds --------------");
+        print("-------------- $_status --------------");
+        print("-------------- $_numberOfIntervals --------------");
+
         return widget.build(context, backgroundTimerData);
       },
     );
@@ -375,6 +379,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
     /// --- Grab shared preferences ---
     SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.reload();
     bool? paused = false;
     final String? workSound = preferences.getString('workSound');
     final String? halfwaySound = preferences.getString('halfwaySound');
