@@ -2,6 +2,7 @@ import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:background_timer/background_timer.dart';
 import 'package:background_timer/background_timer_controller.dart';
+import 'package:background_timer/background_timer_data.dart';
 
 void main() => runApp(MyApp());
 
@@ -134,8 +135,8 @@ class _MyHomePageState extends State<MyHomePage> {
               workSeconds: 8,
               restSeconds: 5,
               numberOfIntervals: 2,
-              build: (_, int time) => Text(
-                time.toString(),
+              build: (_, BackgroundTimerData timerData) => Text(
+                timerData.currentMicroSeconds.toString(),
                 style: TextStyle(
                   fontSize: 100,
                 ),

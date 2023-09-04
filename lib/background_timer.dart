@@ -7,6 +7,7 @@ import 'package:flutter_background_service_android/flutter_background_service_an
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:background_timer/background_timer_controller.dart';
+import 'package:background_timer/background_timer_data.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 /// Possible interval states
@@ -23,7 +24,7 @@ class Countdown extends StatefulWidget {
   final int restSeconds;
 
   /// Build method for the timer
-  final Widget Function(BuildContext, int) build;
+  final Widget Function(BuildContext, BackgroundTimerData) build;
 
   /// Called when finished
   final Function? onFinished;
@@ -92,8 +93,14 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   /// Internal control to indicate if the onFinished method was executed
   bool _onFinishedExecuted = false;
 
-  // Current seconds
+  /// Current seconds
   late int _currentMicroSeconds;
+
+  /// Current timer status
+  late String _status;
+
+  /// Current interval number
+  late int _numberOfIntervals;
 
   /// Audio player controller
   final player = AudioPlayer();
@@ -231,6 +238,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         }
         final data = snapshot.data!;
         _currentMicroSeconds = data["microSeconds"];
+        _status = data["status"];
+        _numberOfIntervals = data["numberOfIntervals"];
 
         if (_currentMicroSeconds <= 0 &&
             widget.controller?.isCompleted == false) {
@@ -245,10 +254,11 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           /// is returned if needed.
         }
 
-        return widget.build(
-          context,
-          _currentMicroSeconds,
-        );
+        /// Data sent back from the timer
+        BackgroundTimerData backgroundTimerData = BackgroundTimerData(
+            _currentMicroSeconds, _status, _numberOfIntervals);
+
+        return widget.build(context, backgroundTimerData);
       },
     );
   }
