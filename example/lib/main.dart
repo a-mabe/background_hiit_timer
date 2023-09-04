@@ -142,11 +142,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               interval: Duration(milliseconds: 100),
               onFinished: () {
-                // ScaffoldMessenger.of(context).showSnackBar(
-                //   SnackBar(
-                //     content: Text('Timer is done!'),
-                //   ),
-                // );
+                print("Done!");
               },
             ),
           ],

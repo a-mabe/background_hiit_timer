@@ -87,7 +87,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   final int _secondsFactor = 1000000;
 
   // Timer
-  Timer? _timer;
+  // Timer? _timer;
 
   /// Internal control to indicate if the onFinished method was executed
   bool _onFinishedExecuted = false;
@@ -97,6 +97,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
   /// Audio player controller
   final player = AudioPlayer();
+
+  /// Timer is currently active
+  bool isActive = false;
 
   @override
   void initState() {
@@ -127,8 +130,10 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    if (_timer?.isActive == true) {
-      _timer?.cancel();
+    /// Stop timer if active
+    if (isActive) {
+      final service = FlutterBackgroundService();
+      service.invoke("stopService");
     }
 
     WidgetsBinding.instance.removeObserver(this);
@@ -139,17 +144,25 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   ///
   /// Then timer paused
   ///
-  void _onTimerPaused() {
-    if (_timer?.isActive == true) {
-      _timer?.cancel();
+  void _onTimerPaused() async {
+    /// Stop timer if currently active. Otherwise, a timer
+    /// is not currently running so we ignore the timer pause.
+    if (isActive) {
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      await preferences.setBool("pause", true);
     }
   }
 
   ///
   /// Then timer resumed
   ///
-  void _onTimerResumed() {
-    _startTimer();
+  void _onTimerResumed() async {
+    /// Resume timer if currently active. Otherwise, a timer
+    /// is not currently running so we ignore the timer resume.
+    if (isActive) {
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      await preferences.setBool("pause", false);
+    }
   }
 
   ///
@@ -158,7 +171,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   void _onTimerRestart() {
     widget.controller?.isCompleted = false;
     _onFinishedExecuted = false;
-    _currentMicroSeconds = widget.workSeconds * _secondsFactor;
     _startTimer();
   }
 
@@ -166,9 +178,23 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   /// Start timer
   ///
   void _startTimer() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
+    /// Set the timer to active
+    isActive = true;
 
-    if (preferences.getInt("workSeconds") != widget.workSeconds) {
+    /// If the service is currently active, stop the active service
+    /// and start it again.
+    if (isActive) {
+      final service = FlutterBackgroundService();
+      service.invoke("stopService");
+
+      await initializeService();
+    }
+
+    /// If the service is not currently running, save data to
+    /// SharedPreferences and start the service.
+    else {
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      await preferences.setBool("pause", false);
       await preferences.setInt("workSeconds", widget.workSeconds);
       await preferences.setInt("restSeconds", widget.restSeconds);
       await preferences.setString("halfwaySound", widget.halfwaySound);
@@ -177,9 +203,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       await preferences.setString("workSound", widget.workSound);
       await preferences.setString("restSound", widget.restSound);
       await preferences.setInt("numberOfIntervals", widget.numberOfIntervals);
-    }
 
-    await initializeService();
+      await initializeService();
+    }
   }
 
   @override
@@ -195,9 +221,22 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         final data = snapshot.data!;
         _currentMicroSeconds = data["microSeconds"];
 
+        if (_currentMicroSeconds <= 0 &&
+            widget.controller?.isCompleted == false) {
+          if (widget.onFinished != null) {
+            widget.onFinished!();
+            _onFinishedExecuted = true;
+            isActive = false;
+          }
+          widget.controller?.isCompleted = true;
+        } else {
+          /// Can execute function every time data
+          /// is returned if needed.
+        }
+
         return widget.build(
           context,
-          (_currentMicroSeconds / _secondsFactor).round(),
+          _currentMicroSeconds,
         );
       },
     );
@@ -315,6 +354,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
     /// --- Grab shared preferences ---
     SharedPreferences preferences = await SharedPreferences.getInstance();
+    bool? paused = false;
     final String? workSound = preferences.getString('workSound');
     final String? halfwaySound = preferences.getString('halfwaySound');
     final String? countdownSound = preferences.getString('countdownSound');
@@ -336,141 +376,145 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     await player.play(AssetSource('audio/blank.mp3'));
 
     /// 10 seconds * microseconds factor
-    int? currentMicroSeconds = 10 * 1000000;
+    int? currentMicroSeconds = 10 * secondsFactor;
 
     Timer.periodic(interval, (timer) async {
-      /// If the timer has not been completed, then
-      /// deduct half a second from the timer
-      if (status != IntervalStates.complete) {
-        currentMicroSeconds = (currentMicroSeconds! - interval.inMicroseconds);
-      }
-
-      /// If there is no more time on the timer to deduct, then
-      /// calculate the next action.
-      if (currentMicroSeconds! < -500000) {
-        /// Determine timer status
-
-        /// If the status was start
-        if (status == IntervalStates.start) {
-          /// Switch to the work state
-          status = IntervalStates.work;
-
-          /// Update the current time to the work time
-          currentMicroSeconds = workSeconds! * secondsFactor;
-
-          /// Since we have changed intervals, decrement the
-          /// number of intervals at each work session
-          numberOfIntervals = numberOfIntervals! - 1;
+      // SharedPreferences prefs = await SharedPreferences.getInstance();
+      preferences.reload();
+      paused = preferences.getBool('pause');
+      if (!paused!) {
+        /// If the timer has not been completed, then
+        /// deduct half a second from the timer
+        if (status != IntervalStates.complete) {
+          currentMicroSeconds =
+              (currentMicroSeconds! - interval.inMicroseconds);
         }
 
-        /// If the status was work
-        else if (status == IntervalStates.work) {
-          /// Switch to the rest state
-          status = IntervalStates.rest;
+        /// If there is no more time on the timer to deduct, then
+        /// calculate the next action.
+        if (currentMicroSeconds! < -500000) {
+          /// Determine timer status
 
-          /// Update the current time to the rest time
-          currentMicroSeconds = restSeconds! * secondsFactor;
-        } else if (status == IntervalStates.rest) {
-          /// Switch to the work state
-          status = IntervalStates.work;
+          /// If the status was start
+          if (status == IntervalStates.start) {
+            /// Switch to the work state
+            status = IntervalStates.work;
 
-          /// Update the current time to the work time
-          currentMicroSeconds = workSeconds! * secondsFactor;
+            /// Update the current time to the work time
+            currentMicroSeconds = workSeconds! * secondsFactor;
 
-          /// Since we have changed intervals, decrement the
-          /// number of intervals at each work session
-          numberOfIntervals = numberOfIntervals! - 1;
-        }
-      }
-
-      /// There is still more time to deduct from the timer, so
-      /// calculate if a sound effect should play
-      else {
-        /// Calculate half of the work time
-        int halfWorkSeconds = ((workSeconds! * secondsFactor) / 2).round();
-
-        /// Check if the halfway sound should play
-        if (currentMicroSeconds! == halfWorkSeconds &&
-            halfwaySound != 'none' &&
-            status == IntervalStates.work) {
-          await player.play(AssetSource('audio/$halfwaySound.mp3'));
-        }
-        // Check if the 3, 2, 1 sound should play
-        else if ((currentMicroSeconds! - 500000) == 2500000 ||
-            (currentMicroSeconds! - 500000) == 1500000 ||
-            (currentMicroSeconds! - 500000) == 500000) {
-          if (countdownSound != 'none') {
-            print("---------------------------------------- COUNTDOWN");
-            await player.play(AssetSource('audio/$countdownSound.mp3'));
+            /// Since we have changed intervals, decrement the
+            /// number of intervals at each work session
+            numberOfIntervals = numberOfIntervals! - 1;
           }
-        }
 
-        /// Check which end sound should play
-        else if (currentMicroSeconds! == 0) {
-          /// The whole timer is done, play the final sound
-          if (numberOfIntervals == 0) {
-            /// Switch to the complete state
-            status = IntervalStates.complete;
+          /// If the status was work
+          else if (status == IntervalStates.work) {
+            /// Switch to the rest state
+            status = IntervalStates.rest;
 
-            /// Audio player controller
-            await player.play(AssetSource('audio/$endSound.mp3'));
-
-            player.onPlayerStateChanged.listen(
-              (it) {
-                switch (it) {
-                  case PlayerState.completed:
-                    service.stopSelf();
-                    break;
-                  default:
-                    break;
-                }
-              },
-            );
-          } else if (status == IntervalStates.work ||
-              status == IntervalStates.start) {
-            // Play the work sound
-            await player.play(AssetSource('audio/$workSound.mp3'));
+            /// Update the current time to the rest time
+            currentMicroSeconds = restSeconds! * secondsFactor;
           } else if (status == IntervalStates.rest) {
-            // Play the rest sound
-            await player.play(AssetSource('audio/$restSound.mp3'));
+            /// Switch to the work state
+            status = IntervalStates.work;
+
+            /// Update the current time to the work time
+            currentMicroSeconds = workSeconds! * secondsFactor;
+
+            /// Since we have changed intervals, decrement the
+            /// number of intervals at each work session
+            numberOfIntervals = numberOfIntervals! - 1;
           }
-          // await player.play(AssetSource('audio/$endSound.mp3'));
         }
-      }
 
-      String stringStatus = "";
-      switch (status) {
-        case IntervalStates.start:
-          stringStatus = "start";
-          break;
-        case IntervalStates.work:
-          stringStatus = "work";
-          break;
-        case IntervalStates.rest:
-          stringStatus = "rest";
-          break;
-        case IntervalStates.complete:
-          stringStatus = "complete";
-          break;
-        default:
-          break;
-      }
+        /// There is still more time to deduct from the timer, so
+        /// calculate if a sound effect should play
+        else {
+          /// Calculate half of the work time
+          int halfWorkSeconds = ((workSeconds! * secondsFactor) / 2).round();
 
-      int time = 0;
-      if (currentMicroSeconds! > 0) {
-        time = (currentMicroSeconds! / secondsFactor).round();
-      }
+          /// Check if the halfway sound should play
+          if (currentMicroSeconds! == halfWorkSeconds &&
+              halfwaySound != 'none' &&
+              status == IntervalStates.work) {
+            await player.play(AssetSource('audio/$halfwaySound.mp3'));
+          }
+          // Check if the 3, 2, 1 sound should play
+          else if ((currentMicroSeconds! - 500000) == 2500000 ||
+              (currentMicroSeconds! - 500000) == 1500000 ||
+              (currentMicroSeconds! - 500000) == 500000) {
+            if (countdownSound != 'none') {
+              await player.play(AssetSource('audio/$countdownSound.mp3'));
+            }
+          }
 
-      // Send data back to the UI
-      service.invoke(
-        'update',
-        {
-          "seconds": time,
-          "microSeconds": currentMicroSeconds,
-          "status": stringStatus,
-          "numberOfIntervals": numberOfIntervals
-        },
-      );
+          /// Check which end sound should play
+          else if (currentMicroSeconds! == 0) {
+            /// The whole timer is done, play the final sound
+            if (numberOfIntervals == 0) {
+              /// Switch to the complete state
+              status = IntervalStates.complete;
+
+              /// Audio player controller
+              await player.play(AssetSource('audio/$endSound.mp3'));
+
+              player.onPlayerStateChanged.listen(
+                (state) {
+                  switch (state) {
+                    case PlayerState.completed:
+                      service.stopSelf();
+                      break;
+                    default:
+                      break;
+                  }
+                },
+              );
+            } else if (status == IntervalStates.work ||
+                status == IntervalStates.start) {
+              // Play the rest sound
+              await player.play(AssetSource('audio/$restSound.mp3'));
+            } else if (status == IntervalStates.rest) {
+              // Play the work sound
+              await player.play(AssetSource('audio/$workSound.mp3'));
+            }
+            // await player.play(AssetSource('audio/$endSound.mp3'));
+          }
+        }
+
+        String stringStatus = "";
+        switch (status) {
+          case IntervalStates.start:
+            stringStatus = "start";
+            break;
+          case IntervalStates.work:
+            stringStatus = "work";
+            break;
+          case IntervalStates.rest:
+            stringStatus = "rest";
+            break;
+          case IntervalStates.complete:
+            stringStatus = "complete";
+            break;
+          default:
+            break;
+        }
+
+        int time = 0;
+        if (currentMicroSeconds! > 0) {
+          time = (currentMicroSeconds! / secondsFactor).round();
+        }
+
+        // Send data back to the UI
+        service.invoke(
+          'update',
+          {
+            "microSeconds": time,
+            "status": stringStatus,
+            "numberOfIntervals": numberOfIntervals
+          },
+        );
+      }
     });
   }
 }
