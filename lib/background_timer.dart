@@ -401,7 +401,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     await player.play(AssetSource('audio/blank.mp3'));
 
     /// 10 seconds * microseconds factor
-    int? currentMicroSeconds = 3 * secondsFactor;
+    int? currentMicroSeconds = 10 * secondsFactor;
 
     Timer.periodic(interval, (timer) async {
       // SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -530,6 +530,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         if (currentMicroSeconds! > 0) {
           time = (currentMicroSeconds! / secondsFactor).round();
         }
+
+        await preferences.setString("status", stringStatus);
 
         // Send data back to the UI
         service.invoke(
