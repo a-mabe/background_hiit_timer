@@ -245,9 +245,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             widget.controller?.isCompleted == false) {
           if (widget.onFinished != null) {
             widget.onFinished!();
-            _onFinishedExecuted = true;
+            // _onFinishedExecuted = true;
           }
-          widget.controller?.isCompleted = true;
+          // widget.controller?.isCompleted = true;
         } else {
           /// Can execute function every time data
           /// is returned if needed.
