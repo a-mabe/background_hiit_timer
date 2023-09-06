@@ -406,7 +406,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       // SharedPreferences prefs = await SharedPreferences.getInstance();
       preferences.reload();
       paused = preferences.getBool('pause');
-      print("--------------- $paused ---------------");
+      // print("--------------- $paused ---------------");
       if (!paused!) {
         /// If the timer has not been completed, then
         /// deduct half a second from the timer
@@ -419,6 +419,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         /// calculate the next action.
         if (currentMicroSeconds! < -500000) {
           /// Determine timer status
+
+          print("----------------------------- $numberOfIntervals");
 
           /// If the status was start
           if (status == IntervalStates.start) {
