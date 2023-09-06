@@ -241,7 +241,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         _status = data["status"];
         _numberOfIntervals = data["numberOfIntervals"];
 
-        if (_currentMicroSeconds == -500000 &&
+        if (_currentMicroSeconds == 0 &&
             widget.controller?.isCompleted == false) {
           if (widget.onFinished != null) {
             widget.onFinished!();
