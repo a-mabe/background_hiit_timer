@@ -176,8 +176,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   /// Then timer restarted
   ///
   void _onTimerRestart() {
-    widget.controller?.isCompleted = false;
-    _onFinishedExecuted = false;
     _startTimer();
   }
 
@@ -199,7 +197,10 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     await preferences.setString("restSound", widget.restSound);
     await preferences.setInt("numberOfIntervals", widget.numberOfIntervals);
 
-    await initializeService();
+    await initializeService().then((value) {
+      widget.controller?.isCompleted = false;
+      _onFinishedExecuted = false;
+    });
 
     // /// If the service is currently active, stop the active service
     // /// and start it again.
@@ -484,7 +485,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               status = IntervalStates.complete;
 
               /// Audio player controller
-              await player.play(AssetSource('audio/$endSound.mp3'));
+              if (endSound != 'none') {
+                await player.play(AssetSource('audio/$endSound.mp3'));
+              }
 
               player.onPlayerStateChanged.listen(
                 (state) {
@@ -500,10 +503,14 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             } else if (status == IntervalStates.work ||
                 status == IntervalStates.start) {
               // Play the rest sound
-              await player.play(AssetSource('audio/$restSound.mp3'));
+              if (restSound != 'none') {
+                await player.play(AssetSource('audio/$restSound.mp3'));
+              }
             } else if (status == IntervalStates.rest) {
               // Play the work sound
-              await player.play(AssetSource('audio/$workSound.mp3'));
+              if (workSound != 'none') {
+                await player.play(AssetSource('audio/$workSound.mp3'));
+              }
             }
             // await player.play(AssetSource('audio/$endSound.mp3'));
           }
