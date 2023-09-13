@@ -104,7 +104,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   late int _numberOfIntervals;
 
   /// Audio player controller
-  final player = AudioPlayer();
+  // final player = AudioPlayer();
 
   /// Timer is currently active
   bool isActive = false;
@@ -419,7 +419,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     IntervalStates status = IntervalStates.start;
 
     /// Audio player controller
-    final player = AudioPlayer();
+    // final player = AudioPlayer();
 
     // final session = await AudioSession.instance;
     // await session.configure(const AudioSessionConfiguration(
@@ -516,7 +516,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           if (currentMicroSeconds! == halfWorkSeconds &&
               halfwaySound != 'none' &&
               status == IntervalStates.work) {
-            await player.play(AssetSource('audio/$halfwaySound.mp3'));
+            // await player.play(AssetSource('audio/$halfwaySound.mp3'));
           }
           // Check if the 3, 2, 1 sound should play
           else if ((currentMicroSeconds! - 500000) == 2500000 ||
@@ -524,7 +524,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               (currentMicroSeconds! - 500000) == 500000) {
             if (countdownSound != 'none') {
               print("COUNTDOWWWWWWWWWWWWWN");
-              await player.play(AssetSource('audio/$countdownSound.mp3'));
+              // await player.play(AssetSource('audio/$countdownSound.mp3'));
             }
           }
 
@@ -537,30 +537,30 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
               /// Audio player controller
               if (endSound != 'none') {
-                await player.play(AssetSource('audio/$endSound.mp3'));
+                // await player.play(AssetSource('audio/$endSound.mp3'));
               }
 
-              player.onPlayerStateChanged.listen(
-                (state) {
-                  switch (state) {
-                    case PlayerState.completed:
-                      service.stopSelf();
-                      break;
-                    default:
-                      break;
-                  }
-                },
-              );
+              // player.onPlayerStateChanged.listen(
+              //   (state) {
+              //     switch (state) {
+              //       case PlayerState.completed:
+              //         service.stopSelf();
+              //         break;
+              //       default:
+              //         break;
+              //     }
+              //   },
+              // );
             } else if (status == IntervalStates.work ||
                 status == IntervalStates.start) {
               // Play the rest sound
               if (restSound != 'none') {
-                await player.play(AssetSource('audio/$restSound.mp3'));
+                // await player.play(AssetSource('audio/$restSound.mp3'));
               }
             } else if (status == IntervalStates.rest) {
               // Play the work sound
               if (workSound != 'none') {
-                await player.play(AssetSource('audio/$workSound.mp3'));
+                // await player.play(AssetSource('audio/$workSound.mp3'));
               }
             }
             // await player.play(AssetSource('audio/$endSound.mp3'));
