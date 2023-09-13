@@ -443,7 +443,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     /// Activate the audio session before playing audio.
     if (await session.setActive(true)) {
       // Now play audio.
-      await player.play(AssetSource('audio/blank.mp3'));
+      // await player.play(AssetSource('audio/blank.mp3'));
     } else {
       // The request was denied and the app should not play audio
     }
