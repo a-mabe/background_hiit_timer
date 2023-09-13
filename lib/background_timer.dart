@@ -127,7 +127,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       _startTimer();
     }
 
-    init();
+    // init();
   }
 
   void init() async {
@@ -421,8 +421,32 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     /// Audio player controller
     final player = AudioPlayer();
 
+    final session = await AudioSession.instance;
+    await session.configure(const AudioSessionConfiguration(
+      // avAudioSessionCategory: AVAudioSessionCategory.playback,
+      avAudioSessionCategoryOptions:
+          AVAudioSessionCategoryOptions.mixWithOthers,
+      avAudioSessionMode: AVAudioSessionMode.defaultMode,
+      avAudioSessionRouteSharingPolicy:
+          AVAudioSessionRouteSharingPolicy.defaultPolicy,
+      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+      androidAudioAttributes: AndroidAudioAttributes(
+        contentType: AndroidAudioContentType.speech,
+        flags: AndroidAudioFlags.none,
+        usage: AndroidAudioUsage.voiceCommunication,
+      ),
+      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+      androidWillPauseWhenDucked: true,
+    ));
+
     /// Start with blank audio
-    await player.play(AssetSource('audio/blank.mp3'));
+    /// // Activate the audio session before playing audio.
+    if (await session.setActive(true)) {
+      // Now play audio.
+      await player.play(AssetSource('audio/blank.mp3'));
+    } else {
+      // The request was denied and the app should not play audio
+    }
 
     /// 10 seconds * microseconds factor
     int? currentMicroSeconds = 10 * secondsFactor;
@@ -497,6 +521,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               (currentMicroSeconds! - 500000) == 1500000 ||
               (currentMicroSeconds! - 500000) == 500000) {
             if (countdownSound != 'none') {
+              print("COUNTDOWWWWWWWWWWWWWN");
               await player.play(AssetSource('audio/$countdownSound.mp3'));
             }
           }
