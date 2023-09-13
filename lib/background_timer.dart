@@ -448,7 +448,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     //   // The request was denied and the app should not play audio
     // }
 
-    await player.play(AssetSource('audio/blank.mp3'));
+    // await player.play(AssetSource('audio/blank.mp3'));
 
     /// 10 seconds * microseconds factor
     int? currentMicroSeconds = 10 * secondsFactor;
