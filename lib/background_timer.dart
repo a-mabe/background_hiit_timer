@@ -127,7 +127,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       _startTimer();
     }
 
-    // init();
+    init();
   }
 
   void init() async {
@@ -141,9 +141,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           AVAudioSessionRouteSharingPolicy.defaultPolicy,
       avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
       androidAudioAttributes: AndroidAudioAttributes(
-        contentType: AndroidAudioContentType.speech,
-        flags: AndroidAudioFlags.none,
-        usage: AndroidAudioUsage.voiceCommunication,
+        contentType: AndroidAudioContentType.sonification,
+        flags: AndroidAudioFlags.audibilityEnforced,
+        usage: AndroidAudioUsage.notification,
       ),
       androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
       androidWillPauseWhenDucked: true,
@@ -423,7 +423,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
     // final session = await AudioSession.instance;
     // await session.configure(const AudioSessionConfiguration(
-    //   avAudioSessionCategory: AVAudioSessionCategory.playback,
+    //   // avAudioSessionCategory: AVAudioSessionCategory.playback,
     //   avAudioSessionCategoryOptions:
     //       AVAudioSessionCategoryOptions.mixWithOthers,
     //   avAudioSessionMode: AVAudioSessionMode.defaultMode,
@@ -431,9 +431,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     //       AVAudioSessionRouteSharingPolicy.defaultPolicy,
     //   avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
     //   androidAudioAttributes: AndroidAudioAttributes(
-    //     contentType: AndroidAudioContentType.speech,
-    //     flags: AndroidAudioFlags.none,
-    //     usage: AndroidAudioUsage.voiceCommunication,
+    //     contentType: AndroidAudioContentType.sonification,
+    //     flags: AndroidAudioFlags.audibilityEnforced,
+    //     usage: AndroidAudioUsage.notification,
     //   ),
     //   androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
     //   androidWillPauseWhenDucked: true,
