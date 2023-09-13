@@ -57,15 +57,18 @@ class Countdown extends StatefulWidget {
   /// Current interval status
   final String status;
 
+  AudioSession session;
+
   ///
   /// Simple countdown timer
   ///
-  const Countdown({
+  Countdown({
     Key? key,
     required this.workSeconds,
     required this.restSeconds,
     required this.numberOfIntervals,
     required this.build,
+    required this.session,
     this.status = 'start',
     this.endSound = 'horn',
     this.workSound = 'short-whistle',
