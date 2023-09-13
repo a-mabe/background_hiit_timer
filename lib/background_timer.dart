@@ -419,7 +419,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     IntervalStates status = IntervalStates.start;
 
     /// Audio player controller
-    // final player = AudioPlayer();
+    final player = AudioPlayer();
 
     // final session = await AudioSession.instance;
     // await session.configure(const AudioSessionConfiguration(
@@ -448,7 +448,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     //   // The request was denied and the app should not play audio
     // }
 
-    // await player.play(AssetSource('audio/blank.mp3'));
+    await player.play(AssetSource('audio/blank.mp3'));
 
     /// 10 seconds * microseconds factor
     int? currentMicroSeconds = 10 * secondsFactor;
