@@ -30,6 +30,7 @@ dependencies:
       url: https://github.com/a-mabe/flutter_background_service.git
       ref: stop-on-app-close # branch name
       path: ./packages/flutter_background_service_android
+  audio_session: ^0.1.16
 
 dev_dependencies:
   flutter_test:
