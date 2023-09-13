@@ -421,32 +421,32 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     /// Audio player controller
     final player = AudioPlayer();
 
-    final session = await AudioSession.instance;
-    await session.configure(const AudioSessionConfiguration(
-      // avAudioSessionCategory: AVAudioSessionCategory.playback,
-      avAudioSessionCategoryOptions:
-          AVAudioSessionCategoryOptions.mixWithOthers,
-      avAudioSessionMode: AVAudioSessionMode.defaultMode,
-      avAudioSessionRouteSharingPolicy:
-          AVAudioSessionRouteSharingPolicy.defaultPolicy,
-      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-      androidAudioAttributes: AndroidAudioAttributes(
-        contentType: AndroidAudioContentType.sonification,
-        flags: AndroidAudioFlags.audibilityEnforced,
-        usage: AndroidAudioUsage.notification,
-      ),
-      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-      androidWillPauseWhenDucked: true,
-    ));
+    // final session = await AudioSession.instance;
+    // await session.configure(const AudioSessionConfiguration(
+    //   // avAudioSessionCategory: AVAudioSessionCategory.playback,
+    //   avAudioSessionCategoryOptions:
+    //       AVAudioSessionCategoryOptions.mixWithOthers,
+    //   avAudioSessionMode: AVAudioSessionMode.defaultMode,
+    //   avAudioSessionRouteSharingPolicy:
+    //       AVAudioSessionRouteSharingPolicy.defaultPolicy,
+    //   avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+    //   androidAudioAttributes: AndroidAudioAttributes(
+    //     contentType: AndroidAudioContentType.sonification,
+    //     flags: AndroidAudioFlags.audibilityEnforced,
+    //     usage: AndroidAudioUsage.notification,
+    //   ),
+    //   androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+    //   androidWillPauseWhenDucked: true,
+    // ));
 
     /// Start with blank audio
     /// Activate the audio session before playing audio.
-    if (await session.setActive(true)) {
-      // Now play audio.
-      // await player.play(AssetSource('audio/blank.mp3'));
-    } else {
-      // The request was denied and the app should not play audio
-    }
+    // if (await session.setActive(true)) {
+    // Now play audio.
+    // await player.play(AssetSource('audio/blank.mp3'));
+    // } else {
+    // The request was denied and the app should not play audio
+    // }
 
     // await player.play(AssetSource('audio/blank.mp3'));
 
