@@ -126,6 +126,28 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     if (widget.controller == null || widget.controller!.autoStart == true) {
       _startTimer();
     }
+
+    init();
+  }
+
+  void init() async {
+    final session = await AudioSession.instance;
+    await session.configure(const AudioSessionConfiguration(
+      // avAudioSessionCategory: AVAudioSessionCategory.playback,
+      avAudioSessionCategoryOptions:
+          AVAudioSessionCategoryOptions.mixWithOthers,
+      avAudioSessionMode: AVAudioSessionMode.defaultMode,
+      avAudioSessionRouteSharingPolicy:
+          AVAudioSessionRouteSharingPolicy.defaultPolicy,
+      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+      androidAudioAttributes: AndroidAudioAttributes(
+        contentType: AndroidAudioContentType.speech,
+        flags: AndroidAudioFlags.none,
+        usage: AndroidAudioUsage.voiceCommunication,
+      ),
+      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+      androidWillPauseWhenDucked: true,
+    ));
   }
 
   @override
@@ -404,24 +426,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
     /// 10 seconds * microseconds factor
     int? currentMicroSeconds = 10 * secondsFactor;
-
-    final session = await AudioSession.instance;
-    await session.configure(const AudioSessionConfiguration(
-      // avAudioSessionCategory: AVAudioSessionCategory.playback,
-      avAudioSessionCategoryOptions:
-          AVAudioSessionCategoryOptions.mixWithOthers,
-      avAudioSessionMode: AVAudioSessionMode.defaultMode,
-      avAudioSessionRouteSharingPolicy:
-          AVAudioSessionRouteSharingPolicy.defaultPolicy,
-      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-      androidAudioAttributes: AndroidAudioAttributes(
-        contentType: AndroidAudioContentType.speech,
-        flags: AndroidAudioFlags.none,
-        usage: AndroidAudioUsage.voiceCommunication,
-      ),
-      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-      androidWillPauseWhenDucked: true,
-    ));
 
     Timer.periodic(interval, (timer) async {
       // SharedPreferences prefs = await SharedPreferences.getInstance();
