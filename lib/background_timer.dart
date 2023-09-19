@@ -418,19 +418,19 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
     /// Audio player controller
     final halfPlayer = AudioPlayer();
-    await halfPlayer.setUrl('audio/$halfwaySound.mp3');
+    await halfPlayer.setUrl('asset:audio/$halfwaySound.mp3');
 
     final workPlayer = AudioPlayer();
-    await workPlayer.setUrl('audio/$workSound.mp3');
+    await workPlayer.setUrl('asset:audio/$workSound.mp3');
 
     final restPlayer = AudioPlayer();
-    await restPlayer.setUrl('audio/$restSound.mp3');
+    await restPlayer.setUrl('asset:audio/$restSound.mp3');
 
     final endPlayer = AudioPlayer();
-    await endPlayer.setUrl('audio/$endSound.mp3');
+    await endPlayer.setUrl('asset:audio/$endSound.mp3');
 
     final countdownPlayer = AudioPlayer();
-    await countdownPlayer.setUrl('audio/$countdownSound.mp3');
+    await countdownPlayer.setUrl('asset:audio/$countdownSound.mp3');
     // await player.play();
 
     // final session = await AudioSession.instance;
