@@ -31,6 +31,7 @@ dependencies:
       ref: stop-on-app-close # branch name
       path: ./packages/flutter_background_service_android
   audio_session: ^0.1.16
+  just_audio: ^0.9.35
 
 dev_dependencies:
   flutter_test:

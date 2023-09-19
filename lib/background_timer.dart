@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
-import 'package:audio_session/audio_session.dart';
+// import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
@@ -9,7 +9,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:background_timer/background_timer_controller.dart';
 import 'package:background_timer/background_timer_data.dart';
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
 
 /// Possible interval states
 enum IntervalStates { start, work, rest, complete }
@@ -102,9 +103,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
   /// Current interval number
   late int _numberOfIntervals;
-
-  /// Audio player controller
-  // final player = AudioPlayer();
 
   /// Timer is currently active
   bool isActive = false;
@@ -419,7 +417,21 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     IntervalStates status = IntervalStates.start;
 
     /// Audio player controller
-    final player = AudioPlayer();
+    final halfPlayer = AudioPlayer();
+    await halfPlayer.setUrl('audio/$halfwaySound.mp3');
+
+    final workPlayer = AudioPlayer();
+    await workPlayer.setUrl('audio/$workSound.mp3');
+
+    final restPlayer = AudioPlayer();
+    await restPlayer.setUrl('audio/$restSound.mp3');
+
+    final endPlayer = AudioPlayer();
+    await endPlayer.setUrl('audio/$endSound.mp3');
+
+    final countdownPlayer = AudioPlayer();
+    await countdownPlayer.setUrl('audio/$countdownSound.mp3');
+    // await player.play();
 
     // final session = await AudioSession.instance;
     // await session.configure(const AudioSessionConfiguration(
@@ -516,15 +528,15 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           if (currentMicroSeconds! == halfWorkSeconds &&
               halfwaySound != 'none' &&
               status == IntervalStates.work) {
-            // await player.play(AssetSource('audio/$halfwaySound.mp3'));
+            await halfPlayer.play();
           }
           // Check if the 3, 2, 1 sound should play
-          else if ((currentMicroSeconds! - 500000) == 2500000 ||
-              (currentMicroSeconds! - 500000) == 1500000 ||
-              (currentMicroSeconds! - 500000) == 500000) {
+          else if ((currentMicroSeconds! - 500000) == 3500000 ||
+              (currentMicroSeconds! - 500000) == 2500000 ||
+              (currentMicroSeconds! - 500000) == 1500000) {
             if (countdownSound != 'none') {
               print("COUNTDOWWWWWWWWWWWWWN");
-              // await player.play(AssetSource('audio/$countdownSound.mp3'));
+              await countdownPlayer.play();
             }
           }
 
@@ -537,7 +549,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
               /// Audio player controller
               if (endSound != 'none') {
-                // await player.play(AssetSource('audio/$endSound.mp3'));
+                await endPlayer.play();
               }
 
               // player.onPlayerStateChanged.listen(
@@ -555,12 +567,12 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
                 status == IntervalStates.start) {
               // Play the rest sound
               if (restSound != 'none') {
-                // await player.play(AssetSource('audio/$restSound.mp3'));
+                await restPlayer.play();
               }
             } else if (status == IntervalStates.rest) {
               // Play the work sound
               if (workSound != 'none') {
-                // await player.play(AssetSource('audio/$workSound.mp3'));
+                await workPlayer.play();
               }
             }
             // await player.play(AssetSource('audio/$endSound.mp3'));
