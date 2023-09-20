@@ -396,7 +396,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     }
 
     service.on('stopService').listen((event) {
-      pool.release();
       service.stopSelf();
     });
 
