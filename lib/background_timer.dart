@@ -417,25 +417,25 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     IntervalStates status = IntervalStates.start;
 
     /// Audio player controller
-    final halfPlayer = AudioPlayer();
-    await halfPlayer.setUrl(
+    final player = AudioPlayer();
+    await player.setUrl(
         'asset:packages/background_timer/lib/assets/audio/$halfwaySound.mp3');
 
-    final workPlayer = AudioPlayer();
-    await workPlayer.setUrl(
-        'asset:packages/background_timer/lib/assets/audio/$workSound.mp3');
+    // final workPlayer = AudioPlayer();
+    // await workPlayer.setUrl(
+    //     'asset:packages/background_timer/lib/assets/audio/$workSound.mp3');
 
-    final restPlayer = AudioPlayer();
-    await restPlayer.setUrl(
-        'asset:packages/background_timer/lib/assets/audio/$restSound.mp3');
+    // final restPlayer = AudioPlayer();
+    // await restPlayer.setUrl(
+    //     'asset:packages/background_timer/lib/assets/audio/$restSound.mp3');
 
-    final endPlayer = AudioPlayer();
-    await endPlayer.setUrl(
-        'asset:packages/background_timer/lib/assets/audio/$endSound.mp3');
+    // final endPlayer = AudioPlayer();
+    // await endPlayer.setUrl(
+    //     'asset:packages/background_timer/lib/assets/audio/$endSound.mp3');
 
-    final countdownPlayer = AudioPlayer();
-    await countdownPlayer.setUrl(
-        'asset:packages/background_timer/lib/assets/audio/$countdownSound.mp3');
+    // final countdownPlayer = AudioPlayer();
+    // await countdownPlayer.setUrl(
+    //     'asset:packages/background_timer/lib/assets/audio/$countdownSound.mp3');
     // await player.play();
 
     // final session = await AudioSession.instance;
@@ -533,7 +533,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           if (currentMicroSeconds! == halfWorkSeconds &&
               halfwaySound != 'none' &&
               status == IntervalStates.work) {
-            await halfPlayer.play();
+            await player.play();
           }
           // Check if the 3, 2, 1 sound should play
           else if ((currentMicroSeconds! - 500000) == 3500000 ||
@@ -541,7 +541,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               (currentMicroSeconds! - 500000) == 1500000) {
             if (countdownSound != 'none') {
               print("COUNTDOWWWWWWWWWWWWWN");
-              await countdownPlayer.play();
+              await player.play();
             }
           }
 
@@ -554,7 +554,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
               /// Audio player controller
               if (endSound != 'none') {
-                await endPlayer.play();
+                await player.play();
               }
 
               // player.onPlayerStateChanged.listen(
@@ -572,12 +572,12 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
                 status == IntervalStates.start) {
               // Play the rest sound
               if (restSound != 'none') {
-                await restPlayer.play();
+                await player.play();
               }
             } else if (status == IntervalStates.rest) {
               // Play the work sound
               if (workSound != 'none') {
-                await workPlayer.play();
+                await player.play();
               }
             }
             // await player.play(AssetSource('audio/$endSound.mp3'));
