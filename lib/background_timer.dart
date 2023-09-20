@@ -422,7 +422,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     Soundpool pool = Soundpool(streamType: StreamType.notification);
 
     int soundId = await rootBundle
-        .load("packages/background_timer/lib/assets/audio/countdown-beep,mp3")
+        .load("packages/background_timer/lib/assets/audio/countdown-beep.mp3")
         .then((ByteData soundData) {
       return pool.load(soundData);
     });
