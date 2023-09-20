@@ -423,6 +423,12 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     /// First interval status is start
     IntervalStates status = IntervalStates.start;
 
+    int blankSoundID = await rootBundle
+        .load("packages/background_timer/lib/assets/audio/blank.mp3")
+        .then((ByteData soundData) {
+      return pool.load(soundData);
+    });
+
     int countdownSoundID = await rootBundle
         .load(
             "packages/background_timer/lib/assets/audio/${countdownSound}.mp3")
@@ -508,6 +514,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     /// 10 seconds * microseconds factor
     int? currentMicroSeconds = 10 * secondsFactor;
 
+    await pool.play(blankSoundID);
+
     Timer.periodic(interval, (timer) async {
       // SharedPreferences prefs = await SharedPreferences.getInstance();
       preferences.reload();
@@ -592,7 +600,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               /// Audio player controller
               if (endSound != 'none' && status != IntervalStates.complete) {
                 // await player.play();
-                await pool.play(endSoundID);
+                await pool.play(endSoundID).then((value) => (pool.release()));
                 // pool.release();
               }
 
