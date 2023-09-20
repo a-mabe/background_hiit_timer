@@ -423,8 +423,33 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
     Soundpool pool = Soundpool.fromOptions(options: soundpoolOptions);
 
-    int soundId = await rootBundle
-        .load("packages/background_timer/lib/assets/audio/countdown-beep.mp3")
+    int countdownSoundID = await rootBundle
+        .load(
+            "packages/background_timer/lib/assets/audio/${countdownSound}.mp3")
+        .then((ByteData soundData) {
+      return pool.load(soundData);
+    });
+
+    int halfwaySoundID = await rootBundle
+        .load("packages/background_timer/lib/assets/audio/${halfwaySound}.mp3")
+        .then((ByteData soundData) {
+      return pool.load(soundData);
+    });
+
+    int restSoundID = await rootBundle
+        .load("packages/background_timer/lib/assets/audio/${restSound}.mp3")
+        .then((ByteData soundData) {
+      return pool.load(soundData);
+    });
+
+    int workSoundID = await rootBundle
+        .load("packages/background_timer/lib/assets/audio/${workSound}.mp3")
+        .then((ByteData soundData) {
+      return pool.load(soundData);
+    });
+
+    int endSoundID = await rootBundle
+        .load("packages/background_timer/lib/assets/audio/${endSound}.mp3")
         .then((ByteData soundData) {
       return pool.load(soundData);
     });
@@ -547,7 +572,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               halfwaySound != 'none' &&
               status == IntervalStates.work) {
             // await player.play();
-            await pool.play(soundId);
+            await pool.play(halfwaySoundID);
           }
           // Check if the 3, 2, 1 sound should play
           else if ((currentMicroSeconds! - 500000) == 3500000 ||
@@ -556,6 +581,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             if (countdownSound != 'none') {
               print("COUNTDOWWWWWWWWWWWWWN");
               // await player.play();
+              await pool.play(countdownSoundID);
             }
           }
 
@@ -569,6 +595,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               /// Audio player controller
               if (endSound != 'none') {
                 // await player.play();
+                await pool.play(endSoundID);
               }
 
               // player.onPlayerStateChanged.listen(
@@ -587,11 +614,13 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               // Play the rest sound
               if (restSound != 'none') {
                 // await player.play();
+                await pool.play(restSoundID);
               }
             } else if (status == IntervalStates.rest) {
               // Play the work sound
               if (workSound != 'none') {
                 // await player.play();
+                await pool.play(workSoundID);
               }
             }
             // await player.play(AssetSource('audio/$endSound.mp3'));
