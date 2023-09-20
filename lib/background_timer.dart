@@ -381,6 +381,10 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   static void onStart(ServiceInstance service) async {
     DartPluginRegistrant.ensureInitialized();
 
+    SoundpoolOptions soundpoolOptions = const SoundpoolOptions();
+
+    Soundpool pool = Soundpool.fromOptions(options: soundpoolOptions);
+
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
         service.setAsForegroundService();
@@ -392,6 +396,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     }
 
     service.on('stopService').listen((event) {
+      pool.release();
       service.stopSelf();
     });
 
@@ -418,10 +423,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
     /// First interval status is start
     IntervalStates status = IntervalStates.start;
-
-    SoundpoolOptions soundpoolOptions = const SoundpoolOptions();
-
-    Soundpool pool = Soundpool.fromOptions(options: soundpoolOptions);
 
     int countdownSoundID = await rootBundle
         .load(
