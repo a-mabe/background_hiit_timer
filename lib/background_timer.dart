@@ -419,7 +419,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     /// First interval status is start
     IntervalStates status = IntervalStates.start;
 
-    Soundpool pool = Soundpool(streamType: StreamType.notification);
+    SoundpoolOptions soundpoolOptions = const SoundpoolOptions();
+
+    Soundpool pool = Soundpool.fromOptions(options: soundpoolOptions);
 
     int soundId = await rootBundle
         .load("packages/background_timer/lib/assets/audio/countdown-beep.mp3")
@@ -545,7 +547,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               halfwaySound != 'none' &&
               status == IntervalStates.work) {
             // await player.play();
-            int streamId = await pool.play(soundId);
+            await pool.play(soundId);
           }
           // Check if the 3, 2, 1 sound should play
           else if ((currentMicroSeconds! - 500000) == 3500000 ||
