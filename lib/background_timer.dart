@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui';
 // import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -11,6 +13,7 @@ import 'package:background_timer/background_timer_controller.dart';
 import 'package:background_timer/background_timer_data.dart';
 // import 'package:audioplayers/audioplayers.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:soundpool/soundpool.dart';
 
 /// Possible interval states
 enum IntervalStates { start, work, rest, complete }
@@ -416,10 +419,18 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     /// First interval status is start
     IntervalStates status = IntervalStates.start;
 
+    Soundpool pool = Soundpool(streamType: StreamType.notification);
+
+    int soundId = await rootBundle
+        .load("audio/countdown-beep,mp3")
+        .then((ByteData soundData) {
+      return pool.load(soundData);
+    });
+
     /// Audio player controller
-    final player = AudioPlayer();
-    await player.setUrl(
-        'asset:packages/background_timer/lib/assets/audio/$halfwaySound.mp3');
+    // final player = AudioPlayer();
+    // await player.setUrl(
+    //     'asset:packages/background_timer/lib/assets/audio/$halfwaySound.mp3');
 
     // final workPlayer = AudioPlayer();
     // await workPlayer.setUrl(
@@ -533,7 +544,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           if (currentMicroSeconds! == halfWorkSeconds &&
               halfwaySound != 'none' &&
               status == IntervalStates.work) {
-            await player.play();
+            // await player.play();
+            int streamId = await pool.play(soundId);
           }
           // Check if the 3, 2, 1 sound should play
           else if ((currentMicroSeconds! - 500000) == 3500000 ||
@@ -541,7 +553,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               (currentMicroSeconds! - 500000) == 1500000) {
             if (countdownSound != 'none') {
               print("COUNTDOWWWWWWWWWWWWWN");
-              await player.play();
+              // await player.play();
             }
           }
 
@@ -554,7 +566,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
               /// Audio player controller
               if (endSound != 'none') {
-                await player.play();
+                // await player.play();
               }
 
               // player.onPlayerStateChanged.listen(
@@ -572,12 +584,12 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
                 status == IntervalStates.start) {
               // Play the rest sound
               if (restSound != 'none') {
-                await player.play();
+                // await player.play();
               }
             } else if (status == IntervalStates.rest) {
               // Play the work sound
               if (workSound != 'none') {
-                await player.play();
+                // await player.play();
               }
             }
             // await player.play(AssetSource('audio/$endSound.mp3'));
