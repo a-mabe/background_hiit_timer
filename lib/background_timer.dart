@@ -575,9 +575,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             await pool.play(halfwaySoundID);
           }
           // Check if the 3, 2, 1 sound should play
-          else if ((currentMicroSeconds! - 500000) == 3500000 ||
-              (currentMicroSeconds! - 500000) == 2500000 ||
-              (currentMicroSeconds! - 500000) == 1500000) {
+          else if ((currentMicroSeconds! - 500000) == 2500000 ||
+              (currentMicroSeconds! - 500000) == 1500000 ||
+              (currentMicroSeconds! - 500000) == 500000) {
             if (countdownSound != 'none') {
               print("COUNTDOWWWWWWWWWWWWWN");
               // await player.play();
