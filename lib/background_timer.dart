@@ -589,15 +589,15 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           else if (currentMicroSeconds! == 0) {
             /// The whole timer is done, play the final sound
             if (numberOfIntervals == 0) {
-              /// Switch to the complete state
-              status = IntervalStates.complete;
-
               /// Audio player controller
-              if (endSound != 'none') {
+              if (endSound != 'none' && status != IntervalStates.complete) {
                 // await player.play();
                 await pool.play(endSoundID);
-                pool.release();
+                // pool.release();
               }
+
+              /// Switch to the complete state
+              status = IntervalStates.complete;
 
               // player.onPlayerStateChanged.listen(
               //   (state) {
