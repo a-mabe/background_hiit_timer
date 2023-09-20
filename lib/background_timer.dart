@@ -596,6 +596,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               if (endSound != 'none') {
                 // await player.play();
                 await pool.play(endSoundID);
+                pool.release();
               }
 
               // player.onPlayerStateChanged.listen(
