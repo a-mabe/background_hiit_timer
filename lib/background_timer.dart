@@ -163,8 +163,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   void dispose() {
     /// Stop timer if active
     if (isActive) {
-      final service = FlutterBackgroundService();
-      service.invoke("stopService");
+      //final service = FlutterBackgroundService();
+      //service.invoke("stopService");
     }
 
     WidgetsBinding.instance.removeObserver(this);
