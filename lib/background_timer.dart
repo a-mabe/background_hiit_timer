@@ -163,8 +163,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   void dispose() {
     /// Stop timer if active
     if (isActive) {
-      //final service = FlutterBackgroundService();
-      //service.invoke("stopService");
+      final service = FlutterBackgroundService();
+      service.invoke("stopService");
     }
 
     WidgetsBinding.instance.removeObserver(this);
@@ -514,8 +514,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     /// 10 seconds * microseconds factor
     int? currentMicroSeconds = 10 * secondsFactor;
 
-    await pool.play(blankSoundID);
-
     Timer.periodic(interval, (timer) async {
       // SharedPreferences prefs = await SharedPreferences.getInstance();
       preferences.reload();
@@ -583,7 +581,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             await pool.play(halfwaySoundID);
           }
           // Check if the 3, 2, 1 sound should play
-          else if ((currentMicroSeconds! - 500000) == 2500000 ||
+          else if ((currentMicroSeconds! - 500000) == 3500000) {
+            await pool.play(blankSoundID);
+          } else if ((currentMicroSeconds! - 500000) == 2500000 ||
               (currentMicroSeconds! - 500000) == 1500000 ||
               (currentMicroSeconds! - 500000) == 500000) {
             if (countdownSound != 'none') {
@@ -600,8 +600,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               /// Audio player controller
               if (endSound != 'none' && status != IntervalStates.complete) {
                 // await player.play();
-                await pool.play(endSoundID).then((value) => (pool.release()));
-                // pool.release();
+                await pool.play(endSoundID);
               }
 
               /// Switch to the complete state
