@@ -341,7 +341,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       avAudioSessionCategory: AVAudioSessionCategory.playback,
       avAudioSessionCategoryOptions:
           AVAudioSessionCategoryOptions.mixWithOthers,
-      avAudioSessionMode: AVAudioSessionMode.defaultMode,
+      avAudioSessionMode: AVAudioSessionMode.moviePlayback,
       avAudioSessionRouteSharingPolicy:
           AVAudioSessionRouteSharingPolicy.defaultPolicy,
       avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
