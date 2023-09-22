@@ -554,6 +554,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               }
             }
             // await player.play(AssetSource('audio/$endSound.mp3'));
+          } else {
+            await pool.play(blankSoundID);
           }
         }
 
