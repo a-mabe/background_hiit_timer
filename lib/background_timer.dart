@@ -336,11 +336,263 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     WidgetsFlutterBinding.ensureInitialized();
     DartPluginRegistrant.ensureInitialized();
 
+    final session = await AudioSession.instance;
+    await session.configure(const AudioSessionConfiguration(
+      avAudioSessionCategory: AVAudioSessionCategory.playback,
+      avAudioSessionCategoryOptions:
+          AVAudioSessionCategoryOptions.mixWithOthers,
+      avAudioSessionMode: AVAudioSessionMode.defaultMode,
+      avAudioSessionRouteSharingPolicy:
+          AVAudioSessionRouteSharingPolicy.defaultPolicy,
+      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+      androidAudioAttributes: AndroidAudioAttributes(
+        contentType: AndroidAudioContentType.sonification,
+        flags: AndroidAudioFlags.audibilityEnforced,
+        usage: AndroidAudioUsage.notification,
+      ),
+      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+      androidWillPauseWhenDucked: true,
+    ));
+
+    SoundpoolOptions soundpoolOptions = const SoundpoolOptions();
+
+    Soundpool pool = Soundpool.fromOptions(options: soundpoolOptions);
+
+    if (service is AndroidServiceInstance) {
+      service.on('setAsForeground').listen((event) {
+        service.setAsForegroundService();
+      });
+
+      service.on('setAsBackground').listen((event) {
+        service.setAsBackgroundService();
+      });
+    }
+
+    service.on('stopService').listen((event) {
+      service.stopSelf();
+    });
+
+    /// Timer interval is half a second
+    Duration interval = const Duration(microseconds: 500000);
+
+    /// Factor by microseconds
+    const int secondsFactor = 1000000;
+
+    /// --- Grab shared preferences ---
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    await preferences.reload();
-    final log = preferences.getStringList('log') ?? <String>[];
-    log.add(DateTime.now().toIso8601String());
-    await preferences.setStringList('log', log);
+    preferences.reload();
+    bool? paused = false;
+    final String? workSound = preferences.getString('workSound');
+    final String? halfwaySound = preferences.getString('halfwaySound');
+    final String? countdownSound = preferences.getString('countdownSound');
+    final String? restSound = preferences.getString('restSound');
+    final String? endSound = preferences.getString('endSound');
+    final int? workSeconds = preferences.getInt("workSeconds");
+    final int? restSeconds = preferences.getInt("restSeconds");
+    int? numberOfIntervals = preferences.getInt("numberOfIntervals");
+
+    /// --- End grab shared preferences ---
+
+    /// First interval status is start
+    IntervalStates status = IntervalStates.start;
+
+    int blankSoundID = await rootBundle
+        .load("packages/background_timer/lib/assets/audio/blank.mp3")
+        .then((ByteData soundData) {
+      return pool.load(soundData);
+    });
+
+    int countdownSoundID = await rootBundle
+        .load(
+            "packages/background_timer/lib/assets/audio/${countdownSound}.mp3")
+        .then((ByteData soundData) {
+      return pool.load(soundData);
+    });
+
+    int halfwaySoundID = await rootBundle
+        .load("packages/background_timer/lib/assets/audio/${halfwaySound}.mp3")
+        .then((ByteData soundData) {
+      return pool.load(soundData);
+    });
+
+    int restSoundID = await rootBundle
+        .load("packages/background_timer/lib/assets/audio/${restSound}.mp3")
+        .then((ByteData soundData) {
+      return pool.load(soundData);
+    });
+
+    int workSoundID = await rootBundle
+        .load("packages/background_timer/lib/assets/audio/${workSound}.mp3")
+        .then((ByteData soundData) {
+      return pool.load(soundData);
+    });
+
+    int endSoundID = await rootBundle
+        .load("packages/background_timer/lib/assets/audio/${endSound}.mp3")
+        .then((ByteData soundData) {
+      return pool.load(soundData);
+    });
+
+    /// 10 seconds * microseconds factor
+    int? currentMicroSeconds = 10 * secondsFactor;
+
+    Timer.periodic(interval, (timer) async {
+      // SharedPreferences prefs = await SharedPreferences.getInstance();
+      preferences.reload();
+      paused = preferences.getBool('pause');
+      // print("--------------- $paused ---------------");
+      if (!paused!) {
+        /// If the timer has not been completed, then
+        /// deduct half a second from the timer
+        if (status != IntervalStates.complete) {
+          currentMicroSeconds =
+              (currentMicroSeconds! - interval.inMicroseconds);
+        }
+
+        /// If there is no more time on the timer to deduct, then
+        /// calculate the next action.
+        if (currentMicroSeconds! < -500000) {
+          /// Determine timer status
+
+          print("----------------------------- $numberOfIntervals");
+
+          /// If the status was start
+          if (status == IntervalStates.start) {
+            /// Switch to the work state
+            status = IntervalStates.work;
+
+            /// Update the current time to the work time
+            currentMicroSeconds = workSeconds! * secondsFactor;
+
+            /// Since we have changed intervals, decrement the
+            /// number of intervals at each work session
+            numberOfIntervals = numberOfIntervals! - 1;
+          }
+
+          /// If the status was work
+          else if (status == IntervalStates.work) {
+            /// Switch to the rest state
+            status = IntervalStates.rest;
+
+            /// Update the current time to the rest time
+            currentMicroSeconds = restSeconds! * secondsFactor;
+          } else if (status == IntervalStates.rest) {
+            /// Switch to the work state
+            status = IntervalStates.work;
+
+            /// Update the current time to the work time
+            currentMicroSeconds = workSeconds! * secondsFactor;
+
+            /// Since we have changed intervals, decrement the
+            /// number of intervals at each work session
+            numberOfIntervals = numberOfIntervals! - 1;
+          }
+        }
+
+        /// There is still more time to deduct from the timer, so
+        /// calculate if a sound effect should play
+        else {
+          /// Calculate half of the work time
+          int halfWorkSeconds = ((workSeconds! * secondsFactor) / 2).round();
+
+          /// Check if the halfway sound should play
+          if (currentMicroSeconds! == halfWorkSeconds &&
+              halfwaySound != 'none' &&
+              status == IntervalStates.work) {
+            // await player.play();
+            await pool.play(halfwaySoundID);
+          }
+          // Check if the 3, 2, 1 sound should play
+          else if ((currentMicroSeconds! - 500000) == 3500000) {
+            await pool.play(blankSoundID);
+          } else if ((currentMicroSeconds! - 500000) == 2500000 ||
+              (currentMicroSeconds! - 500000) == 1500000 ||
+              (currentMicroSeconds! - 500000) == 500000) {
+            if (countdownSound != 'none') {
+              print("COUNTDOWWWWWWWWWWWWWN");
+              // await player.play();
+              await pool.play(countdownSoundID);
+            }
+          }
+
+          /// Check which end sound should play
+          else if (currentMicroSeconds! == 0) {
+            /// The whole timer is done, play the final sound
+            if (numberOfIntervals == 0) {
+              /// Audio player controller
+              if (endSound != 'none' && status != IntervalStates.complete) {
+                // await player.play();
+                await pool.play(endSoundID);
+              }
+
+              /// Switch to the complete state
+              status = IntervalStates.complete;
+
+              // player.onPlayerStateChanged.listen(
+              //   (state) {
+              //     switch (state) {
+              //       case PlayerState.completed:
+              //         service.stopSelf();
+              //         break;
+              //       default:
+              //         break;
+              //     }
+              //   },
+              // );
+            } else if (status == IntervalStates.work ||
+                status == IntervalStates.start) {
+              // Play the rest sound
+              if (restSound != 'none') {
+                // await player.play();
+                await pool.play(restSoundID);
+              }
+            } else if (status == IntervalStates.rest) {
+              // Play the work sound
+              if (workSound != 'none') {
+                // await player.play();
+                await pool.play(workSoundID);
+              }
+            }
+            // await player.play(AssetSource('audio/$endSound.mp3'));
+          }
+        }
+
+        String stringStatus = "";
+        switch (status) {
+          case IntervalStates.start:
+            stringStatus = "start";
+            break;
+          case IntervalStates.work:
+            stringStatus = "work";
+            break;
+          case IntervalStates.rest:
+            stringStatus = "rest";
+            break;
+          case IntervalStates.complete:
+            stringStatus = "complete";
+            break;
+          default:
+            break;
+        }
+
+        int time = 0;
+        if (currentMicroSeconds! > 0) {
+          time = (currentMicroSeconds! / secondsFactor).round();
+        }
+
+        await preferences.setString("status", stringStatus);
+
+        // Send data back to the UI
+        service.invoke(
+          'update',
+          {
+            "microSeconds": time,
+            "status": stringStatus,
+            "numberOfIntervals": numberOfIntervals
+          },
+        );
+      }
+    });
 
     return true;
   }
