@@ -354,7 +354,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
     final session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration(
-      avAudioSessionCategory: AVAudioSessionCategory.ambient,
+      avAudioSessionCategory: AVAudioSessionCategory.playback,
       avAudioSessionCategoryOptions:
           AVAudioSessionCategoryOptions.mixWithOthers,
       avAudioSessionMode: AVAudioSessionMode.defaultMode,
