@@ -371,7 +371,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     ));
 
     SoundpoolOptions soundpoolOptions =
-        const SoundpoolOptions(streamType: StreamType.alarm);
+        const SoundpoolOptions(streamType: StreamType.notification);
 
     Soundpool pool = Soundpool.fromOptions(options: soundpoolOptions);
 
