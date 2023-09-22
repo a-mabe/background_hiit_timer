@@ -370,7 +370,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       androidWillPauseWhenDucked: true,
     ));
 
-    SoundpoolOptions soundpoolOptions = const SoundpoolOptions();
+    SoundpoolOptions soundpoolOptions =
+        const SoundpoolOptions(streamType: StreamType.alarm);
 
     Soundpool pool = Soundpool.fromOptions(options: soundpoolOptions);
 
