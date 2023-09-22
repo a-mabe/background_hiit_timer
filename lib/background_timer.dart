@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
-// import 'package:audio_session/audio_session.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -11,8 +11,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:background_timer/background_timer_controller.dart';
 import 'package:background_timer/background_timer_data.dart';
-// import 'package:audioplayers/audioplayers.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:soundpool/soundpool.dart';
 
 /// Possible interval states
@@ -92,9 +90,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   // Multiplier of secconds
   final int _secondsFactor = 1000000;
 
-  // Timer
-  // Timer? _timer;
-
   /// Internal control to indicate if the onFinished method was executed
   bool _onFinishedExecuted = false;
 
@@ -128,28 +123,28 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       _startTimer();
     }
 
-    // init();
+    init();
   }
 
-  // void init() async {
-  //   final session = await AudioSession.instance;
-  //   await session.configure(const AudioSessionConfiguration(
-  //     // avAudioSessionCategory: AVAudioSessionCategory.playback,
-  //     avAudioSessionCategoryOptions:
-  //         AVAudioSessionCategoryOptions.mixWithOthers,
-  //     avAudioSessionMode: AVAudioSessionMode.defaultMode,
-  //     avAudioSessionRouteSharingPolicy:
-  //         AVAudioSessionRouteSharingPolicy.defaultPolicy,
-  //     avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-  //     androidAudioAttributes: AndroidAudioAttributes(
-  //       contentType: AndroidAudioContentType.sonification,
-  //       flags: AndroidAudioFlags.audibilityEnforced,
-  //       usage: AndroidAudioUsage.notification,
-  //     ),
-  //     androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-  //     androidWillPauseWhenDucked: true,
-  //   ));
-  // }
+  void init() async {
+    final session = await AudioSession.instance;
+    await session.configure(const AudioSessionConfiguration(
+      avAudioSessionCategory: AVAudioSessionCategory.ambient,
+      avAudioSessionCategoryOptions:
+          AVAudioSessionCategoryOptions.mixWithOthers,
+      avAudioSessionMode: AVAudioSessionMode.defaultMode,
+      avAudioSessionRouteSharingPolicy:
+          AVAudioSessionRouteSharingPolicy.defaultPolicy,
+      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+      androidAudioAttributes: AndroidAudioAttributes(
+        contentType: AndroidAudioContentType.sonification,
+        flags: AndroidAudioFlags.audibilityEnforced,
+        usage: AndroidAudioUsage.notification,
+      ),
+      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+      androidWillPauseWhenDucked: true,
+    ));
+  }
 
   @override
   void didUpdateWidget(Countdown oldWidget) {
@@ -225,30 +220,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       widget.controller?.isCompleted = false;
       _onFinishedExecuted = false;
     });
-
-    // /// If the service is currently active, stop the active service
-    // /// and start it again.
-    // if (isActive) {
-    //   final service = FlutterBackgroundService();
-    //   service.invoke("stopService");
-
-    //   await initializeService();
-    // }
-
-    // /// If the service is not currently running, save data to
-    // /// SharedPreferences and start the service.
-    // else {
-    //   await preferences.setInt("workSeconds", widget.workSeconds);
-    //   await preferences.setInt("restSeconds", widget.restSeconds);
-    //   await preferences.setString("halfwaySound", widget.halfwaySound);
-    //   await preferences.setString("endSound", widget.endSound);
-    //   await preferences.setString("countdownSound", widget.countdownSound);
-    //   await preferences.setString("workSound", widget.workSound);
-    //   await preferences.setString("restSound", widget.restSound);
-    //   await preferences.setInt("numberOfIntervals", widget.numberOfIntervals);
-
-    //   await initializeService();
-    // }
   }
 
   @override
@@ -459,57 +430,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         .then((ByteData soundData) {
       return pool.load(soundData);
     });
-
-    /// Audio player controller
-    // final player = AudioPlayer();
-    // await player.setUrl(
-    //     'asset:packages/background_timer/lib/assets/audio/$halfwaySound.mp3');
-
-    // final workPlayer = AudioPlayer();
-    // await workPlayer.setUrl(
-    //     'asset:packages/background_timer/lib/assets/audio/$workSound.mp3');
-
-    // final restPlayer = AudioPlayer();
-    // await restPlayer.setUrl(
-    //     'asset:packages/background_timer/lib/assets/audio/$restSound.mp3');
-
-    // final endPlayer = AudioPlayer();
-    // await endPlayer.setUrl(
-    //     'asset:packages/background_timer/lib/assets/audio/$endSound.mp3');
-
-    // final countdownPlayer = AudioPlayer();
-    // await countdownPlayer.setUrl(
-    //     'asset:packages/background_timer/lib/assets/audio/$countdownSound.mp3');
-    // await player.play();
-
-    // final session = await AudioSession.instance;
-    // await session.configure(const AudioSessionConfiguration(
-    //   // avAudioSessionCategory: AVAudioSessionCategory.playback,
-    //   avAudioSessionCategoryOptions:
-    //       AVAudioSessionCategoryOptions.mixWithOthers,
-    //   avAudioSessionMode: AVAudioSessionMode.defaultMode,
-    //   avAudioSessionRouteSharingPolicy:
-    //       AVAudioSessionRouteSharingPolicy.defaultPolicy,
-    //   avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-    //   androidAudioAttributes: AndroidAudioAttributes(
-    //     contentType: AndroidAudioContentType.sonification,
-    //     flags: AndroidAudioFlags.audibilityEnforced,
-    //     usage: AndroidAudioUsage.notification,
-    //   ),
-    //   androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-    //   androidWillPauseWhenDucked: true,
-    // ));
-
-    /// Start with blank audio
-    /// Activate the audio session before playing audio.
-    // if (await session.setActive(true)) {
-    // Now play audio.
-    // await player.play(AssetSource('audio/blank.mp3'));
-    // } else {
-    // The request was denied and the app should not play audio
-    // }
-
-    // await player.play(AssetSource('audio/blank.mp3'));
 
     /// 10 seconds * microseconds factor
     int? currentMicroSeconds = 10 * secondsFactor;
