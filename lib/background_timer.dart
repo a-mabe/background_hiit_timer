@@ -123,7 +123,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       _startTimer();
     }
 
-    init();
+    // init();
   }
 
   void init() async {
@@ -351,6 +351,24 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   @pragma('vm:entry-point')
   static void onStart(ServiceInstance service) async {
     DartPluginRegistrant.ensureInitialized();
+
+    final session = await AudioSession.instance;
+    await session.configure(const AudioSessionConfiguration(
+      avAudioSessionCategory: AVAudioSessionCategory.ambient,
+      avAudioSessionCategoryOptions:
+          AVAudioSessionCategoryOptions.mixWithOthers,
+      avAudioSessionMode: AVAudioSessionMode.defaultMode,
+      avAudioSessionRouteSharingPolicy:
+          AVAudioSessionRouteSharingPolicy.defaultPolicy,
+      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+      androidAudioAttributes: AndroidAudioAttributes(
+        contentType: AndroidAudioContentType.sonification,
+        flags: AndroidAudioFlags.audibilityEnforced,
+        usage: AndroidAudioUsage.notification,
+      ),
+      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+      androidWillPauseWhenDucked: true,
+    ));
 
     SoundpoolOptions soundpoolOptions = const SoundpoolOptions();
 
