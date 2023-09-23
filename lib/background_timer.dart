@@ -341,10 +341,10 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       avAudioSessionCategory: AVAudioSessionCategory.playback,
       avAudioSessionCategoryOptions:
           AVAudioSessionCategoryOptions.mixWithOthers,
-      avAudioSessionMode: AVAudioSessionMode.moviePlayback,
-      avAudioSessionRouteSharingPolicy:
-          AVAudioSessionRouteSharingPolicy.defaultPolicy,
-      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+      // avAudioSessionMode: AVAudioSessionMode.moviePlayback,
+      // avAudioSessionRouteSharingPolicy:
+      // AVAudioSessionRouteSharingPolicy.defaultPolicy,
+      // avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
       androidAudioAttributes: AndroidAudioAttributes(
         contentType: AndroidAudioContentType.sonification,
         flags: AndroidAudioFlags.audibilityEnforced,
@@ -373,7 +373,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     });
 
     /// Timer interval is half a second
-    Duration interval = const Duration(microseconds: 500000);
+    Duration interval = const Duration(microseconds: 100000);
 
     /// Factor by microseconds
     const int secondsFactor = 1000000;
