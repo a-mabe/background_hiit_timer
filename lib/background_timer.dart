@@ -709,6 +709,12 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       return pool.load(soundData);
     });
 
+    int testID = await rootBundle
+        .load("packages/background_timer/lib/assets/audio/horn-test.mp3")
+        .then((ByteData soundData) {
+      return pool.load(soundData);
+    });
+
     /// 10 seconds * microseconds factor
     int? currentMicroSeconds = 10 * secondsFactor;
 
@@ -787,7 +793,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             if (countdownSound != 'none') {
               print("COUNTDOWWWWWWWWWWWWWN");
               // await player.play();
-              await pool.play(countdownSoundID);
+              await pool.play(testID);
             }
           }
 
