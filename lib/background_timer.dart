@@ -473,7 +473,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               halfwaySound != 'none' &&
               status == IntervalStates.work) {
             print("------------------------ HALFWAY");
-            await pool.stop(blankSoundID);
             await pool.play(halfwaySoundID);
           }
           // Check if the 3, 2, 1 sound should play
@@ -515,7 +514,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             await pool.release();
             service.stopSelf();
           } else {
-            // await pool.play(blankSoundID);
+            if (Platform.isIOS) {
+              await pool.play(blankSoundID);
+            }
           }
         }
 
