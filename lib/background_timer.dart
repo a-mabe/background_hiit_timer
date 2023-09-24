@@ -472,6 +472,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           if (currentMicroSeconds! == halfWorkSeconds &&
               halfwaySound != 'none' &&
               status == IntervalStates.work) {
+            print("------------------------ HALFWAY");
+            await pool.stop(blankSoundID);
             await pool.play(halfwaySoundID);
           }
           // Check if the 3, 2, 1 sound should play
