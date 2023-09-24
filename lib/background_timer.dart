@@ -472,7 +472,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           if (currentMicroSeconds! == halfWorkSeconds &&
               halfwaySound != 'none' &&
               status == IntervalStates.work) {
-            // await player.play();
             await pool.play(halfwaySoundID);
           }
           // Check if the 3, 2, 1 sound should play
@@ -510,6 +509,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
                 await pool.play(workSoundID);
               }
             }
+          } else if (currentMicroSeconds! <= -2000000) {
+            await pool.release();
+            service.stopSelf();
           } else {
             await pool.play(blankSoundID);
           }
