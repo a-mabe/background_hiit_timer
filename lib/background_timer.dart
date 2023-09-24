@@ -515,7 +515,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             await pool.release();
             service.stopSelf();
           } else {
-            await pool.play(blankSoundID);
+            // await pool.play(blankSoundID);
           }
         }
 
