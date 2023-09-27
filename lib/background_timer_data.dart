@@ -31,13 +31,14 @@ class BackgroundTimerData {
   /// -------------
   ///
 
-  BackgroundTimerData(
-      this.currentMicroSeconds, this.status, this.numberOfIntervals);
+  BackgroundTimerData(this.currentMicroSeconds, this.status,
+      this.numberOfIntervals, this.paused);
 
   BackgroundTimerData.empty() {
     currentMicroSeconds = 0;
     status = "";
     numberOfIntervals = 0;
+    paused = false;
   }
 
   ///
