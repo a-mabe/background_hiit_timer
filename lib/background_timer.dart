@@ -228,7 +228,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
         /// Data sent back from the timer
         BackgroundTimerData backgroundTimerData = BackgroundTimerData(
-            _currentMicroSeconds, _status, _numberOfIntervals);
+            _currentMicroSeconds, _status, _numberOfIntervals, _paused);
 
         return widget.build(context, backgroundTimerData);
       },
