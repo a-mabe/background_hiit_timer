@@ -16,6 +16,9 @@ class BackgroundTimerData {
   /// Current interval number
   int numberOfIntervals = 0;
 
+  /// Whether the timer is paused
+  bool paused = false;
+
   ///
   /// -------------
   /// END FIELDS

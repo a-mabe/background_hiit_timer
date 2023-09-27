@@ -98,6 +98,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   /// Current interval number
   late int _numberOfIntervals;
 
+  /// Whether the timer is paused
+  late bool _paused;
+
   /// Timer is currently active
   bool isActive = false;
 
@@ -211,6 +214,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         _currentMicroSeconds = data["microSeconds"];
         _status = data["status"];
         _numberOfIntervals = data["numberOfIntervals"];
+        _paused = data["paused"];
 
         if (_currentMicroSeconds == 0 &&
             widget.controller?.isCompleted == false) {
@@ -553,7 +557,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           {
             "microSeconds": time,
             "status": stringStatus,
-            "numberOfIntervals": numberOfIntervals
+            "numberOfIntervals": numberOfIntervals,
+            "paused": paused
           },
         );
       }
