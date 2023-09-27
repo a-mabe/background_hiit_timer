@@ -551,6 +551,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
         await preferences.setString("status", stringStatus);
 
+        print(paused);
+
         // Send data back to the UI
         service.invoke(
           'update',
