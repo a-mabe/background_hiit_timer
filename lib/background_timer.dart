@@ -525,45 +525,45 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             }
           }
         }
-
-        String stringStatus = "";
-        switch (status) {
-          case IntervalStates.start:
-            stringStatus = "start";
-            break;
-          case IntervalStates.work:
-            stringStatus = "work";
-            break;
-          case IntervalStates.rest:
-            stringStatus = "rest";
-            break;
-          case IntervalStates.complete:
-            stringStatus = "complete";
-            break;
-          default:
-            break;
-        }
-
-        int time = 0;
-        if (currentMicroSeconds! > 0) {
-          time = (currentMicroSeconds! / secondsFactor).round();
-        }
-
-        await preferences.setString("status", stringStatus);
-
-        print(paused);
-
-        // Send data back to the UI
-        service.invoke(
-          'update',
-          {
-            "microSeconds": time,
-            "status": stringStatus,
-            "numberOfIntervals": numberOfIntervals,
-            "paused": paused
-          },
-        );
       }
+
+      String stringStatus = "";
+      switch (status) {
+        case IntervalStates.start:
+          stringStatus = "start";
+          break;
+        case IntervalStates.work:
+          stringStatus = "work";
+          break;
+        case IntervalStates.rest:
+          stringStatus = "rest";
+          break;
+        case IntervalStates.complete:
+          stringStatus = "complete";
+          break;
+        default:
+          break;
+      }
+
+      int time = 0;
+      if (currentMicroSeconds! > 0) {
+        time = (currentMicroSeconds! / secondsFactor).round();
+      }
+
+      await preferences.setString("status", stringStatus);
+
+      print(paused);
+
+      // Send data back to the UI
+      service.invoke(
+        'update',
+        {
+          "microSeconds": time,
+          "status": stringStatus,
+          "numberOfIntervals": numberOfIntervals,
+          "paused": paused
+        },
+      );
     });
   }
 }
