@@ -385,41 +385,16 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       return pool.load(soundData);
     });
 
-    int countdownSoundID = await rootBundle
-        .load("packages/background_timer/lib/assets/audio/$countdownSound.mp3")
-        .then((ByteData soundData) {
-      return pool.load(soundData);
-    });
-
-    int halfwaySoundID = await rootBundle
-        .load("packages/background_timer/lib/assets/audio/$halfwaySound.mp3")
-        .then((ByteData soundData) {
-      return pool.load(soundData);
-    });
-
-    int restSoundID = await rootBundle
-        .load("packages/background_timer/lib/assets/audio/$restSound.mp3")
-        .then((ByteData soundData) {
-      return pool.load(soundData);
-    });
-
-    int workSoundID = await rootBundle
-        .load("packages/background_timer/lib/assets/audio/$workSound.mp3")
-        .then((ByteData soundData) {
-      return pool.load(soundData);
-    });
-
-    int endSoundID = await rootBundle
-        .load("packages/background_timer/lib/assets/audio/$endSound.mp3")
-        .then((ByteData soundData) {
-      return pool.load(soundData);
-    });
+    int countdownSoundID = await loadSound(countdownSound!, pool);
+    int halfwaySoundID = await loadSound(halfwaySound!, pool);
+    int restSoundID = await loadSound(restSound!, pool);
+    int workSoundID = await loadSound(workSound!, pool);
+    int endSoundID = await loadSound(endSound!, pool);
 
     /// 10 seconds * microseconds factor
     int? currentMicroSeconds = 10 * secondsFactor;
 
     Timer.periodic(interval, (timer) async {
-      // SharedPreferences prefs = await SharedPreferences.getInstance();
       preferences.reload();
       paused = preferences.getBool('pause');
       if (!paused!) {
@@ -476,9 +451,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
           /// Check if the halfway sound should play
           if (currentMicroSeconds! == halfWorkSeconds &&
-              halfwaySound != 'none' &&
+              halfwaySoundID != -1 &&
               status == IntervalStates.work) {
-            print("------------------------ HALFWAY");
             await pool.play(halfwaySoundID);
           }
           // Check if the 3, 2, 1 sound should play
@@ -487,7 +461,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           } else if ((currentMicroSeconds! - 500000) == 2500000 ||
               (currentMicroSeconds! - 500000) == 1500000 ||
               (currentMicroSeconds! - 500000) == 500000) {
-            if (countdownSound != 'none') {
+            if (countdownSoundID != -1) {
               await pool.play(countdownSoundID);
             }
           }
@@ -497,8 +471,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             /// The whole timer is done, play the final sound
             if (numberOfIntervals == 0) {
               /// Audio player controller
-              if (endSound != 'none' && status != IntervalStates.complete) {
-                // await player.play();
+              if (endSoundID != -1 && status != IntervalStates.complete) {
                 await pool.play(endSoundID);
               }
 
@@ -507,7 +480,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             } else if (status == IntervalStates.work ||
                 status == IntervalStates.start) {
               // Play the rest sound
-              if (restSound != 'none') {
+              if (restSoundID != -1) {
                 await pool.play(restSoundID);
               }
             } else if (status == IntervalStates.rest) {
@@ -552,8 +525,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
       await preferences.setString("status", stringStatus);
 
-      print(paused);
-
       // Send data back to the UI
       service.invoke(
         'update',
@@ -565,5 +536,16 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         },
       );
     });
+  }
+
+  static Future<int> loadSound(String sound, Soundpool pool) async {
+    if (sound != "none") {
+      return await rootBundle
+          .load("packages/background_timer/lib/assets/audio/$sound.mp3")
+          .then((ByteData soundData) {
+        return pool.load(soundData);
+      });
+    }
+    return -1;
   }
 }
