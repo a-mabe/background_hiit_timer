@@ -53,7 +53,7 @@ class Countdown extends StatefulWidget {
   final String countdownSound;
 
   /// Intervals in the session
-  final int numberOfIntervals;
+  final int numberOfWorkIntervals;
 
   /// Current interval status
   final String status;
@@ -65,7 +65,7 @@ class Countdown extends StatefulWidget {
     Key? key,
     required this.workSeconds,
     required this.restSeconds,
-    required this.numberOfIntervals,
+    required this.numberOfWorkIntervals,
     required this.build,
     this.status = 'start',
     this.endSound = 'horn',
@@ -94,6 +94,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
   /// Current timer status
   late String _status;
+
+  /// Current work interval number
+  late int _numberOfWorkIntervals;
 
   /// Current interval number
   late int _numberOfIntervals;
@@ -193,7 +196,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     await preferences.setString("countdownSound", widget.countdownSound);
     await preferences.setString("workSound", widget.workSound);
     await preferences.setString("restSound", widget.restSound);
-    await preferences.setInt("numberOfIntervals", widget.numberOfIntervals);
+    await preferences.setInt(
+        "numberOfWorkIntervals", widget.numberOfWorkIntervals);
 
     await initializeService().then((value) {
       widget.controller?.isCompleted = false;
@@ -213,6 +217,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         final data = snapshot.data!;
         _currentMicroSeconds = data["microSeconds"];
         _status = data["status"];
+        _numberOfWorkIntervals = data["numberOfWorkIntervals"];
         _numberOfIntervals = data["numberOfIntervals"];
         _paused = data["paused"];
 
@@ -228,7 +233,11 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
         /// Data sent back from the timer
         BackgroundTimerData backgroundTimerData = BackgroundTimerData(
-            _currentMicroSeconds, _status, _numberOfIntervals, _paused);
+            _currentMicroSeconds,
+            _status,
+            _numberOfWorkIntervals,
+            _numberOfIntervals,
+            _paused);
 
         return widget.build(context, backgroundTimerData);
       },
@@ -372,7 +381,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     final String? endSound = preferences.getString('endSound');
     final int? workSeconds = preferences.getInt("workSeconds");
     final int? restSeconds = preferences.getInt("restSeconds");
-    int? numberOfIntervals = preferences.getInt("numberOfIntervals");
+    int? numberOfWorkIntervals = preferences.getInt("numberOfWorkIntervals");
+    int numberOfIntervals = 0;
 
     /// --- End grab shared preferences ---
 
@@ -420,7 +430,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
             /// Since we have changed intervals, decrement the
             /// number of intervals at each work session
-            numberOfIntervals = numberOfIntervals! - 1;
+            numberOfWorkIntervals = numberOfWorkIntervals! - 1;
           }
 
           /// If the status was work
@@ -439,8 +449,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
             /// Since we have changed intervals, decrement the
             /// number of intervals at each work session
-            numberOfIntervals = numberOfIntervals! - 1;
+            numberOfWorkIntervals = numberOfWorkIntervals! - 1;
           }
+          numberOfIntervals++;
         }
 
         /// There is still more time to deduct from the timer, so
@@ -469,7 +480,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           /// Check which end sound should play
           else if (currentMicroSeconds! == 0) {
             /// The whole timer is done, play the final sound
-            if (numberOfIntervals == 0) {
+            if (numberOfWorkIntervals == 0) {
               /// Audio player controller
               if (endSoundID != -1 && status != IntervalStates.complete) {
                 await pool.play(endSoundID);
@@ -485,7 +496,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               }
             } else if (status == IntervalStates.rest) {
               // Play the work sound
-              if (workSound != 'none') {
+              if (workSoundID != -1) {
                 await pool.play(workSoundID);
               }
             }
@@ -531,6 +542,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         {
           "microSeconds": time,
           "status": stringStatus,
+          "numberOfWorkIntervals": numberOfWorkIntervals,
           "numberOfIntervals": numberOfIntervals,
           "paused": paused
         },

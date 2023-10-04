@@ -134,7 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
               controller: _controller,
               workSeconds: 8,
               restSeconds: 5,
-              numberOfIntervals: 2,
+              numberOfWorkIntervals: 2,
               build: (_, BackgroundTimerData timerData) => Text(
                 timerData.currentMicroSeconds.toString(),
                 style: TextStyle(

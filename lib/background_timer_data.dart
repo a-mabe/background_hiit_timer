@@ -13,6 +13,9 @@ class BackgroundTimerData {
   /// Current timer status
   String status = "";
 
+  /// Current interval work number
+  int numberOfWorkIntervals = 0;
+
   /// Current interval number
   int numberOfIntervals = 0;
 
@@ -32,11 +35,12 @@ class BackgroundTimerData {
   ///
 
   BackgroundTimerData(this.currentMicroSeconds, this.status,
-      this.numberOfIntervals, this.paused);
+      this.numberOfWorkIntervals, this.numberOfIntervals, this.paused);
 
   BackgroundTimerData.empty() {
     currentMicroSeconds = 0;
     status = "";
+    numberOfWorkIntervals = 0;
     numberOfIntervals = 0;
     paused = false;
   }
