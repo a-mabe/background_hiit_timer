@@ -239,7 +239,13 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             _numberOfIntervals,
             _paused);
 
-        return widget.build(context, backgroundTimerData);
+        if (_status == "completed" || _currentMicroSeconds < 0) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          return widget.build(context, backgroundTimerData);
+        }
       },
     );
   }

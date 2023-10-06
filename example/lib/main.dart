@@ -4,12 +4,14 @@ import 'package:background_timer/background_timer.dart';
 import 'package:background_timer/background_timer_controller.dart';
 import 'package:background_timer/background_timer_data.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 ///
 /// Test app
 ///
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(
+      home: const MyHomePage(
         title: 'Flutter Demo Countdown',
       ),
     );
@@ -34,7 +36,7 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   /// Home page
-  MyHomePage({
+  const MyHomePage({
     Key? key,
     required this.title,
   }) : super(key: key);
@@ -101,28 +103,28 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: <Widget>[
                   // Start
                   ElevatedButton(
-                    child: Text('Start'),
+                    child: const Text('Start'),
                     onPressed: () {
                       _controller.start();
                     },
                   ),
                   // Pause
                   ElevatedButton(
-                    child: Text('Pause'),
+                    child: const Text('Pause'),
                     onPressed: () {
                       _controller.pause();
                     },
                   ),
                   // Resume
                   ElevatedButton(
-                    child: Text('Resume'),
+                    child: const Text('Resume'),
                     onPressed: () {
                       _controller.resume();
                     },
                   ),
                   // Stop
                   ElevatedButton(
-                    child: Text('Restart'),
+                    child: const Text('Restart'),
                     onPressed: () {
                       _controller.restart();
                     },
@@ -137,11 +139,11 @@ class _MyHomePageState extends State<MyHomePage> {
               numberOfWorkIntervals: 2,
               build: (_, BackgroundTimerData timerData) => Text(
                 timerData.currentMicroSeconds.toString(),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 100,
                 ),
               ),
-              interval: Duration(milliseconds: 100),
+              interval: const Duration(milliseconds: 100),
               onFinished: () {
                 print("Done!");
               },
