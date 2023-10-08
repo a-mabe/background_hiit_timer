@@ -177,7 +177,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   void _onTimerRestart() {
     final service = FlutterBackgroundService();
     service.invoke("stopService");
-    Future.delayed(Duration(microseconds: 500000), () {
+    Future.delayed(Duration(microseconds: 2000000), () {
       _startTimer();
     });
   }
