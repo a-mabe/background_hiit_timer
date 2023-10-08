@@ -332,7 +332,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     DartPluginRegistrant.ensureInitialized();
 
     final session = await AudioSession.instance;
-    session.setActive(false);
+    // session.setActive(false);
     await session.configure(const AudioSessionConfiguration(
       avAudioSessionCategory: AVAudioSessionCategory.playback,
       avAudioSessionCategoryOptions:
@@ -349,7 +349,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
       androidWillPauseWhenDucked: true,
     ));
-    session.setActive(true);
+    // session.setActive(true);
 
     SoundpoolOptions soundpoolOptions = const SoundpoolOptions();
 
