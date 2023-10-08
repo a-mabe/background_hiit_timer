@@ -177,9 +177,10 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   void _onTimerRestart() {
     final service = FlutterBackgroundService();
     service.invoke("stopService");
-    Future.delayed(Duration(microseconds: 2000000), () {
-      _startTimer();
-    });
+    _startTimer();
+    // Future.delayed(Duration(microseconds: 2000000), () {
+    //   _startTimer();
+    // });
   }
 
   ///
@@ -331,6 +332,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     DartPluginRegistrant.ensureInitialized();
 
     final session = await AudioSession.instance;
+    session.setActive(false);
     await session.configure(const AudioSessionConfiguration(
       avAudioSessionCategory: AVAudioSessionCategory.playback,
       avAudioSessionCategoryOptions:
@@ -347,6 +349,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
       androidWillPauseWhenDucked: true,
     ));
+    session.setActive(true);
 
     SoundpoolOptions soundpoolOptions = const SoundpoolOptions();
 
@@ -526,7 +529,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           break;
         case IntervalStates.complete:
           stringStatus = "complete";
-          session.setActive(false);
           break;
         default:
           break;
