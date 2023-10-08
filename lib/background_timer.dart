@@ -526,6 +526,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           break;
         case IntervalStates.complete:
           stringStatus = "complete";
+          session.setActive(false);
           break;
         default:
           break;
