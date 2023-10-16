@@ -178,9 +178,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     final service = FlutterBackgroundService();
     service.invoke("stopService");
     _startTimer();
-    // Future.delayed(Duration(microseconds: 2000000), () {
-    //   _startTimer();
-    // });
   }
 
   ///
@@ -349,7 +346,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
       androidWillPauseWhenDucked: true,
     ));
-    // session.setActive(true);
 
     SoundpoolOptions soundpoolOptions = const SoundpoolOptions();
 
