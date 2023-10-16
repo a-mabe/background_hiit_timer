@@ -1,13 +1,17 @@
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
-import 'package:timer_count_down/timer_controller.dart';
-import 'package:timer_count_down/timer_count_down.dart';
+import 'package:background_timer/background_timer.dart';
+import 'package:background_timer/background_timer_controller.dart';
+import 'package:background_timer/background_timer_data.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 ///
 /// Test app
 ///
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -15,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(
+      home: const MyHomePage(
         title: 'Flutter Demo Countdown',
       ),
     );
@@ -32,7 +36,7 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   /// Home page
-  MyHomePage({
+  const MyHomePage({
     Key? key,
     required this.title,
   }) : super(key: key);
@@ -46,8 +50,36 @@ class MyHomePage extends StatefulWidget {
 ///
 class _MyHomePageState extends State<MyHomePage> {
   // Controller
-  final CountdownController _controller =
-      new CountdownController(autoStart: true);
+  final CountdownController _controller = CountdownController(autoStart: true);
+
+  @override
+  initState() {
+    super.initState();
+    init();
+  }
+
+  void init() async {
+    // final session = await AudioSession.instance;
+    // await session.configure(const AudioSessionConfiguration.music());
+
+    final session = await AudioSession.instance;
+    await session.configure(const AudioSessionConfiguration(
+      avAudioSessionCategory: AVAudioSessionCategory.ambient,
+      avAudioSessionCategoryOptions:
+          AVAudioSessionCategoryOptions.mixWithOthers,
+      avAudioSessionMode: AVAudioSessionMode.defaultMode,
+      avAudioSessionRouteSharingPolicy:
+          AVAudioSessionRouteSharingPolicy.defaultPolicy,
+      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+      androidAudioAttributes: AndroidAudioAttributes(
+        contentType: AndroidAudioContentType.speech,
+        flags: AndroidAudioFlags.none,
+        usage: AndroidAudioUsage.voiceCommunication,
+      ),
+      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+      androidWillPauseWhenDucked: true,
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,28 +103,28 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: <Widget>[
                   // Start
                   ElevatedButton(
-                    child: Text('Start'),
+                    child: const Text('Start'),
                     onPressed: () {
                       _controller.start();
                     },
                   ),
                   // Pause
                   ElevatedButton(
-                    child: Text('Pause'),
+                    child: const Text('Pause'),
                     onPressed: () {
                       _controller.pause();
                     },
                   ),
                   // Resume
                   ElevatedButton(
-                    child: Text('Resume'),
+                    child: const Text('Resume'),
                     onPressed: () {
                       _controller.resume();
                     },
                   ),
                   // Stop
                   ElevatedButton(
-                    child: Text('Restart'),
+                    child: const Text('Restart'),
                     onPressed: () {
                       _controller.restart();
                     },
@@ -102,20 +134,18 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Countdown(
               controller: _controller,
-              seconds: 10,
-              build: (_, int time) => Text(
-                time.toString(),
-                style: TextStyle(
+              workSeconds: 8,
+              restSeconds: 5,
+              numberOfWorkIntervals: 2,
+              build: (_, BackgroundTimerData timerData) => Text(
+                timerData.currentMicroSeconds.toString(),
+                style: const TextStyle(
                   fontSize: 100,
                 ),
               ),
-              interval: Duration(milliseconds: 100),
+              interval: const Duration(milliseconds: 100),
               onFinished: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Timer is done!'),
-                  ),
-                );
+                print("Done!");
               },
             ),
           ],

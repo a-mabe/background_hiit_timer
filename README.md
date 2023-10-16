@@ -1,53 +1,39 @@
-# Simple Count Down
+<!--
+This README describes the package. If you publish this package to pub.dev,
+this README's contents appear on the landing page for your package.
 
-[![pub](https://img.shields.io/pub/v/timer_count_down?logo=dart)](https://pub.dev/packages/timer_count_down)
-![](https://badges.fyi/github/latest-tag/DizoftTeam/simple_count_down)
-![](https://badges.fyi/github/stars/DizoftTeam/simple_count_down)
-![](https://badges.fyi/github/license/DizoftTeam/simple_count_down)
+For information about how to write a good package README, see the guide for
+[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
 
-A highly customizable countdown widget for [Flutter](https://flutter.dev/), with support for custom styling, intervals, and onFinished callbacks.
+For general information about developing packages, see the Dart guide for
+[creating packages](https://dart.dev/guides/libraries/create-library-packages)
+and the Flutter guide for
+[developing packages and plugins](https://flutter.dev/developing-packages).
+-->
 
-## Preview
+TODO: Put a short description of the package here that helps potential users
+know whether this package might be useful for them.
 
-<img src="https://raw.githubusercontent.com/DizoftTeam/simple_count_down/master/assets/preview.gif" width="320" height="640" />
+## Features
 
-## Installing
+TODO: List what your package can do. Maybe include images, gifs, or videos.
 
-* Add the latest version of the package to your [pubspec.yaml](https://github.com/DizoftTeam/simple_count_down/blob/master/example/pubspec.yaml) file in the dependency section.
+## Getting started
 
-```yaml
-  dependencies:
-    flutter:
-      sdk: flutter
+TODO: List prerequisites and provide or point to information on how to
+start using the package.
 
-    timer_count_down: ^2.2.2
-```
-Run this in your terminal or click on `pub get`
+## Usage
 
-```sh
-$ flutter pub get
-```
-
-## How to use
-
-Simple example for the usage of the package is shown below.
+TODO: Include short and useful examples for package users. Add longer examples
+to `/example` folder.
 
 ```dart
-class MyWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Countdown(
-      seconds: 20,
-      build: (BuildContext context, double time) => Text(time.toString()),
-      interval: Duration(milliseconds: 100),
-      onFinished: () {
-        print('Timer is done!');
-      },
-    );
-  }
-}
+const like = 'sample';
 ```
-## Example
 
-For pause, restart and resume you need to use `CountdownController`.
-For an example of using the package, please check the [example](./example) folder. Otherwise, keep reading and keep going!
+## Additional information
+
+TODO: Tell users more about the package: where to find more information, how to
+contribute to the package, how to file issues, what response they can expect
+from the package authors, and more.
