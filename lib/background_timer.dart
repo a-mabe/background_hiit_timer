@@ -489,13 +489,13 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
               /// Switch to the complete state
               status = IntervalStates.complete;
-            } else if (status == IntervalStates.work ||
-                status == IntervalStates.start) {
+            } else if (status == IntervalStates.work) {
               // Play the rest sound
               if (restSoundID != -1) {
                 await pool.play(restSoundID);
               }
-            } else if (status == IntervalStates.rest) {
+            } else if (status == IntervalStates.rest ||
+                status == IntervalStates.start) {
               // Play the work sound
               if (workSoundID != -1) {
                 await pool.play(workSoundID);
