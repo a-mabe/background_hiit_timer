@@ -22,34 +22,17 @@ dependencies:
   flutter_background_service:
     git:
       url: https://github.com/a-mabe/flutter_background_service.git
-      ref: stop-on-app-close # branch name
+      ref: prevent-autostart-on-boot # branch name
       path: ./packages/flutter_background_service
 
   flutter_background_service_android:
     git:
       url: https://github.com/a-mabe/flutter_background_service.git
-      ref: stop-on-app-close # branch name
+      ref: prevent-autostart-on-boot # branch name
       path: ./packages/flutter_background_service_android
   audio_session: ^0.1.16
   just_audio: ^0.9.35
   soundpool: ^2.4.1
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^2.0.0
-
-  flutter_background_service:
-    git:
-      url: https://github.com/a-mabe/flutter_background_service.git
-      ref: stop-on-app-close # branch name
-      path: ./packages/flutter_background_service
-
-  flutter_background_service_android:
-    git:
-      url: https://github.com/a-mabe/flutter_background_service.git
-      ref: stop-on-app-close # branch name
-      path: ./packages/flutter_background_service_android
 
   # flutter_background_service_ios:
   #   git:
