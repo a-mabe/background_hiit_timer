@@ -143,7 +143,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   fontSize: 100,
                 ),
               ),
-              interval: const Duration(milliseconds: 100),
               onFinished: () {
                 print("Done!");
               },

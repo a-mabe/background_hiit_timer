@@ -31,32 +31,54 @@ class Countdown extends StatefulWidget {
   /// Called when finished
   final Function? onFinished;
 
-  /// Build interval
-  final Duration interval;
-
-  /// Controller
+  /// Controller for the countdown timer.
+  /// Allows external control and monitoring of the countdown timer.
+  ///
   final CountdownController? controller;
 
-  /// Sound to play at session completion
+  /// End sound - Sound to play at session completion.
+  /// E.g. all intervals finished and timer complete.
+  ///
   final String endSound;
 
-  /// Sound for work interval
+  /// Work sound - Sound to play at the start of the
+  /// work interval.
+  ///
   final String workSound;
 
-  /// Sound for rest interval
+  /// Rest sound - Sound to play at the start of the
+  /// rest interval.
+  ///
   final String restSound;
 
-  /// Halfway mark sound
+  /// Halfway sound - Sound to play at the halfway point
+  /// of the work interval.
+  ///
   final String halfwaySound;
 
-  /// Countdown sound
+  /// Countdown sound - Sound to play at the 3, 2, and 1
+  /// second mark of each interval. Signifies the current
+  /// interval is nearing the end.
+  ///
   final String countdownSound;
 
-  /// Intervals in the session
+  /// Number of work intervals in the session.
+  ///
+  /// The number of rest intervals will be extrapolated from
+  /// this value.
+  ///
   final int numberOfWorkIntervals;
 
-  /// Current interval status
+  /// Current interval status.
+  ///
+  /// One of: start, work, rest, end.
+  ///
   final String status;
+
+  /// Describes the previous view before navigating to
+  /// the timer screen.
+  ///
+  final String navigatedFrom;
 
   ///
   /// Simple countdown timer
@@ -73,7 +95,7 @@ class Countdown extends StatefulWidget {
     this.restSound = 'short-rest-beep',
     this.halfwaySound = 'short-halfway-beep',
     this.countdownSound = 'countdown-beep',
-    this.interval = const Duration(microseconds: 500000),
+    this.navigatedFrom = "",
     this.onFinished,
     this.controller,
   }) : super(key: key);
@@ -121,7 +143,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     widget.controller?.setOnRestart(_onTimerRestart);
     widget.controller?.isCompleted = false;
 
-    if (widget.controller == null || widget.controller!.autoStart == true) {
+    if ((widget.controller == null && widget.navigatedFrom != "") ||
+        (widget.controller!.autoStart == true && widget.navigatedFrom != "")) {
       _startTimer();
     }
   }
