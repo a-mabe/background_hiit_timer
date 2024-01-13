@@ -81,75 +81,154 @@ class _MyHomePageState extends State<MyHomePage> {
     ));
   }
 
+  Color backgroundColor(String status) {
+    if (status == "work") {
+      return Colors.green;
+    } else if (status == "rest") {
+      return Colors.red;
+    } else if (status == "start") {
+      return Colors.black;
+    } else {
+      return const Color.fromARGB(255, 0, 225, 255);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.title,
-        ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: Countdown(
+          controller: _controller,
+          workSeconds: 8,
+          restSeconds: 5,
+          numberOfWorkIntervals: 2,
+          onFinished: () {},
+          build: (_, BackgroundTimerData timerData) {
+            return Container(
+              color: backgroundColor(timerData.status),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  // Start
-                  ElevatedButton(
-                    child: const Text('Start'),
-                    onPressed: () {
-                      _controller.start();
-                    },
+                  Text(
+                    timerData.status,
+                    style: const TextStyle(fontSize: 50, color: Colors.white),
                   ),
-                  // Pause
-                  ElevatedButton(
-                    child: const Text('Pause'),
-                    onPressed: () {
-                      _controller.pause();
-                    },
+                  Text(
+                    timerData.currentMicroSeconds.toString(),
+                    style: const TextStyle(fontSize: 100, color: Colors.white),
                   ),
-                  // Resume
-                  ElevatedButton(
-                    child: const Text('Resume'),
-                    onPressed: () {
-                      _controller.resume();
-                    },
-                  ),
-                  // Stop
-                  ElevatedButton(
-                    child: const Text('Restart'),
-                    onPressed: () {
-                      _controller.restart();
-                    },
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        // Start
+                        ElevatedButton(
+                          child: const Text('Start'),
+                          onPressed: () {
+                            _controller.start();
+                          },
+                        ),
+                        // Pause
+                        ElevatedButton(
+                          child: const Text('Pause'),
+                          onPressed: () {
+                            _controller.pause();
+                          },
+                        ),
+                        // Resume
+                        ElevatedButton(
+                          child: const Text('Resume'),
+                          onPressed: () {
+                            _controller.resume();
+                          },
+                        ),
+                        // Stop
+                        ElevatedButton(
+                          child: const Text('Restart'),
+                          onPressed: () {
+                            _controller.restart();
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-            ),
-            Countdown(
-              controller: _controller,
-              workSeconds: 8,
-              restSeconds: 5,
-              numberOfWorkIntervals: 2,
-              build: (_, BackgroundTimerData timerData) => Text(
-                timerData.currentMicroSeconds.toString(),
-                style: const TextStyle(
-                  fontSize: 100,
-                ),
-              ),
-              onFinished: () {
-                print("Done!");
-              },
-            ),
-          ],
-        ),
-      ),
+            );
+          }),
     );
+
+    // build: (_, BackgroundTimerData timerData) {
+
+    // return Scaffold(
+    //   appBar: AppBar(
+    //     title: Text(
+    //       widget.title,
+    //     ),
+    //   ),
+    //   body: Center(
+    //     child: Column(
+    //       mainAxisAlignment: MainAxisAlignment.center,
+    //       crossAxisAlignment: CrossAxisAlignment.center,
+    //       children: <Widget>[
+    //         Container(
+    //           padding: const EdgeInsets.symmetric(
+    //             horizontal: 16,
+    //           ),
+    //           child: Row(
+    //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    //             children: <Widget>[
+    //               // Start
+    //               ElevatedButton(
+    //                 child: const Text('Start'),
+    //                 onPressed: () {
+    //                   _controller.start();
+    //                 },
+    //               ),
+    //               // Pause
+    //               ElevatedButton(
+    //                 child: const Text('Pause'),
+    //                 onPressed: () {
+    //                   _controller.pause();
+    //                 },
+    //               ),
+    //               // Resume
+    //               ElevatedButton(
+    //                 child: const Text('Resume'),
+    //                 onPressed: () {
+    //                   _controller.resume();
+    //                 },
+    //               ),
+    //               // Stop
+    //               ElevatedButton(
+    //                 child: const Text('Restart'),
+    //                 onPressed: () {
+    //                   _controller.restart();
+    //                 },
+    //               ),
+    //             ],
+    //           ),
+    //         ),
+    //         Countdown(
+    //           controller: _controller,
+    //           workSeconds: 8,
+    //           restSeconds: 5,
+    //           numberOfWorkIntervals: 2,
+    //           build: (_, BackgroundTimerData timerData) => Text(
+    //             timerData.currentMicroSeconds.toString(),
+    //             style: const TextStyle(
+    //               fontSize: 100,
+    //             ),
+    //           ),
+    //           onFinished: () {
+    //           },
+    //         ),
+    //       ],
+    //     ),
+    //   ),
+    // );
   }
 }
