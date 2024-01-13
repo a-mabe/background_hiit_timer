@@ -260,7 +260,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         final data = snapshot.data!;
 
         // Check if the timer has completed
-        if (_currentMicroSeconds == 0 &&
+        if (data["microSeconds"] == 0 &&
             widget.controller?.isCompleted == false) {
           // Invoke the onFinished callback if provided
           if (widget.onFinished != null) {
@@ -269,7 +269,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           widget.controller?.isCompleted = true;
         }
         // If not completed, ensure the isCompleted bool is set as such
-        else if (_currentMicroSeconds > 0) {
+        else if (data["microSeconds"] > 0) {
           widget.controller?.isCompleted = false;
         }
 
@@ -484,62 +484,19 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         /// There is still more time to deduct from the timer, so
         /// calculate if a sound effect should play
         else {
-          /// Calculate half of the work time
-          int halfWorkSeconds =
-              ((config.exerciseTime * secondsFactor) / 2).round();
-
-          /// Check if the halfway sound should play
-          if (currentMicroSeconds! == halfWorkSeconds &&
-              halfwaySoundID != -1 &&
-              status == workStatus) {
-            await pool.play(halfwaySoundID);
-          }
-          // Check if the 3, 2, 1 sound should play
-          else if ((currentMicroSeconds! - 500000) == 3500000) {
-            await pool.play(blankSoundID);
-          } else if ((currentMicroSeconds! - 500000) == 2500000 ||
-              (currentMicroSeconds! - 500000) == 1500000 ||
-              (currentMicroSeconds! - 500000) == 500000) {
-            await playSound(countdownSoundID, pool);
-          }
-
-          /// Check which end sound should play
-          else if (currentMicroSeconds! == 0) {
-            /// The whole timer is done, play the final sound
-            if (config.numberOfWorkIntervals == 0 && status != completeStatus) {
-              /// Play complete sound
-              await playSound(completeSoundID, pool);
-
-              /// Switch to the complete state
-              status = completeStatus;
-            } else if (status == workStatus) {
-              // Play the rest sound
-              await playSound(restSoundID, pool);
-            } else if (status == restStatus || status == startStatus) {
-              // Play the work sound
-              await playSound(workSoundID, pool);
-            }
-          } else if (currentMicroSeconds! <= -2000000) {
-            await pool.release();
-            service.stopSelf();
-          } else {
-            if (Platform.isIOS) {
-              await pool.play(blankSoundID);
-            }
-          }
-          // status = await determineSoundEffectAndStatus(
-          //     config,
-          //     secondsFactor,
-          //     currentMicroSeconds!,
-          //     workSoundID,
-          //     restSoundID,
-          //     halfwaySoundID,
-          //     countdownSoundID,
-          //     completeSoundID,
-          //     blankSoundID,
-          //     status,
-          //     pool,
-          //     service);
+          status = await determineSoundEffectAndStatus(
+              config,
+              secondsFactor,
+              currentMicroSeconds!,
+              workSoundID,
+              restSoundID,
+              halfwaySoundID,
+              countdownSoundID,
+              completeSoundID,
+              blankSoundID,
+              status,
+              pool,
+              service);
         }
       }
 
