@@ -1,29 +1,29 @@
 import 'dart:core';
 
 class TimerConfig {
-  /// Whether or not the timer is currently paused.
-  ///
-  /// e.g., false
-  ///
-  late bool paused;
-
-  /// The number of exercises.
-  ///
-  /// e.g., "I need to do X but do it in Y way"
-  ///
-  late int numberOfWorkIntervals;
-
   /// Amount of time for an exercise, in seconds.
   ///
   /// e.g., 30
   ///
   late int exerciseTime;
 
-  /// Amount of time between exercises, in seconds. (Rest time)
+  /// Amount of time between exercises, in seconds.
   ///
   /// e.g., 30
   ///
   late int restTime;
+
+  /// Amount of time between iterations, in seconds.
+  ///
+  /// e.g., 30
+  ///
+  late int breakTime;
+
+  late int warmupTime;
+
+  late int cooldownTime;
+
+  late int firstIteration;
 
   /// Sound for the work/exercise period.
   ///
@@ -57,10 +57,12 @@ class TimerConfig {
   late String countdownSound;
 
   TimerConfig(
-      this.paused,
-      this.numberOfWorkIntervals,
       this.exerciseTime,
       this.restTime,
+      this.breakTime,
+      this.warmupTime,
+      this.cooldownTime,
+      this.firstIteration,
       this.workSound,
       this.restSound,
       this.halfwaySound,
@@ -68,10 +70,12 @@ class TimerConfig {
       this.countdownSound);
 
   TimerConfig.empty() {
-    paused = false;
-    numberOfWorkIntervals = 0;
     exerciseTime = 0;
     restTime = 0;
+    breakTime = 0;
+    warmupTime = 0;
+    cooldownTime = 0;
+    firstIteration = 0;
     workSound = "short-whistle";
     restSound = "short-rest-beep";
     halfwaySound = "short-halfway-beep";

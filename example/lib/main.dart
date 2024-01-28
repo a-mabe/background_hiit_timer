@@ -42,13 +42,13 @@ class MyHomePage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  MyHomePageState createState() => MyHomePageState();
 }
 
 ///
 /// Page state
 ///
-class _MyHomePageState extends State<MyHomePage> {
+class MyHomePageState extends State<MyHomePage> {
   // Controller
   final CountdownController _controller = CountdownController(autoStart: true);
 
@@ -59,9 +59,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void init() async {
-    // final session = await AudioSession.instance;
-    // await session.configure(const AudioSessionConfiguration.music());
-
     final session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration(
       avAudioSessionCategory: AVAudioSessionCategory.ambient,
@@ -82,14 +79,21 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Color backgroundColor(String status) {
-    if (status == "work") {
-      return Colors.green;
-    } else if (status == "rest") {
-      return Colors.red;
-    } else if (status == "start") {
-      return Colors.black;
-    } else {
-      return const Color.fromARGB(255, 0, 225, 255);
+    switch (status) {
+      case "work":
+        return Colors.green;
+      case "rest":
+        return Colors.red;
+      case "start":
+        return Colors.black;
+      case "break":
+        return Colors.teal;
+      case "warmup":
+        return Colors.orange;
+      case "cooldown":
+        return Colors.blue;
+      default:
+        return const Color.fromARGB(255, 0, 225, 255);
     }
   }
 
@@ -98,9 +102,13 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: Countdown(
           controller: _controller,
-          workSeconds: 8,
-          restSeconds: 5,
-          numberOfWorkIntervals: 2,
+          workSeconds: 4,
+          restSeconds: 2,
+          breakSeconds: 5,
+          warmupSeconds: 10,
+          cooldownSeconds: 10,
+          numberOfWorkIntervals: 1,
+          iterations: 1,
           onFinished: () {},
           build: (_, BackgroundTimerData timerData) {
             return Container(
@@ -160,75 +168,5 @@ class _MyHomePageState extends State<MyHomePage> {
             );
           }),
     );
-
-    // build: (_, BackgroundTimerData timerData) {
-
-    // return Scaffold(
-    //   appBar: AppBar(
-    //     title: Text(
-    //       widget.title,
-    //     ),
-    //   ),
-    //   body: Center(
-    //     child: Column(
-    //       mainAxisAlignment: MainAxisAlignment.center,
-    //       crossAxisAlignment: CrossAxisAlignment.center,
-    //       children: <Widget>[
-    //         Container(
-    //           padding: const EdgeInsets.symmetric(
-    //             horizontal: 16,
-    //           ),
-    //           child: Row(
-    //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    //             children: <Widget>[
-    //               // Start
-    //               ElevatedButton(
-    //                 child: const Text('Start'),
-    //                 onPressed: () {
-    //                   _controller.start();
-    //                 },
-    //               ),
-    //               // Pause
-    //               ElevatedButton(
-    //                 child: const Text('Pause'),
-    //                 onPressed: () {
-    //                   _controller.pause();
-    //                 },
-    //               ),
-    //               // Resume
-    //               ElevatedButton(
-    //                 child: const Text('Resume'),
-    //                 onPressed: () {
-    //                   _controller.resume();
-    //                 },
-    //               ),
-    //               // Stop
-    //               ElevatedButton(
-    //                 child: const Text('Restart'),
-    //                 onPressed: () {
-    //                   _controller.restart();
-    //                 },
-    //               ),
-    //             ],
-    //           ),
-    //         ),
-    //         Countdown(
-    //           controller: _controller,
-    //           workSeconds: 8,
-    //           restSeconds: 5,
-    //           numberOfWorkIntervals: 2,
-    //           build: (_, BackgroundTimerData timerData) => Text(
-    //             timerData.currentMicroSeconds.toString(),
-    //             style: const TextStyle(
-    //               fontSize: 100,
-    //             ),
-    //           ),
-    //           onFinished: () {
-    //           },
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    // );
   }
 }

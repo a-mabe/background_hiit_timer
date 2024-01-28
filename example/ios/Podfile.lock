@@ -12,12 +12,16 @@ PODS:
     - Flutter
   - flutter_local_notifications (0.0.1):
     - Flutter
+  - just_audio (0.0.1):
+    - Flutter
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - soundpool (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
@@ -27,8 +31,10 @@ DEPENDENCIES:
   - flutter_background_service_ios (from `.symlinks/plugins/flutter_background_service_ios/ios`)
   - flutter_fgbg (from `.symlinks/plugins/flutter_fgbg/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
+  - just_audio (from `.symlinks/plugins/just_audio/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
+  - soundpool (from `.symlinks/plugins/soundpool/ios`)
 
 EXTERNAL SOURCES:
   audio_session:
@@ -45,10 +51,14 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_fgbg/ios"
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
+  just_audio:
+    :path: ".symlinks/plugins/just_audio/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
+  soundpool:
+    :path: ".symlinks/plugins/soundpool/ios"
 
 SPEC CHECKSUMS:
   audio_session: 4f3e461722055d21515cf3261b64c973c062f345
@@ -58,8 +68,10 @@ SPEC CHECKSUMS:
   flutter_background_service_ios: e30e0d3ee69e4cee66272d0c78eacd48c2e94aac
   flutter_fgbg: 31c0d1140a131daea2d342121808f6aa0dcd879d
   flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
-  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
-  shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
+  just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
+  path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
+  shared_preferences_foundation: b4c3b4cddf1c21f02770737f147a3f5da9d39695
+  soundpool: c7f4422ca206e77f8900ed3c4ee6a6ff5a0e38a9
 
 PODFILE CHECKSUM: e46e794ba0ddc397045dc2d44ed592903b330637
 
