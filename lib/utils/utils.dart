@@ -50,6 +50,7 @@ void saveTimerPreferences(
   await preferences.setInt("workSeconds", timerConfig.exerciseTime);
   await preferences.setInt("restSeconds", timerConfig.restTime);
   await preferences.setInt("breakSeconds", timerConfig.breakTime);
+  await preferences.setInt("getreadySeconds", timerConfig.getreadyTime);
   await preferences.setInt("warmupSeconds", timerConfig.warmupTime);
   await preferences.setInt("cooldownSeconds", timerConfig.cooldownTime);
   await preferences.setString("halfwaySound", timerConfig.halfwaySound);
@@ -69,6 +70,7 @@ Future<TimerConfig> loadTimerPreferences(SharedPreferences preferences) async {
       preferences.getInt("workSeconds")!,
       preferences.getInt("restSeconds")!,
       preferences.getInt("breakSeconds")!,
+      preferences.getInt("getreadySeconds")!,
       preferences.getInt("warmupSeconds")!,
       preferences.getInt("cooldownSeconds")!,
       preferences.getInt("iterations")!,

@@ -19,6 +19,8 @@ class TimerConfig {
   ///
   late int breakTime;
 
+  late int getreadyTime;
+
   late int warmupTime;
 
   late int cooldownTime;
@@ -60,6 +62,7 @@ class TimerConfig {
       this.exerciseTime,
       this.restTime,
       this.breakTime,
+      this.getreadyTime,
       this.warmupTime,
       this.cooldownTime,
       this.firstIteration,
@@ -73,6 +76,7 @@ class TimerConfig {
     exerciseTime = 0;
     restTime = 0;
     breakTime = 0;
+    getreadyTime = 0;
     warmupTime = 0;
     cooldownTime = 0;
     firstIteration = 0;

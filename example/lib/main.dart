@@ -104,6 +104,7 @@ class MyHomePageState extends State<MyHomePage> {
           controller: _controller,
           workSeconds: 4,
           restSeconds: 2,
+          getreadySeconds: 7,
           breakSeconds: 5,
           warmupSeconds: 10,
           cooldownSeconds: 10,

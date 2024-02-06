@@ -32,6 +32,8 @@ class Countdown extends StatefulWidget {
   ///
   final int breakSeconds;
 
+  final int getreadySeconds;
+
   final int warmupSeconds;
 
   final int cooldownSeconds;
@@ -102,6 +104,7 @@ class Countdown extends StatefulWidget {
     required this.numberOfWorkIntervals,
     required this.build,
     this.breakSeconds = 0,
+    this.getreadySeconds = 0,
     this.warmupSeconds = 0,
     this.cooldownSeconds = 0,
     this.iterations = 1,
@@ -209,6 +212,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         widget.workSeconds,
         widget.restSeconds,
         widget.breakSeconds,
+        widget.getreadySeconds,
         widget.warmupSeconds,
         widget.cooldownSeconds,
         widget.iterations,
@@ -364,7 +368,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         false,
         preferences.getInt('numberOfWorkIntervals')!,
         0,
-        10 * secondsFactor,
+        preferences.getInt('getreadySeconds')! * secondsFactor,
         "start",
         preferences.getInt('iterations')!);
 
