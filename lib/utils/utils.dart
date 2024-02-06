@@ -123,23 +123,7 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
 
   /// Check which end sound should play
   else if (currentMicroSeconds == 0) {
-    // Last iteration complete, start cooldown if configured
-    if (timerState.numberOfWorkIntervalsRemaining == 0 &&
-        timerState.status != completeStatus &&
-        timerState.iterations <= 1 &&
-        timerConfig.cooldownTime > 0) {
-      timerState.iterations = timerState.iterations - 1;
-      // Play the rest sound
-      await playSound(restSoundID, pool);
-      SharedPreferences preferences = await SharedPreferences.getInstance();
-      timerState = TimerState(
-          false,
-          preferences.getInt('numberOfWorkIntervals')!,
-          0,
-          preferences.getInt('cooldownSeconds')! * secondsFactor,
-          "cooldown",
-          timerState.iterations);
-    } else if (timerState.status == cooldownStatus) {
+    if (timerState.status == cooldownStatus) {
       /// Play complete sound
       await playSound(completeSoundID, pool);
 
@@ -150,35 +134,51 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
     /// The whole iteration is done, play the final sound
     else if (timerState.numberOfWorkIntervalsRemaining == 0 &&
         timerState.status != completeStatus) {
-      /// Play complete sound
-      await playSound(completeSoundID, pool);
+      SharedPreferences preferences = await SharedPreferences.getInstance();
 
-      /// Switch to the complete state
-      timerState.status = completeStatus;
-
-      /// Decrement the iterations if this was the last work interval
-      if (timerState.numberOfWorkIntervalsRemaining == 0 &&
-          timerState.iterations > 1) {
+      if (timerState.status != cooldownStatus &&
+          preferences.getInt('cooldownSeconds')! > 0 &&
+          timerState.iterations == 1) {
         timerState.iterations = timerState.iterations - 1;
+        // Play the rest sound
+        await playSound(restSoundID, pool);
+        timerState = TimerState(
+            false,
+            preferences.getInt('numberOfWorkIntervals')!,
+            0,
+            preferences.getInt('cooldownSeconds')! * secondsFactor,
+            "cooldown",
+            timerState.iterations);
+      } else {
+        /// Play complete sound
+        await playSound(completeSoundID, pool);
 
-        SharedPreferences preferences = await SharedPreferences.getInstance();
-        int breakSeconds = timerConfig.breakTime;
-        if (breakSeconds > 0) {
-          timerState = TimerState(
-              false,
-              preferences.getInt('numberOfWorkIntervals')!,
-              0,
-              breakSeconds * secondsFactor,
-              "break",
-              timerState.iterations);
-        } else {
-          timerState = TimerState(
-              false,
-              preferences.getInt('numberOfWorkIntervals')!,
-              0,
-              preferences.getInt('workSeconds')! * secondsFactor,
-              "work",
-              timerState.iterations);
+        /// Switch to the complete state
+        timerState.status = completeStatus;
+
+        /// Decrement the iterations if this was the last work interval
+        if (timerState.numberOfWorkIntervalsRemaining == 0 &&
+            timerState.iterations > 1) {
+          timerState.iterations = timerState.iterations - 1;
+
+          int breakSeconds = timerConfig.breakTime;
+          if (breakSeconds > 0) {
+            timerState = TimerState(
+                false,
+                preferences.getInt('numberOfWorkIntervals')!,
+                0,
+                breakSeconds * secondsFactor,
+                "break",
+                timerState.iterations);
+          } else {
+            timerState = TimerState(
+                false,
+                preferences.getInt('numberOfWorkIntervals')!,
+                0,
+                preferences.getInt('workSeconds')! * secondsFactor,
+                "work",
+                timerState.iterations);
+          }
         }
       }
     } else if (timerState.status == workStatus ||
