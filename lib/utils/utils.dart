@@ -145,7 +145,7 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
         timerState = TimerState(
             false,
             preferences.getInt('numberOfWorkIntervals')!,
-            0,
+            timerState.currentOverallInterval,
             preferences.getInt('cooldownSeconds')! * secondsFactor,
             "cooldown",
             timerState.iterations);
