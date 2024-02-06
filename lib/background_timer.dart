@@ -107,7 +107,7 @@ class Countdown extends StatefulWidget {
     this.getreadySeconds = 0,
     this.warmupSeconds = 0,
     this.cooldownSeconds = 0,
-    this.iterations = 1,
+    this.iterations = 0,
     this.status = 'start',
     this.completeSound = 'horn',
     this.workSound = 'short-whistle',

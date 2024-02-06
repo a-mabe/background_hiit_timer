@@ -109,7 +109,7 @@ class MyHomePageState extends State<MyHomePage> {
           warmupSeconds: 10,
           cooldownSeconds: 10,
           numberOfWorkIntervals: 1,
-          iterations: 1,
+          iterations: 0,
           onFinished: () {},
           build: (_, BackgroundTimerData timerData) {
             return Container(

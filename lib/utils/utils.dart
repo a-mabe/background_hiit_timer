@@ -138,8 +138,8 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
 
       if (timerState.status != cooldownStatus &&
           preferences.getInt('cooldownSeconds')! > 0 &&
-          timerState.iterations == 1) {
-        timerState.iterations = timerState.iterations - 1;
+          timerState.iterations == 0) {
+        // timerState.iterations = timerState.iterations - 1;
         // Play the rest sound
         await playSound(restSoundID, pool);
         timerState = TimerState(
@@ -158,7 +158,7 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
 
         /// Decrement the iterations if this was the last work interval
         if (timerState.numberOfWorkIntervalsRemaining == 0 &&
-            timerState.iterations > 1) {
+            timerState.iterations > 0) {
           timerState.iterations = timerState.iterations - 1;
 
           int breakSeconds = timerConfig.breakTime;
