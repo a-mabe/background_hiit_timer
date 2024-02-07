@@ -166,7 +166,7 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
             timerState = TimerState(
                 false,
                 preferences.getInt('numberOfWorkIntervals')!,
-                timerState.currentOverallInterval,
+                timerState.currentOverallInterval + 1,
                 breakSeconds * secondsFactor,
                 "break",
                 timerState.iterations);
@@ -174,7 +174,7 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
             timerState = TimerState(
                 false,
                 preferences.getInt('numberOfWorkIntervals')!,
-                timerState.currentOverallInterval,
+                timerState.currentOverallInterval + 1,
                 preferences.getInt('workSeconds')! * secondsFactor,
                 "work",
                 timerState.iterations);
