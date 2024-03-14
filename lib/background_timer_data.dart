@@ -29,11 +29,18 @@ class BackgroundTimerData {
   ///
   bool paused = false;
 
+  int iterations = 0;
+
   ///
   /// Constructor
   ///
-  BackgroundTimerData(this.currentMicroSeconds, this.status,
-      this.remainingWorkIntervals, this.currentOverallInterval, this.paused);
+  BackgroundTimerData(
+      this.currentMicroSeconds,
+      this.status,
+      this.remainingWorkIntervals,
+      this.currentOverallInterval,
+      this.paused,
+      this.iterations);
 
   ///
   /// Empty constructor
