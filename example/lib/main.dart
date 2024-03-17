@@ -42,13 +42,13 @@ class MyHomePage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  MyHomePageState createState() => MyHomePageState();
 }
 
 ///
 /// Page state
 ///
-class _MyHomePageState extends State<MyHomePage> {
+class MyHomePageState extends State<MyHomePage> {
   // Controller
   final CountdownController _controller = CountdownController(autoStart: true);
 
@@ -59,9 +59,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void init() async {
-    // final session = await AudioSession.instance;
-    // await session.configure(const AudioSessionConfiguration.music());
-
     final session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration(
       avAudioSessionCategory: AVAudioSessionCategory.ambient,
@@ -81,76 +78,96 @@ class _MyHomePageState extends State<MyHomePage> {
     ));
   }
 
+  Color backgroundColor(String status) {
+    switch (status) {
+      case "work":
+        return Colors.green;
+      case "rest":
+        return Colors.red;
+      case "start":
+        return Colors.black;
+      case "break":
+        return Colors.teal;
+      case "warmup":
+        return Colors.orange;
+      case "cooldown":
+        return Colors.blue;
+      default:
+        return const Color.fromARGB(255, 0, 225, 255);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.title,
-        ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: Countdown(
+          controller: _controller,
+          workSeconds: 4,
+          restSeconds: 2,
+          getreadySeconds: 7,
+          breakSeconds: 5,
+          warmupSeconds: 10,
+          cooldownSeconds: 10,
+          numberOfWorkIntervals: 1,
+          iterations: 0,
+          onFinished: () {},
+          build: (_, BackgroundTimerData timerData) {
+            return Container(
+              color: backgroundColor(timerData.status),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  // Start
-                  ElevatedButton(
-                    child: const Text('Start'),
-                    onPressed: () {
-                      _controller.start();
-                    },
+                  Text(
+                    timerData.status,
+                    style: const TextStyle(fontSize: 50, color: Colors.white),
                   ),
-                  // Pause
-                  ElevatedButton(
-                    child: const Text('Pause'),
-                    onPressed: () {
-                      _controller.pause();
-                    },
+                  Text(
+                    timerData.currentMicroSeconds.toString(),
+                    style: const TextStyle(fontSize: 100, color: Colors.white),
                   ),
-                  // Resume
-                  ElevatedButton(
-                    child: const Text('Resume'),
-                    onPressed: () {
-                      _controller.resume();
-                    },
-                  ),
-                  // Stop
-                  ElevatedButton(
-                    child: const Text('Restart'),
-                    onPressed: () {
-                      _controller.restart();
-                    },
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        // Start
+                        ElevatedButton(
+                          child: const Text('Start'),
+                          onPressed: () {
+                            _controller.start();
+                          },
+                        ),
+                        // Pause
+                        ElevatedButton(
+                          child: const Text('Pause'),
+                          onPressed: () {
+                            _controller.pause();
+                          },
+                        ),
+                        // Resume
+                        ElevatedButton(
+                          child: const Text('Resume'),
+                          onPressed: () {
+                            _controller.resume();
+                          },
+                        ),
+                        // Stop
+                        ElevatedButton(
+                          child: const Text('Restart'),
+                          onPressed: () {
+                            _controller.restart();
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-            ),
-            Countdown(
-              controller: _controller,
-              workSeconds: 8,
-              restSeconds: 5,
-              numberOfWorkIntervals: 2,
-              build: (_, BackgroundTimerData timerData) => Text(
-                timerData.currentMicroSeconds.toString(),
-                style: const TextStyle(
-                  fontSize: 100,
-                ),
-              ),
-              interval: const Duration(milliseconds: 100),
-              onFinished: () {
-                print("Done!");
-              },
-            ),
-          ],
-        ),
-      ),
+            );
+          }),
     );
   }
 }

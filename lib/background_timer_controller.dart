@@ -4,16 +4,20 @@ import 'package:flutter/widgets.dart';
 /// Controller for Count down
 ///
 class CountdownController {
-  /// Called when called `pause` method
+  /// Called when pausing the timer.
+  ///
   VoidCallback? onPause;
 
-  /// Called when called `resume` method
+  /// Called when resuming the timer.
+  ///
   VoidCallback? onResume;
 
-  /// Called when restarting the timer
+  /// Called when restarting the timer.
+  ///
   VoidCallback? onRestart;
 
-  /// Called when timer is staring
+  /// Called when the timer starts.
+  ///
   VoidCallback? onStart;
 
   ///
@@ -30,7 +34,8 @@ class CountdownController {
   ///
   bool? isCompleted;
 
-  /// if timer auto start.
+  /// Whether or not the timer should automatically begin.
+  ///
   final bool autoStart;
 
   ///
@@ -47,13 +52,15 @@ class CountdownController {
     }
   }
 
-  /// Set onStart callback
+  ///
+  /// Set onStart callback.
+  ///
   setOnStart(VoidCallback onStart) {
     this.onStart = onStart;
   }
 
   ///
-  /// Set timer in pause
+  /// Set timer pause.
   ///
   pause() async {
     if (onPause != null) {
@@ -61,13 +68,15 @@ class CountdownController {
     }
   }
 
-  /// Set onPause callback
+  ///
+  /// Set onPause callback.
+  ///
   setOnPause(VoidCallback onPause) {
     this.onPause = onPause;
   }
 
   ///
-  /// Resume from pause
+  /// Resume from pause.
   ///
   resume() {
     if (onResume != null) {
@@ -75,13 +84,15 @@ class CountdownController {
     }
   }
 
-  /// Set onResume callback
+  ///
+  /// Set onResume callback.
+  ///
   setOnResume(VoidCallback onResume) {
     this.onResume = onResume;
   }
 
   ///
-  /// Restart timer from cold
+  /// Restart timer, starts things fresh.
   ///
   restart() {
     if (onRestart != null) {
@@ -89,7 +100,9 @@ class CountdownController {
     }
   }
 
-  /// set onRestart callback
+  ///
+  /// set onRestart callback.
+  ///
   setOnRestart(VoidCallback onRestart) {
     this.onRestart = onRestart;
   }

@@ -1,64 +1,55 @@
+/// Defines the object returned from the background timer process
+/// that is sent to the foreground.
+///
+
 import 'dart:core';
 
 class BackgroundTimerData {
+  /// Current microseconds, used to calculate how many
+  /// seconds to display on the UI.
   ///
-  /// -------------
-  /// FIELDS
-  /// -------------
-  ///
-
-  /// Current seconds
   int currentMicroSeconds = 0;
 
-  /// Current timer status
+  /// Current timer interval status.
+  ///
+  /// One of: start, work, rest, end.
+  ///
   String status = "";
 
-  /// Current interval work number
-  int numberOfWorkIntervals = 0;
+  /// Remaining number of work intervals.
+  ///
+  int remainingWorkIntervals = 0;
 
-  /// Current interval number
-  int numberOfIntervals = 0;
+  /// Current interval number, includes all possible
+  /// interval status types. E.g. start, work, or rest.
+  ///
+  int currentOverallInterval = 0;
 
-  /// Whether the timer is paused
+  /// Whether the timer is currently paused.
+  ///
   bool paused = false;
 
-  ///
-  /// -------------
-  /// END FIELDS
-  /// -------------
-  ///
+  int iterations = 0;
 
   ///
-  /// -------------
-  /// CONSTRUCTORS
-  /// -------------
+  /// Constructor
   ///
+  BackgroundTimerData(
+      this.currentMicroSeconds,
+      this.status,
+      this.remainingWorkIntervals,
+      this.currentOverallInterval,
+      this.paused,
+      this.iterations);
 
-  BackgroundTimerData(this.currentMicroSeconds, this.status,
-      this.numberOfWorkIntervals, this.numberOfIntervals, this.paused);
-
+  ///
+  /// Empty constructor
+  ///
   BackgroundTimerData.empty() {
     currentMicroSeconds = 0;
     status = "";
-    numberOfWorkIntervals = 0;
-    numberOfIntervals = 0;
+    remainingWorkIntervals = 0;
+    currentOverallInterval = 0;
     paused = false;
   }
-
-  ///
-  /// -------------
-  /// END CONSTRUCTORS
-  /// -------------
-  ///
-  ///
-  /// -------------
-  /// FUNCTIONS
-  /// -------------
-  ///
-
-  ///
-  /// -------------
-  /// END FUNCTIONS
-  /// -------------
-  ///
 }
