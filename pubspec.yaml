@@ -1,7 +1,7 @@
-name: background_timer
+name: background_hiit_timer
 description: A new Flutter package project.
 version: 1.0.0-dev.1
-repository: https://github.com/a-mabe/background_timer
+repository: https://github.com/a-mabe/background_hiit_timer
 
 funding:
   - https://www.buymeacoffee.com/amabe

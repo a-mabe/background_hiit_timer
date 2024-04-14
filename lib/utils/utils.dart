@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:audio_session/audio_session.dart';
-import 'package:background_timer/utils/timer_config.dart';
-import 'package:background_timer/utils/timer_state.dart';
+import 'package:background_hiit_timer/utils/timer_config.dart';
+import 'package:background_hiit_timer/utils/timer_state.dart';
 import 'package:flutter/services.dart';
 import 'package:openhiit_background_service/openhiit_background_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,7 +35,7 @@ Future<AudioSession> configureAudioSession() async {
 Future<int> loadSound(String sound, Soundpool pool) async {
   if (sound != "none") {
     return await rootBundle
-        .load("packages/background_timer/lib/assets/audio/$sound.mp3")
+        .load("packages/background_hiit_timer/lib/assets/audio/$sound.mp3")
         .then((ByteData soundData) {
       return pool.load(soundData);
     });

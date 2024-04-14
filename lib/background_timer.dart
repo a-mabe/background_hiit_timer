@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
-import 'package:background_timer/utils/timer_config.dart';
-import 'package:background_timer/utils/timer_state.dart';
+import 'package:background_hiit_timer/utils/timer_config.dart';
+import 'package:background_hiit_timer/utils/timer_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:openhiit_background_service/openhiit_background_service.dart';
 import 'package:openhiit_background_service_android/openhiit_background_service_android.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:background_timer/background_timer_controller.dart';
-import 'package:background_timer/background_timer_data.dart';
+import 'package:background_hiit_timer/background_timer_controller.dart';
+import 'package:background_hiit_timer/background_timer_data.dart';
 import 'package:soundpool/soundpool.dart';
 
 import 'utils/constants.dart';
@@ -396,7 +396,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     });
 
     int blankSoundID = await rootBundle
-        .load("packages/background_timer/lib/assets/audio/blank.mp3")
+        .load("packages/background_hiit_timer/lib/assets/audio/blank.mp3")
         .then((ByteData soundData) {
       return pool.load(soundData);
     });

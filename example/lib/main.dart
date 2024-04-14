@@ -1,8 +1,8 @@
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
-import 'package:background_timer/background_timer.dart';
-import 'package:background_timer/background_timer_controller.dart';
-import 'package:background_timer/background_timer_data.dart';
+import 'package:background_hiit_timer/background_timer.dart';
+import 'package:background_hiit_timer/background_timer_controller.dart';
+import 'package:background_hiit_timer/background_timer_data.dart';
 
 void main() => runApp(const MyApp());
 
