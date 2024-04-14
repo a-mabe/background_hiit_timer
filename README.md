@@ -1,39 +1,53 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# background_hiit_timer
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
+A Flutter package for creating a background HIIT (High-Intensity Interval Training) timer. This package is based on the [`timer_count_down`](https://pub.dev/packages/timer_count_down) package and extends its functionality to support background execution for interval timers.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages).
--->
+## Installation
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+Add `background_hiit_timer` to your `pubspec.yaml` file:
 
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  background_hiit_timer: ^1.0.0
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+Import `background_hiit_timer` in your Dart file:
 
 ```dart
-const like = 'sample';
+import 'package:background_hiit_timer/background_hiit_timer.dart';
 ```
 
-## Additional information
+Create a `Countdown` widget and configure it with your interval settings:
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+```dart
+Countdown(
+    controller: _controller,
+    workSeconds: 20,
+    restSeconds: 10,
+    getreadySeconds: 10,
+    breakSeconds: 30,
+    warmupSeconds: 60,
+    cooldownSeconds: 60,
+    numberOfWorkIntervals: 8,
+    iterations: 2,
+    onFinished: () {},
+    build: Text(timerData.currentMicroSeconds.toString())
+```
+
+Ensure that your app is properly configured to handle background execution on both Android and iOS platforms.
+
+## Example
+
+Check out the `example` directory in this repository for a complete example of how to use `background_hiit_timer` in a Flutter app.
+
+## Credits
+
+This package is based on the [`timer_count_down`](https://pub.dev/packages/timer_count_down) package by [Dizoft Team](https://github.com/DizoftTeam).
+
+## License
+
+MIT License. See [LICENSE](LICENSE) for details.

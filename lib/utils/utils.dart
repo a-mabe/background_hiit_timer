@@ -4,7 +4,7 @@ import 'package:audio_session/audio_session.dart';
 import 'package:background_timer/utils/timer_config.dart';
 import 'package:background_timer/utils/timer_state.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:openhiit_background_service/openhiit_background_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soundpool/soundpool.dart';
 

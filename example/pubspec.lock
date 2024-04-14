@@ -87,7 +87,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.0.1"
+    version: "1.0.0-dev.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -189,40 +189,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_background_service:
-    dependency: transitive
-    description:
-      path: "packages/flutter_background_service"
-      ref: prevent-autostart-on-boot
-      resolved-ref: f6b44310f2ae49102f8b360408e12a4b2f09e6cd
-      url: "https://github.com/a-mabe/flutter_background_service.git"
-    source: git
-    version: "5.0.1"
-  flutter_background_service_android:
-    dependency: transitive
-    description:
-      path: "packages/flutter_background_service_android"
-      ref: prevent-autostart-on-boot
-      resolved-ref: f6b44310f2ae49102f8b360408e12a4b2f09e6cd
-      url: "https://github.com/a-mabe/flutter_background_service.git"
-    source: git
-    version: "6.0.1"
-  flutter_background_service_ios:
-    dependency: transitive
-    description:
-      name: flutter_background_service_ios
-      sha256: ab73657535876e16abc89e40f924df3e92ad3dee83f64d187081417e824709ed
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.0"
-  flutter_background_service_platform_interface:
-    dependency: transitive
-    description:
-      name: flutter_background_service_platform_interface
-      sha256: cd5720ff5b051d551a4734fae16683aace779bd0425e8d3f15d84a0cdcc2d8d9
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.0"
   flutter_fgbg:
     dependency: transitive
     description:
@@ -377,6 +343,38 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.11.0"
+  openhiit_background_service:
+    dependency: transitive
+    description:
+      name: openhiit_background_service
+      sha256: a9e24e1d725c94c4d7dec3a716de04cc4f026a6a36f3400f1480823bdfe8052b
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0-dev.1"
+  openhiit_background_service_android:
+    dependency: transitive
+    description:
+      name: openhiit_background_service_android
+      sha256: d485e1ff87b057fde21caaec0e4a538db3453e028eee1ca310dafe7d4e202436
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0-dev.1"
+  openhiit_background_service_ios:
+    dependency: transitive
+    description:
+      name: openhiit_background_service_ios
+      sha256: "262f1ead508ee006a3b345ab9f35d73b1632f1c82f520e4e1ce70ced56145700"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0-dev.1"
+  openhiit_background_service_platform_interface:
+    dependency: transitive
+    description:
+      name: openhiit_background_service_platform_interface
+      sha256: "3b04763f7392506c786f462effd4014079fdb28e5275ee872e9881fa3ba32af8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0-dev.1"
   path:
     dependency: transitive
     description:

@@ -5,8 +5,8 @@ import 'package:background_timer/utils/timer_config.dart';
 import 'package:background_timer/utils/timer_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_background_service_android/flutter_background_service_android.dart';
+import 'package:openhiit_background_service/openhiit_background_service.dart';
+import 'package:openhiit_background_service_android/openhiit_background_service_android.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:background_timer/background_timer_controller.dart';
@@ -158,7 +158,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   void dispose() {
     /// Stop timer if active.
     if (isActive) {
-      final service = FlutterBackgroundService();
+      final service = OpenhiitBackgroundService();
       service.invoke("stopService");
     }
 
@@ -196,7 +196,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   /// by running _startTimer.
   ///
   void _onTimerRestart() {
-    final service = FlutterBackgroundService();
+    final service = OpenhiitBackgroundService();
     service.invoke("stopService");
     _startTimer();
   }
@@ -237,7 +237,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Map<String, dynamic>?>(
-      stream: FlutterBackgroundService().on('update'),
+      stream: OpenhiitBackgroundService().on('update'),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           // Show loading indicator while waiting for data
@@ -282,7 +282,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   /// Initialize background service
   ///
   Future<void> initializeService() async {
-    final service = FlutterBackgroundService();
+    final service = OpenhiitBackgroundService();
 
     /// --- FOR BACKGROUND SERVICE NOTIFICATION CHANNEL ---
 
