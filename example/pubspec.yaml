@@ -9,7 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  background_timer:
+  background_hiit_timer:
         path: "../"
   audio_session: ^0.1.16
 
