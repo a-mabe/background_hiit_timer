@@ -87,7 +87,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.0.0-dev.1"
+    version: "1.0.0-dev.3"
   boolean_selector:
     dependency: transitive
     description:
@@ -339,34 +339,34 @@ packages:
     dependency: transitive
     description:
       name: openhiit_background_service
-      sha256: "27a29ea84a18ef84790535470d28f4ffa1e9b43fdda50f5ed9d1c1d0c8ae48cb"
+      sha256: "25f4f98ec12c735fcba2aaf814422d7ee151dde4de5887fdbbec9013fc90c087"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0-dev.2"
+    version: "1.0.0-dev.3"
   openhiit_background_service_android:
     dependency: transitive
     description:
       name: openhiit_background_service_android
-      sha256: bddec4ae236c77812a0edd7936b63865818cd396174576eb4dee06e0f5db11ff
+      sha256: "97a6fe921708bd624c9a430440260822bce2d39f986ec823a8702abb12ba6c06"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0-dev.2"
+    version: "1.0.0-dev.3"
   openhiit_background_service_ios:
     dependency: transitive
     description:
       name: openhiit_background_service_ios
-      sha256: "50da509fc0bd1091764a5a2b15306b2b37ed68e5847ab0946ef7c03dc2220cc3"
+      sha256: ed0449509310db836a7bb210f7f48850ef1425bd8e73fe9e4e265f67c2a662ec
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0-dev.2"
+    version: "1.0.0-dev.3"
   openhiit_background_service_platform_interface:
     dependency: transitive
     description:
       name: openhiit_background_service_platform_interface
-      sha256: b53a1052605cbf072a292d68832aa997219d1bd66d9d7e4b9fca76bff970abe6
+      sha256: "98316593f32dd334ea25c3d4a1552e0c8b9b6ac8fbc5c47676c816d420318976"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0-dev.2"
+    version: "1.0.0-dev.3"
   path:
     dependency: transitive
     description:
