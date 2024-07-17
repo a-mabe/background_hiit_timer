@@ -85,7 +85,7 @@ Future<TimerConfig> loadTimerPreferences(SharedPreferences preferences) async {
 
 Future playSound(int soundID, Soundpool pool) async {
   if (soundID != -1) {
-    await pool.play(soundID);
+    await pool.play(soundID, rate: 0.1);
   }
 }
 
@@ -110,7 +110,7 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
   if (currentMicroSeconds == halfWorkSeconds &&
       halfwaySoundID != -1 &&
       timerState.status == workStatus) {
-    await pool.play(halfwaySoundID);
+    await pool.play(halfwaySoundID, rate: 0.1);
   }
   // Check if the 3, 2, 1 sound should play
   else if ((currentMicroSeconds - 500000) == 3500000) {
