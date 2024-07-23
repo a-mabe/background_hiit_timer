@@ -11,7 +11,8 @@ dependencies:
     sdk: flutter
   background_hiit_timer:
         path: "../"
-  audio_session: ^0.1.16
+  audioplayers: ^6.0.0
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:

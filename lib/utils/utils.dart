@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:audio_session/audio_session.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:background_hiit_timer/utils/timer_config.dart';
 import 'package:background_hiit_timer/utils/timer_state.dart';
 import 'package:flutter/services.dart';
@@ -10,27 +10,29 @@ import 'package:soundpool/soundpool.dart';
 
 import 'constants.dart';
 
-Future<AudioSession> configureAudioSession() async {
-  final session = await AudioSession.instance;
+// Future<audio_session.AudioSession> configureAudioSession() async {
+//   final session = await audio_session.AudioSession.instance;
 
-  await session.configure(const AudioSessionConfiguration(
-    avAudioSessionCategory: AVAudioSessionCategory.playback,
-    avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.mixWithOthers,
-    avAudioSessionMode: AVAudioSessionMode.defaultMode,
-    avAudioSessionRouteSharingPolicy:
-        AVAudioSessionRouteSharingPolicy.defaultPolicy,
-    avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-    androidAudioAttributes: AndroidAudioAttributes(
-      contentType: AndroidAudioContentType.sonification,
-      flags: AndroidAudioFlags.audibilityEnforced,
-      usage: AndroidAudioUsage.notification,
-    ),
-    androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-    androidWillPauseWhenDucked: true,
-  ));
+//   await session.configure(const audio_session.AudioSessionConfiguration(
+//     avAudioSessionCategory: audio_session.AVAudioSessionCategory.playback,
+//     avAudioSessionCategoryOptions:
+//         audio_session.AVAudioSessionCategoryOptions.mixWithOthers,
+//     avAudioSessionMode: audio_session.AVAudioSessionMode.defaultMode,
+//     avAudioSessionRouteSharingPolicy:
+//         audio_session.AVAudioSessionRouteSharingPolicy.defaultPolicy,
+//     avAudioSessionSetActiveOptions:
+//         audio_session.AVAudioSessionSetActiveOptions.none,
+//     androidAudioAttributes: audio_session.AndroidAudioAttributes(
+//       contentType: audio_session.AndroidAudioContentType.sonification,
+//       flags: audio_session.AndroidAudioFlags.audibilityEnforced,
+//       usage: audio_session.AndroidAudioUsage.notification,
+//     ),
+//     androidAudioFocusGainType: audio_session.AndroidAudioFocusGainType.gain,
+//     androidWillPauseWhenDucked: true,
+//   ));
 
-  return session;
-}
+//   return session;
+// }
 
 Future<int> loadSound(String sound, Soundpool pool) async {
   if (sound != "none") {
@@ -83,9 +85,14 @@ Future<TimerConfig> loadTimerPreferences(SharedPreferences preferences) async {
   return timerConfig;
 }
 
-Future playSound(int soundID, Soundpool pool) async {
-  if (soundID != -1) {
-    await pool.play(soundID, rate: 0.5);
+Future playSound(AudioPlayer player, String soundTitle,
+    SharedPreferences preferences) async {
+  if (soundTitle != "") {
+    // await pool.play(soundID);
+    preferences.getDouble('volume') == null
+        ? await player.setVolume(1.0)
+        : await player.setVolume((preferences.getDouble('volume')! / 100));
+    await player.play(AssetSource("audio/$soundTitle.mp3"));
   }
 }
 
@@ -94,38 +101,33 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
     TimerState timerState,
     int secondsFactor,
     int currentMicroSeconds,
-    int workSoundID,
-    int restSoundID,
-    int halfwaySoundID,
-    int countdownSoundID,
-    int completeSoundID,
-    int blankSoundID,
-    Soundpool pool,
-    ServiceInstance service) async {
+    ServiceInstance service,
+    AudioPlayer player,
+    SharedPreferences preferences) async {
   /// Calculate half of the work time
   int halfWorkSeconds =
       ((timerConfig.exerciseTime * secondsFactor) / 2).round();
 
   /// Check if the halfway sound should play
   if (currentMicroSeconds == halfWorkSeconds &&
-      halfwaySoundID != -1 &&
       timerState.status == workStatus) {
-    await pool.play(halfwaySoundID, rate: 0.5);
+    // await pool.play(halfwaySoundID);
+    await playSound(player, timerConfig.halfwaySound, preferences);
   }
   // Check if the 3, 2, 1 sound should play
   else if ((currentMicroSeconds - 500000) == 3500000) {
-    await pool.play(blankSoundID);
+    await playSound(player, 'blank', preferences);
   } else if ((currentMicroSeconds - 500000) == 2500000 ||
       (currentMicroSeconds - 500000) == 1500000 ||
       (currentMicroSeconds - 500000) == 500000) {
-    await playSound(countdownSoundID, pool);
+    await playSound(player, timerConfig.countdownSound, preferences);
   }
 
   /// Check which end sound should play
   else if (currentMicroSeconds == 0) {
     if (timerState.status == cooldownStatus) {
       /// Play complete sound
-      await playSound(completeSoundID, pool);
+      await playSound(player, timerConfig.completeSound, preferences);
 
       /// Switch to the complete state
       timerState.status = completeStatus;
@@ -141,7 +143,7 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
           timerState.iterations == 0) {
         // timerState.iterations = timerState.iterations - 1;
         // Play the rest sound
-        await playSound(restSoundID, pool);
+        await playSound(player, timerConfig.restSound, preferences);
         timerState = TimerState(
             false,
             preferences.getInt('numberOfWorkIntervals')!,
@@ -151,7 +153,7 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
             timerState.iterations);
       } else {
         /// Play complete sound
-        await playSound(completeSoundID, pool);
+        await playSound(player, timerConfig.completeSound, preferences);
 
         /// Switch to the complete state
         timerState.status = completeStatus;
@@ -184,19 +186,19 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
     } else if (timerState.status == workStatus ||
         timerState.status == warmupStatus) {
       // Play the rest sound
-      await playSound(restSoundID, pool);
+      await playSound(player, timerConfig.restSound, preferences);
     } else if (timerState.status == restStatus ||
         timerState.status == startStatus ||
         timerState.status == breakStatus) {
       // Play the work sound
-      await playSound(workSoundID, pool);
+      await playSound(player, timerConfig.workSound, preferences);
     }
   } else if (currentMicroSeconds < -500000) {
-    await pool.release();
     service.stopSelf();
   } else {
     if (Platform.isIOS) {
-      await pool.play(blankSoundID);
+      // await pool.play(blankSoundID);
+      await playSound(player, 'blank', preferences);
     }
   }
 

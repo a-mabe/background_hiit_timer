@@ -1,5 +1,6 @@
-import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:background_hiit_timer/background_timer.dart';
 import 'package:background_hiit_timer/background_timer_controller.dart';
 import 'package:background_hiit_timer/background_timer_data.dart';
@@ -55,27 +56,41 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   initState() {
     super.initState();
-    init();
+    // init();
   }
 
   void init() async {
-    final session = await AudioSession.instance;
-    await session.configure(const AudioSessionConfiguration(
-      avAudioSessionCategory: AVAudioSessionCategory.ambient,
-      avAudioSessionCategoryOptions:
-          AVAudioSessionCategoryOptions.mixWithOthers,
-      avAudioSessionMode: AVAudioSessionMode.defaultMode,
-      avAudioSessionRouteSharingPolicy:
-          AVAudioSessionRouteSharingPolicy.defaultPolicy,
-      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-      androidAudioAttributes: AndroidAudioAttributes(
-        contentType: AndroidAudioContentType.speech,
-        flags: AndroidAudioFlags.none,
-        usage: AndroidAudioUsage.voiceCommunication,
+    final context = AudioContext(
+      android: const AudioContextAndroid(
+          audioFocus: AndroidAudioFocus.none,
+          usageType: AndroidUsageType.media),
+      iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.playback,
+        options: const {
+          AVAudioSessionOptions.mixWithOthers,
+        },
       ),
-      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-      androidWillPauseWhenDucked: true,
-    ));
+    );
+
+    await AudioPlayer.global.setAudioContext(context);
+
+    // final session = await AudioSession.instance;
+    // await session.configure(const AudioSessionConfiguration(
+    //   avAudioSessionCategory: AVAudioSessionCategory.ambient,
+    //   avAudioSessionCategoryOptions:
+    //       AVAudioSessionCategoryOptions.mixWithOthers,
+    //   avAudioSessionMode: AVAudioSessionMode.defaultMode,
+    //   avAudioSessionRouteSharingPolicy:
+    //       AVAudioSessionRouteSharingPolicy.defaultPolicy,
+    //   avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+    //   androidAudioAttributes: AndroidAudioAttributes(
+    //     contentType: AndroidAudioContentType.speech,
+    //     flags: AndroidAudioFlags.none,
+    //     usage: AndroidAudioUsage.voiceCommunication,
+    //   ),
+    //   androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+    //   androidWillPauseWhenDucked: true,
+    // ));
   }
 
   Color backgroundColor(String status) {
@@ -97,8 +112,19 @@ class MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future<void> setVolume(double volume) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('volume', volume);
+  }
+
+  double _currentSliderValue = 80;
+
   @override
   Widget build(BuildContext context) {
+    // setVolume();
+
+    // SharedPreferences preferences = await SharedPreferences.getInstance();
+
     return Scaffold(
       body: Countdown(
           controller: _controller,
@@ -163,6 +189,18 @@ class MyHomePageState extends State<MyHomePage> {
                         ),
                       ],
                     ),
+                  ),
+                  Slider(
+                    value: _currentSliderValue,
+                    max: 100,
+                    divisions: 10,
+                    label: _currentSliderValue.round().toString(),
+                    onChanged: (double value) async {
+                      setState(() {
+                        _currentSliderValue = value;
+                      });
+                      await setVolume(value);
+                    },
                   ),
                 ],
               ),
