@@ -269,6 +269,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             data["numberOfIntervals"],
             data["paused"],
             data["iterations"],
+            data["changeVolume"],
             data["volume"].toDouble());
 
         // Return data and context to the UI
@@ -481,6 +482,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           "numberOfIntervals": timerState.currentOverallInterval,
           "paused": timerState.paused,
           "iterations": timerState.iterations,
+          "changeVolume": preferences.getBool('changeVolume') ?? false,
           "volume": preferences.getDouble('volume') ?? 80.0,
         },
       );

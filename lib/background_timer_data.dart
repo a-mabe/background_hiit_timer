@@ -31,6 +31,8 @@ class BackgroundTimerData {
 
   int iterations = 0;
 
+  bool changeVolume = false;
+
   double volume = 80.0;
 
   ///
@@ -43,6 +45,7 @@ class BackgroundTimerData {
       this.currentOverallInterval,
       this.paused,
       this.iterations,
+      this.changeVolume,
       this.volume);
 
   ///
@@ -55,6 +58,7 @@ class BackgroundTimerData {
     currentOverallInterval = 0;
     paused = false;
     iterations = 0;
+    changeVolume = false;
     volume = 80.0;
   }
 }
