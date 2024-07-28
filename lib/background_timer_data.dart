@@ -31,7 +31,7 @@ class BackgroundTimerData {
 
   int iterations = 0;
 
-  double volume = 80.0;
+  // double volume = 80.0;
 
   ///
   /// Constructor
@@ -42,8 +42,7 @@ class BackgroundTimerData {
       this.remainingWorkIntervals,
       this.currentOverallInterval,
       this.paused,
-      this.iterations,
-      this.volume);
+      this.iterations);
 
   ///
   /// Empty constructor
@@ -55,6 +54,5 @@ class BackgroundTimerData {
     currentOverallInterval = 0;
     paused = false;
     iterations = 0;
-    volume = 0.0;
   }
 }
