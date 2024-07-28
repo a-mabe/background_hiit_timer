@@ -268,7 +268,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             data["numberOfWorkIntervals"],
             data["numberOfIntervals"],
             data["paused"],
-            data["iterations"]);
+            data["iterations"],
+            data["volume"]);
 
         // Return data and context to the UI
         return widget.build(context, backgroundTimerData);
@@ -479,7 +480,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           "numberOfWorkIntervals": timerState.numberOfWorkIntervalsRemaining,
           "numberOfIntervals": timerState.currentOverallInterval,
           "paused": timerState.paused,
-          "iterations": timerState.iterations
+          "iterations": timerState.iterations,
+          "volume": preferences.getDouble('volume')!
         },
       );
     });
