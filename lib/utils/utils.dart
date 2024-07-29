@@ -196,9 +196,11 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
   } else if (currentMicroSeconds < -500000) {
     service.stopSelf();
   } else {
-    if (Platform.isIOS) {
+    if (Platform.isIOS && currentMicroSeconds % 1000000 == 0) {
       // await pool.play(blankSoundID);
-      //await playSound(player, 'blank', preferences);
+      print("BLANK");
+      print(currentMicroSeconds);
+      await playSound(player, 'blank', preferences);
     }
   }
 
