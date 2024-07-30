@@ -116,7 +116,7 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
   }
   // Check if the 3, 2, 1 sound should play
   else if ((currentMicroSeconds - 500000) == 3500000) {
-    //await playSound(player, 'blank', preferences);
+    await playSound(player, 'blank', preferences);
   } else if ((currentMicroSeconds - 500000) == 2500000 ||
       (currentMicroSeconds - 500000) == 1500000 ||
       (currentMicroSeconds - 500000) == 500000) {
@@ -196,7 +196,9 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
   } else if (currentMicroSeconds < -500000) {
     service.stopSelf();
   } else {
-    if (Platform.isIOS && currentMicroSeconds % 1000000 == 0) {
+    if (Platform.isIOS &&
+        currentMicroSeconds % 1000000 == 0 &&
+        currentMicroSeconds > 4000000) {
       // await pool.play(blankSoundID);
       print("BLANK");
       print(currentMicroSeconds);
