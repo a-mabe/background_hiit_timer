@@ -1,6 +1,6 @@
 name: background_hiit_timer
 description: Flutter background timer package developed for HIIT timers.
-version: 1.0.0-dev.3
+version: 1.0.0-dev.4
 repository: https://github.com/a-mabe/background_hiit_timer
 
 funding:
@@ -20,11 +20,11 @@ dependencies:
   flutter_fgbg: ^0.3.0
   flutter_local_notifications: ^17.1.2
   shared_preferences: ^2.2.0
-  audio_session: ^0.1.16
-  just_audio: ^0.9.35
+  just_audio: ^0.9.39
   soundpool: ^2.4.1
   openhiit_background_service: ^1.0.0-dev.3
   openhiit_background_service_android: ^1.0.0-dev.3
+  just_audio_background: ^0.0.1-beta.13
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
