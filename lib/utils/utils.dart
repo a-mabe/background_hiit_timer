@@ -3,47 +3,10 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:background_hiit_timer/utils/timer_config.dart';
 import 'package:background_hiit_timer/utils/timer_state.dart';
-import 'package:flutter/services.dart';
 import 'package:openhiit_background_service/openhiit_background_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:soundpool/soundpool.dart';
 
 import 'constants.dart';
-
-// Future<audio_session.AudioSession> configureAudioSession() async {
-//   final session = await audio_session.AudioSession.instance;
-
-//   await session.configure(const audio_session.AudioSessionConfiguration(
-//     avAudioSessionCategory: audio_session.AVAudioSessionCategory.playback,
-//     avAudioSessionCategoryOptions:
-//         audio_session.AVAudioSessionCategoryOptions.mixWithOthers,
-//     avAudioSessionMode: audio_session.AVAudioSessionMode.defaultMode,
-//     avAudioSessionRouteSharingPolicy:
-//         audio_session.AVAudioSessionRouteSharingPolicy.defaultPolicy,
-//     avAudioSessionSetActiveOptions:
-//         audio_session.AVAudioSessionSetActiveOptions.none,
-//     androidAudioAttributes: audio_session.AndroidAudioAttributes(
-//       contentType: audio_session.AndroidAudioContentType.sonification,
-//       flags: audio_session.AndroidAudioFlags.audibilityEnforced,
-//       usage: audio_session.AndroidAudioUsage.notification,
-//     ),
-//     androidAudioFocusGainType: audio_session.AndroidAudioFocusGainType.gain,
-//     androidWillPauseWhenDucked: true,
-//   ));
-
-//   return session;
-// }
-
-Future<int> loadSound(String sound, Soundpool pool) async {
-  if (sound != "none") {
-    return await rootBundle
-        .load("packages/background_hiit_timer/lib/assets/audio/$sound.mp3")
-        .then((ByteData soundData) {
-      return pool.load(soundData);
-    });
-  }
-  return -1;
-}
 
 void saveTimerPreferences(
     TimerConfig timerConfig, TimerState timerState) async {
@@ -88,7 +51,6 @@ Future<TimerConfig> loadTimerPreferences(SharedPreferences preferences) async {
 Future playSound(AudioPlayer player, String soundTitle,
     SharedPreferences preferences) async {
   if (soundTitle != "") {
-    // await pool.play(soundID);
     preferences.getDouble('volume') == null
         ? await player.setVolume(1.0)
         : await player.setVolume((preferences.getDouble('volume')! / 100));
@@ -199,9 +161,6 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
     if (Platform.isIOS &&
         currentMicroSeconds % 1000000 == 0 &&
         currentMicroSeconds > 4000000) {
-      // await pool.play(blankSoundID);
-      print("BLANK");
-      print(currentMicroSeconds);
       await playSound(player, 'blank', preferences);
     }
   }

@@ -97,7 +97,7 @@ class Countdown extends StatefulWidget {
   /// Constructor
   ///
   const Countdown({
-    Key? key,
+    super.key,
     required this.workSeconds,
     required this.restSeconds,
     required this.numberOfWorkIntervals,
@@ -115,7 +115,7 @@ class Countdown extends StatefulWidget {
     this.countdownSound = 'countdown-beep',
     this.onFinished,
     this.controller,
-  }) : super(key: key);
+  });
 
   @override
   CountdownState createState() => CountdownState();
