@@ -88,7 +88,7 @@ Future playSound(
   if (soundID != -1) {
     await pool.setVolume(
         soundId: soundID,
-        volume: (preferences.getDouble('volume') ?? 80 / 100));
+        volume: ((preferences.getDouble('volume') ?? 80) / 100));
     await pool.play(soundID);
   }
 }

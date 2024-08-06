@@ -197,8 +197,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   ///
   void _onTimerRestart() {
     final service = OpenhiitBackgroundService();
-    service.invoke("stopService");
-    _startTimer();
+    service.invoke("restartService");
   }
 
   ///
@@ -393,6 +392,16 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       });
     }
 
+    service.on('restartService').listen((event) {
+      timerState = TimerState(
+          false,
+          preferences.getInt('numberOfWorkIntervals')!,
+          0,
+          preferences.getInt('getreadySeconds')! * secondsFactor,
+          "start",
+          preferences.getInt('iterations')!);
+    });
+
     service.on('stopService').listen((event) {
       service.stopSelf();
     });
@@ -485,7 +494,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           "paused": timerState.paused,
           "iterations": timerState.iterations,
           "changeVolume": preferences.getBool('changeVolume') ?? false,
-          "volume": preferences.getBool('volume') ?? 80,
+          "volume": preferences.getDouble('volume') ?? 80,
         },
       );
     });
