@@ -481,7 +481,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           "numberOfWorkIntervals": timerState.numberOfWorkIntervalsRemaining,
           "numberOfIntervals": timerState.currentOverallInterval,
           "paused": timerState.paused,
-          "iterations": timerState.iterations
+          "iterations": timerState.iterations,
+          "changeVolume": preferences.getBool('changeVolume') ?? false,
+          "volume": preferences.getBool('volume') ?? 80,
         },
       );
     });
