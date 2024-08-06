@@ -462,6 +462,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               completeSoundID,
               blankSoundID,
               pool,
+              preferences,
               service);
         }
       }
