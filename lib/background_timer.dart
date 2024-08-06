@@ -1,16 +1,17 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:background_hiit_timer/utils/timer_config.dart';
 import 'package:background_hiit_timer/utils/timer_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:openhiit_background_service/openhiit_background_service.dart';
 import 'package:openhiit_background_service_android/openhiit_background_service_android.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:background_hiit_timer/background_timer_controller.dart';
 import 'package:background_hiit_timer/background_timer_data.dart';
+import 'package:soundpool/soundpool.dart';
 
 import 'utils/constants.dart';
 import 'utils/utils.dart';
@@ -97,7 +98,7 @@ class Countdown extends StatefulWidget {
   /// Constructor
   ///
   const Countdown({
-    super.key,
+    Key? key,
     required this.workSeconds,
     required this.restSeconds,
     required this.numberOfWorkIntervals,
@@ -115,7 +116,7 @@ class Countdown extends StatefulWidget {
     this.countdownSound = 'countdown-beep',
     this.onFinished,
     this.controller,
-  });
+  }) : super(key: key);
 
   @override
   CountdownState createState() => CountdownState();
@@ -196,7 +197,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   ///
   void _onTimerRestart() {
     final service = OpenhiitBackgroundService();
-    service.invoke('restartService');
+    service.invoke("stopService");
+    _startTimer();
   }
 
   ///
@@ -268,9 +270,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             data["numberOfWorkIntervals"],
             data["numberOfIntervals"],
             data["paused"],
-            data["iterations"],
-            data["changeVolume"],
-            data["volume"].toDouble());
+            data["iterations"]);
 
         // Return data and context to the UI
         return widget.build(context, backgroundTimerData);
@@ -373,20 +373,13 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         "start",
         preferences.getInt('iterations')!);
 
-    // Configure the soundpool for the sound effects.
-    final player = AudioPlayer();
+    // Configure the audio session so that the timer does not
+    // duck or pause other audio
+    await configureAudioSession();
 
-    await player.setAudioContext(AudioContext(
-      android: const AudioContextAndroid(
-          audioFocus: AndroidAudioFocus.none,
-          usageType: AndroidUsageType.media),
-      iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.playback,
-        options: const {
-          AVAudioSessionOptions.mixWithOthers,
-        },
-      ),
-    ));
+    // Configure the soundpool for the sound effects.
+    SoundpoolOptions soundpoolOptions = const SoundpoolOptions();
+    Soundpool pool = Soundpool.fromOptions(options: soundpoolOptions);
 
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
@@ -398,20 +391,21 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       });
     }
 
-    service.on('restartService').listen((event) {
-      timerState = TimerState(
-          false,
-          preferences.getInt('numberOfWorkIntervals')!,
-          0,
-          preferences.getInt('getreadySeconds')! * secondsFactor,
-          "start",
-          preferences.getInt('iterations')!);
-    });
-
     service.on('stopService').listen((event) {
-      player.dispose();
       service.stopSelf();
     });
+
+    int blankSoundID = await rootBundle
+        .load("packages/background_hiit_timer/lib/assets/audio/blank.mp3")
+        .then((ByteData soundData) {
+      return pool.load(soundData);
+    });
+
+    int countdownSoundID = await loadSound(timerConfig.countdownSound, pool);
+    int halfwaySoundID = await loadSound(timerConfig.halfwaySound, pool);
+    int restSoundID = await loadSound(timerConfig.restSound, pool);
+    int workSoundID = await loadSound(timerConfig.workSound, pool);
+    int completeSoundID = await loadSound(timerConfig.completeSound, pool);
 
     Timer.periodic(interval, (timer) async {
       // Refresh shared preferences
@@ -461,9 +455,14 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               timerState,
               secondsFactor,
               timerState.currentMicroSeconds,
-              service,
-              player,
-              preferences);
+              workSoundID,
+              restSoundID,
+              halfwaySoundID,
+              countdownSoundID,
+              completeSoundID,
+              blankSoundID,
+              pool,
+              service);
         }
       }
 
@@ -481,9 +480,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           "numberOfWorkIntervals": timerState.numberOfWorkIntervalsRemaining,
           "numberOfIntervals": timerState.currentOverallInterval,
           "paused": timerState.paused,
-          "iterations": timerState.iterations,
-          "changeVolume": preferences.getBool('changeVolume') ?? false,
-          "volume": preferences.getDouble('volume') ?? 80.0,
+          "iterations": timerState.iterations
         },
       );
     });
