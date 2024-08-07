@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:audio_session/audio_session.dart';
 import 'package:background_hiit_timer/utils/timer_config.dart';
 import 'package:background_hiit_timer/utils/timer_state.dart';
@@ -85,8 +83,6 @@ Future<TimerConfig> loadTimerPreferences(SharedPreferences preferences) async {
 
 Future playSound(
     int soundID, Soundpool pool, SharedPreferences preferences) async {
-  print("soundid");
-  print(soundID);
   if (soundID != -1) {
     await pool.setVolume(
         soundId: soundID,
