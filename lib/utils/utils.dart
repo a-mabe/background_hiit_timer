@@ -87,6 +87,8 @@ Future<TimerConfig> loadTimerPreferences(SharedPreferences preferences) async {
 
 Future playSound(
     int soundID, Soundpool pool, SharedPreferences preferences) async {
+  print("soundid");
+  print(soundID);
   if (soundID != -1) {
     await pool.setVolume(
         soundId: soundID,
