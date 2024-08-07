@@ -117,11 +117,11 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
   if (currentMicroSeconds == halfWorkSeconds &&
       halfwaySoundID != -1 &&
       timerState.status == workStatus) {
-    await pool.play(halfwaySoundID);
+    await playSound(halfwaySoundID, pool, preferences);
   }
   // Check if the 3, 2, 1 sound should play
   else if ((currentMicroSeconds - 500000) == 3500000) {
-    await pool.play(blankSoundID);
+    await playSound(blankSoundID, pool, preferences);
   } else if ((currentMicroSeconds - 500000) == 2500000 ||
       (currentMicroSeconds - 500000) == 1500000 ||
       (currentMicroSeconds - 500000) == 500000) {
@@ -202,8 +202,8 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
     await pool.release();
     service.stopSelf();
   } else {
-    if (Platform.isIOS) {
-      await pool.play(blankSoundID);
+    if (currentMicroSeconds % 1000000 == 0) {
+      await playSound(blankSoundID, pool, preferences);
     }
   }
 
