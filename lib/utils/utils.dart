@@ -35,7 +35,7 @@ Future<AudioSession> configureAudioSession() async {
 Future<int> loadSound(String sound, Soundpool pool) async {
   print("WWWWWWWWWWWWWWWWWWWWWWWWWW");
   print(sound);
-  if (sound != "none" || sound != "None") {
+  if (!sound.contains("none")) {
     print("enter");
     return await rootBundle
         .load("packages/background_hiit_timer/lib/assets/audio/$sound.mp3")
