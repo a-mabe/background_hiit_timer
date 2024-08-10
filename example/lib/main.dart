@@ -1,5 +1,6 @@
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:background_hiit_timer/background_timer.dart';
 import 'package:background_hiit_timer/background_timer_controller.dart';
 import 'package:background_hiit_timer/background_timer_data.dart';
@@ -51,6 +52,7 @@ class MyHomePage extends StatefulWidget {
 class MyHomePageState extends State<MyHomePage> {
   // Controller
   final CountdownController _controller = CountdownController(autoStart: true);
+  double _currentSliderValue = 80;
 
   @override
   initState() {
@@ -76,6 +78,11 @@ class MyHomePageState extends State<MyHomePage> {
       androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
       androidWillPauseWhenDucked: true,
     ));
+  }
+
+  Future<void> setVolume(double volume) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('volume', volume);
   }
 
   Color backgroundColor(String status) {
@@ -163,6 +170,18 @@ class MyHomePageState extends State<MyHomePage> {
                         ),
                       ],
                     ),
+                  ),
+                  Slider(
+                    value: _currentSliderValue,
+                    max: 100,
+                    divisions: 10,
+                    label: _currentSliderValue.round().toString(),
+                    onChanged: (double value) async {
+                      setState(() {
+                        _currentSliderValue = value;
+                      });
+                      await setVolume(value);
+                    },
                   ),
                 ],
               ),

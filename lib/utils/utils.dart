@@ -33,7 +33,7 @@ Future<AudioSession> configureAudioSession() async {
 }
 
 Future<int> loadSound(String sound, Soundpool pool) async {
-  if (sound != "none") {
+  if (!sound.contains("none")) {
     return await rootBundle
         .load("packages/background_hiit_timer/lib/assets/audio/$sound.mp3")
         .then((ByteData soundData) {
@@ -83,8 +83,12 @@ Future<TimerConfig> loadTimerPreferences(SharedPreferences preferences) async {
   return timerConfig;
 }
 
-Future playSound(int soundID, Soundpool pool) async {
+Future playSound(
+    int soundID, Soundpool pool, SharedPreferences preferences) async {
   if (soundID != -1) {
+    await pool.setVolume(
+        soundId: soundID,
+        volume: ((preferences.getDouble('volume') ?? 80) / 100));
     await pool.play(soundID);
   }
 }
@@ -101,6 +105,7 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
     int completeSoundID,
     int blankSoundID,
     Soundpool pool,
+    SharedPreferences preferences,
     ServiceInstance service) async {
   /// Calculate half of the work time
   int halfWorkSeconds =
@@ -110,22 +115,22 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
   if (currentMicroSeconds == halfWorkSeconds &&
       halfwaySoundID != -1 &&
       timerState.status == workStatus) {
-    await pool.play(halfwaySoundID);
+    await playSound(halfwaySoundID, pool, preferences);
   }
   // Check if the 3, 2, 1 sound should play
   else if ((currentMicroSeconds - 500000) == 3500000) {
-    await pool.play(blankSoundID);
+    await playSound(blankSoundID, pool, preferences);
   } else if ((currentMicroSeconds - 500000) == 2500000 ||
       (currentMicroSeconds - 500000) == 1500000 ||
       (currentMicroSeconds - 500000) == 500000) {
-    await playSound(countdownSoundID, pool);
+    await playSound(countdownSoundID, pool, preferences);
   }
 
   /// Check which end sound should play
   else if (currentMicroSeconds == 0) {
     if (timerState.status == cooldownStatus) {
       /// Play complete sound
-      await playSound(completeSoundID, pool);
+      await playSound(completeSoundID, pool, preferences);
 
       /// Switch to the complete state
       timerState.status = completeStatus;
@@ -141,7 +146,7 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
           timerState.iterations == 0) {
         // timerState.iterations = timerState.iterations - 1;
         // Play the rest sound
-        await playSound(restSoundID, pool);
+        await playSound(restSoundID, pool, preferences);
         timerState = TimerState(
             false,
             preferences.getInt('numberOfWorkIntervals')!,
@@ -151,7 +156,7 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
             timerState.iterations);
       } else {
         /// Play complete sound
-        await playSound(completeSoundID, pool);
+        await playSound(completeSoundID, pool, preferences);
 
         /// Switch to the complete state
         timerState.status = completeStatus;
@@ -184,19 +189,19 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
     } else if (timerState.status == workStatus ||
         timerState.status == warmupStatus) {
       // Play the rest sound
-      await playSound(restSoundID, pool);
+      await playSound(restSoundID, pool, preferences);
     } else if (timerState.status == restStatus ||
         timerState.status == startStatus ||
         timerState.status == breakStatus) {
       // Play the work sound
-      await playSound(workSoundID, pool);
+      await playSound(workSoundID, pool, preferences);
     }
   } else if (currentMicroSeconds < -500000) {
     await pool.release();
     service.stopSelf();
   } else {
-    if (Platform.isIOS) {
-      await pool.play(blankSoundID);
+    if (Platform.isIOS && currentMicroSeconds % 1000000 == 0) {
+      await playSound(blankSoundID, pool, preferences);
     }
   }
 

@@ -197,8 +197,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   ///
   void _onTimerRestart() {
     final service = OpenhiitBackgroundService();
-    service.invoke("stopService");
-    _startTimer();
+    service.invoke("restartService");
   }
 
   ///
@@ -270,7 +269,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             data["numberOfWorkIntervals"],
             data["numberOfIntervals"],
             data["paused"],
-            data["iterations"]);
+            data["iterations"],
+            data["changeVolume"],
+            data["volume"]);
 
         // Return data and context to the UI
         return widget.build(context, backgroundTimerData);
@@ -391,6 +392,16 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       });
     }
 
+    service.on('restartService').listen((event) {
+      timerState = TimerState(
+          false,
+          preferences.getInt('numberOfWorkIntervals')!,
+          0,
+          preferences.getInt('getreadySeconds')! * secondsFactor,
+          "start",
+          preferences.getInt('iterations')!);
+    });
+
     service.on('stopService').listen((event) {
       service.stopSelf();
     });
@@ -462,6 +473,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
               completeSoundID,
               blankSoundID,
               pool,
+              preferences,
               service);
         }
       }
@@ -480,7 +492,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           "numberOfWorkIntervals": timerState.numberOfWorkIntervalsRemaining,
           "numberOfIntervals": timerState.currentOverallInterval,
           "paused": timerState.paused,
-          "iterations": timerState.iterations
+          "iterations": timerState.iterations,
+          "changeVolume": preferences.getBool('changeVolume') ?? false,
+          "volume": preferences.getDouble('volume') ?? 80,
         },
       );
     });
