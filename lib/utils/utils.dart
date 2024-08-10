@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:audio_session/audio_session.dart';
 import 'package:background_hiit_timer/utils/timer_config.dart';
 import 'package:background_hiit_timer/utils/timer_state.dart';
@@ -198,7 +200,7 @@ Future<TimerState> playSoundEffectAndDetermineStatus(
     await pool.release();
     service.stopSelf();
   } else {
-    if (currentMicroSeconds % 1000000 == 0) {
+    if (Platform.isIOS && currentMicroSeconds % 1000000 == 0) {
       await playSound(blankSoundID, pool, preferences);
     }
   }
