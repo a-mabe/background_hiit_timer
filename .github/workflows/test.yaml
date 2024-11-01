@@ -35,10 +35,22 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-      - run: flutter pub get
-        working-directory: example
-      - run: flutter test
-        working-directory: example
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          script: flutter devices
+          # script: flutter run -t ./example/test/widget_test.dart
+      # - run: flutter pub get
+      #   working-directory: example
+      # - run: flutter test
+      #   working-directory: example
 
 # jobs:
 #   test:
