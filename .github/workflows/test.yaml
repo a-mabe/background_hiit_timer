@@ -44,7 +44,7 @@ jobs:
       - name: run tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
+          api-level: 34
           # script: flutter devices
           script: flutter run -t ./example/test/widget_test.dart
       # - run: flutter pub get
