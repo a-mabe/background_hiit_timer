@@ -1,15 +1,14 @@
 import 'package:audio_session/audio_session.dart';
+import 'package:background_hiit_timer/models/interval_type.dart';
+import 'package:background_hiit_timer/utils/timer_state.dart';
+import 'package:example/controls/control_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:background_hiit_timer/background_timer.dart';
 import 'package:background_hiit_timer/background_timer_controller.dart';
-import 'package:background_hiit_timer/background_timer_data.dart';
 
 void main() => runApp(const MyApp());
 
-///
-/// Test app
-///
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -20,59 +19,130 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(
-        title: 'Flutter Demo Countdown',
-      ),
+      home: const MyHomePage(title: 'Flutter Demo Countdown'),
     );
   }
 }
 
-///
-/// Home page
-///
 class MyHomePage extends StatefulWidget {
-  ///
-  /// AppBar title
-  ///
   final String title;
-
-  /// Home page
-  const MyHomePage({
-    Key? key,
-    required this.title,
-  }) : super(key: key);
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
 
   @override
   MyHomePageState createState() => MyHomePageState();
 }
 
-///
-/// Page state
-///
 class MyHomePageState extends State<MyHomePage> {
-  // Controller
   final CountdownController _controller = CountdownController(autoStart: true);
-  double _currentSliderValue = 80;
+  bool _paused = false;
+  bool _changeVolume = false;
+  double _volume = .8;
+  late SharedPreferences prefs;
+
+  final List<IntervalType> intervals = [
+    IntervalType(
+        id: "0",
+        workoutId: "1",
+        time: 10,
+        name: "Get ready",
+        color: 0,
+        intervalIndex: 0,
+        startSound: "",
+        halfwaySound: "",
+        countdownSound: "countdown-beep",
+        endSound: ""),
+    IntervalType(
+        id: "1",
+        workoutId: "1",
+        time: 10,
+        name: "Warmup",
+        color: 0,
+        intervalIndex: 1,
+        startSound: "long-bell",
+        halfwaySound: "",
+        countdownSound: "countdown-beep",
+        endSound: ""),
+    IntervalType(
+        id: "2",
+        workoutId: "1",
+        time: 20,
+        name: "Work",
+        color: 0,
+        intervalIndex: 2,
+        startSound: "long-bell",
+        halfwaySound: "",
+        countdownSound: "countdown-beep",
+        endSound: ""),
+    IntervalType(
+        id: "3",
+        workoutId: "1",
+        time: 10,
+        name: "Rest",
+        color: 0,
+        intervalIndex: 3,
+        startSound: "long-rest-beep",
+        halfwaySound: "",
+        countdownSound: "countdown-beep",
+        endSound: ""),
+    IntervalType(
+        id: "4",
+        workoutId: "1",
+        time: 20,
+        name: "Work",
+        color: 0,
+        intervalIndex: 4,
+        startSound: "long-bell",
+        halfwaySound: "",
+        countdownSound: "",
+        endSound: ""),
+    IntervalType(
+        id: "5",
+        workoutId: "1",
+        time: 10,
+        name: "Rest",
+        color: 0,
+        intervalIndex: 5,
+        startSound: "long-rest-beep",
+        halfwaySound: "",
+        countdownSound: "",
+        endSound: ""),
+    IntervalType(
+        id: "6",
+        workoutId: "1",
+        time: 10,
+        name: "Cooldown",
+        color: 0,
+        intervalIndex: 6,
+        startSound: "long-rest-beep",
+        countdownSound: "countdown-beep",
+        endSound: "horn",
+        halfwaySound: ''),
+  ];
+
+  static const Map<String, Color> intervalColors = {
+    "Work": Colors.green,
+    "Rest": Colors.red,
+    "Get ready": Colors.black,
+    "Warmup": Colors.orange,
+    "Cooldown": Colors.blue,
+    "End": Colors.purple,
+  };
 
   @override
-  initState() {
+  void initState() {
     super.initState();
-    init();
+    initializeAudioSession();
+    loadPreferences();
   }
 
-  void init() async {
+  Future<void> initializeAudioSession() async {
     final session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration(
       avAudioSessionCategory: AVAudioSessionCategory.ambient,
       avAudioSessionCategoryOptions:
           AVAudioSessionCategoryOptions.mixWithOthers,
-      avAudioSessionMode: AVAudioSessionMode.defaultMode,
-      avAudioSessionRouteSharingPolicy:
-          AVAudioSessionRouteSharingPolicy.defaultPolicy,
-      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
       androidAudioAttributes: AndroidAudioAttributes(
         contentType: AndroidAudioContentType.speech,
-        flags: AndroidAudioFlags.none,
         usage: AndroidAudioUsage.voiceCommunication,
       ),
       androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
@@ -80,113 +150,83 @@ class MyHomePageState extends State<MyHomePage> {
     ));
   }
 
-  Future<void> setVolume(double volume) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('volume', volume);
+  Future<void> loadPreferences() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _volume = prefs.getDouble('volume') ?? .8;
+      _changeVolume = prefs.getBool('changeVolume') ?? false;
+    });
   }
 
-  Color backgroundColor(String status) {
-    switch (status) {
-      case "work":
-        return Colors.green;
-      case "rest":
-        return Colors.red;
-      case "start":
-        return Colors.black;
-      case "break":
-        return Colors.teal;
-      case "warmup":
-        return Colors.orange;
-      case "cooldown":
-        return Colors.blue;
-      default:
-        return const Color.fromARGB(255, 0, 225, 255);
-    }
+  Future<void> toggleVolumeSlider() async {
+    setState(() {
+      _changeVolume = !_changeVolume;
+    });
+    await prefs.setBool('changeVolume', _changeVolume);
   }
+
+  Future<void> togglePause() async {
+    setState(() {
+      _paused = !_paused;
+    });
+    _paused ? _controller.pause() : _controller.resume();
+  }
+
+  Color getBackgroundColor(String status) =>
+      intervalColors[status] ?? const Color.fromARGB(255, 0, 225, 255);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Countdown(
-          controller: _controller,
-          workSeconds: 4,
-          restSeconds: 2,
-          getreadySeconds: 7,
-          breakSeconds: 5,
-          warmupSeconds: 10,
-          cooldownSeconds: 10,
-          numberOfWorkIntervals: 1,
-          iterations: 0,
-          onFinished: () {},
-          build: (_, BackgroundTimerData timerData) {
-            return Container(
-              color: backgroundColor(timerData.status),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    timerData.status,
-                    style: const TextStyle(fontSize: 50, color: Colors.white),
-                  ),
-                  Text(
-                    timerData.currentMicroSeconds.toString(),
-                    style: const TextStyle(fontSize: 100, color: Colors.white),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        // Start
-                        ElevatedButton(
-                          child: const Text('Start'),
-                          onPressed: () {
-                            _controller.start();
-                          },
-                        ),
-                        // Pause
-                        ElevatedButton(
-                          child: const Text('Pause'),
-                          onPressed: () {
-                            _controller.pause();
-                          },
-                        ),
-                        // Resume
-                        ElevatedButton(
-                          child: const Text('Resume'),
-                          onPressed: () {
-                            _controller.resume();
-                          },
-                        ),
-                        // Stop
-                        ElevatedButton(
-                          child: const Text('Restart'),
-                          onPressed: () {
-                            _controller.restart();
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Slider(
-                    value: _currentSliderValue,
-                    max: 100,
-                    divisions: 10,
-                    label: _currentSliderValue.round().toString(),
-                    onChanged: (double value) async {
-                      setState(() {
-                        _currentSliderValue = value;
-                      });
-                      await setVolume(value);
-                    },
-                  ),
-                ],
-              ),
-            );
-          }),
+        controller: _controller,
+        seconds: 30,
+        intervals: intervals,
+        onFinished: () {},
+        build: (_, TimerState timerState) {
+          return Container(
+            color: getBackgroundColor(timerState.status),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(timerState.status,
+                    style: const TextStyle(fontSize: 50, color: Colors.white)),
+                Text(
+                    (timerState.currentMicroSeconds /
+                            const Duration(seconds: 1).inMicroseconds)
+                        .round()
+                        .toString(),
+                    style: const TextStyle(fontSize: 100, color: Colors.white)),
+                ControlBar(
+                  onRestart: () => _controller.restart(),
+                  paused: _paused,
+                  changeVolume: _changeVolume,
+                  volume: _volume,
+                  onTogglePlayPause: togglePause,
+                  onAdjustVolume: toggleVolumeSlider,
+                  onSkipNext: _controller.skipNext,
+                  onSkipPrevious: _controller.skipPrevious,
+                ),
+                Center(
+                    child: TextButton(
+                  onPressed: () {
+                    _controller.stop();
+                  },
+                  child: const Text('Stop'),
+                )),
+                Center(
+                    child: TextButton(
+                  onPressed: () {
+                    _controller.start();
+                  },
+                  child: const Text('Start'),
+                ))
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

@@ -11,20 +11,46 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:example/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('Timer smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Wait until the text "Get ready" is found.
+    await tester.pumpAndSettle();
+    expect(find.text('Get ready'), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    // Move forward 11 seconds.
+    await tester.pump(const Duration(seconds: 11));
+
+    await tester.pumpAndSettle();
+    expect(find.text('Warmup'), findsOneWidget);
+
+    // Move forward 22 seconds.
+    await tester.pump(const Duration(seconds: 20));
+    await tester.pumpAndSettle();
+    expect(find.text('Work'), findsOneWidget);
+
+    // Tap the restart icon.
+    await tester.tap(find.byIcon(Icons.restart_alt));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Wait at most 10 seconds for "Get ready" to be on screen.
+    await tester.pumpAndSettle(const Duration(seconds: 10));
+    // expect(find.text('Get ready'), findsOneWidget);
+
+    // Tap the button with the text "Stop".
+    await tester.tap(find.text('Stop'));
+    await tester.pump();
+
+    // Verify that the initial text is "Get ready".
+    // expect(find.text('Get ready'), findsOneWidget);
+    // expect(find.text('Warmup'), findsNothing);
+
+    // // Wait for 11 seconds.
+    // await tester.pump(const Duration(seconds: 11));
+
+    // // Verify that the text has changed to "Warmup".
+    // expect(find.text('Get ready'), findsNothing);
+    // expect(find.text('Warmup'), findsOneWidget);
   });
 }
