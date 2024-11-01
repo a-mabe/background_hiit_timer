@@ -4,6 +4,9 @@ run-name: ${{ github.actor }} is testing the app
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 'interval-type'
     
   # pull_request:
   #   types:
