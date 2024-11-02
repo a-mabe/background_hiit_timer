@@ -48,6 +48,7 @@ jobs:
           arch: x86_64
           # script: flutter devices
           script: flutter run -t ./example/test/widget_test.dart
+          working-directory: example
       # - run: flutter pub get
       #   working-directory: example
       # - run: flutter test
