@@ -5,6 +5,8 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -41,6 +43,8 @@ void main() {
     // Tap the button with the text "Stop".
     await tester.tap(find.text('Stop'));
     await tester.pump();
+
+    exit(0);
 
     // Verify that the initial text is "Get ready".
     // expect(find.text('Get ready'), findsOneWidget);

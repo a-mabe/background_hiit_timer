@@ -13,6 +13,9 @@ dependencies:
         path: "../"
   audio_session: ^0.1.16
   shared_preferences: ^2.3.2
+  flutter_driver:
+    sdk: flutter
+  test: ^1.25.8
 
 dev_dependencies:
   flutter_test:

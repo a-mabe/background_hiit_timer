@@ -81,6 +81,7 @@ class ControlBarState extends State<ControlBar> {
                 onPressed: widget.onSkipNext,
               ),
               IconButton(
+                tooltip: 'Restart',
                 icon: const Icon(Icons.restart_alt, color: Colors.white),
                 onPressed: widget.onRestart,
               ),
