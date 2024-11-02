@@ -50,7 +50,7 @@ jobs:
         with:
           api-level: 35
           arch: x86_64
-          script: flutter drive -d test
+          script: flutter drive -d emulator-5554
           # script: flutter run -t ./test/widget_test.dart
           working-directory: example
       # - run: flutter pub get
