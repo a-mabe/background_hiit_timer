@@ -50,7 +50,7 @@ jobs:
         with:
           api-level: 35
           arch: x86_64
-          script: flutter emulators
+          script: flutter test -d test
           # script: flutter run -t ./test/widget_test.dart
           working-directory: example
       # - run: flutter pub get
