@@ -1,6 +1,6 @@
 # background_hiit_timer
 
-A Flutter package for creating a background HIIT (High-Intensity Interval Training) timer. This package is based on the [`timer_count_down`](https://pub.dev/packages/timer_count_down) package and extends its functionality to support background execution for interval timers.
+A Flutter package for creating a high-intensity interval training (HIIT) timer with full background service capabilities.
 
 ## Installation
 
@@ -25,20 +25,17 @@ Create a `Countdown` widget and configure it with your interval settings:
 
 ```dart
 Countdown(
-    controller: _controller,
-    workSeconds: 20,
-    restSeconds: 10,
-    getreadySeconds: 10,
-    breakSeconds: 30,
-    warmupSeconds: 60,
-    cooldownSeconds: 60,
-    numberOfWorkIntervals: 8,
-    iterations: 2,
-    onFinished: () {},
-    build: Text(timerData.currentMicroSeconds.toString())
+  controller: _controller,
+  seconds: 30,
+  intervals: intervals,
+  onFinished: () {},
+  build: (_, TimerState timerState) {
+    Text(timerState.currentMicroSeconds.toString())
+  }
+)
 ```
 
-Ensure that your app is properly configured to handle background execution on both Android and iOS platforms.
+Ensure that your app is properly configured to handle background execution on both Android and iOS platforms. Refer to [flutter_background_service](https://pub.dev/packages/flutter_background_service) for additional details.
 
 ## Example
 
@@ -46,7 +43,7 @@ Check out the `example` directory in this repository for a complete example of h
 
 ## Credits
 
-This package is based on the [`timer_count_down`](https://pub.dev/packages/timer_count_down) package by [Dizoft Team](https://github.com/DizoftTeam).
+This package is inspired by the [`timer_count_down`](https://pub.dev/packages/timer_count_down) package by [Dizoft Team](https://github.com/DizoftTeam).
 
 ## License
 

@@ -8,16 +8,14 @@ import 'package:background_hiit_timer/utils/log.dart';
 import 'package:background_hiit_timer/utils/timer_state.dart';
 import 'package:background_hiit_timer/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:openhiit_background_service/openhiit_background_service.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:openhiit_background_service_android/openhiit_background_service_android.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soundpool/soundpool.dart';
 
 import 'utils/constants.dart';
 
 class Countdown extends StatefulWidget {
-  final int seconds;
   final List<IntervalType> intervals;
   final Widget Function(BuildContext, TimerState) build;
   final Function? onFinished;
@@ -25,7 +23,6 @@ class Countdown extends StatefulWidget {
 
   const Countdown({
     super.key,
-    required this.seconds,
     required this.intervals,
     required this.build,
     this.onFinished,
@@ -71,7 +68,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   @override
   void dispose() {
     if (isActive) {
-      OpenhiitBackgroundService().invoke("stopService");
+      FlutterBackgroundService().invoke("stopService");
     }
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -92,18 +89,22 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   }
 
   void _onTimerRestart() {
-    OpenhiitBackgroundService().invoke("restartService");
+    logger.d("Restarting timer");
+    FlutterBackgroundService().invoke("restartService");
   }
 
   void _onTimerSkipNext() {
-    OpenhiitBackgroundService().invoke("skipNext");
+    logger.d("Skipping to next interval");
+    FlutterBackgroundService().invoke("skipNext");
   }
 
   void _onTimerSkipPrevious() {
-    OpenhiitBackgroundService().invoke("skipPrevious");
+    logger.d("Skipping to previous interval");
+    FlutterBackgroundService().invoke("skipPrevious");
   }
 
   void _startTimer() async {
+    logger.d("Starting timer");
     setState(() => isActive = true);
 
     // Ensure the 'pause' shared preference is set to false when the timer starts
@@ -115,14 +116,15 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   }
 
   void _stopTimer() {
+    logger.d("Stopping timer");
     setState(() => isActive = false);
-    OpenhiitBackgroundService().invoke("stopService");
+    FlutterBackgroundService().invoke("stopService");
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Map<String, dynamic>?>(
-      stream: OpenhiitBackgroundService().on('update'),
+      stream: FlutterBackgroundService().on('update'),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
@@ -137,7 +139,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   }
 
   Future<void> _initializeService() async {
-    final service = OpenhiitBackgroundService();
+    final service = FlutterBackgroundService();
 
     // Database setup
     DatabaseManager dbManager = DatabaseManager();
@@ -199,7 +201,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     double volume = preferences.getDouble("volume") ?? 80.0;
     bool changeVolume = preferences.getBool("changeVolume") ?? false;
-    await configureAudioSession();
 
     Soundpool pool = Soundpool.fromOptions();
     DatabaseManager dbManager = DatabaseManager();
@@ -230,14 +231,14 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         int soundID = await loadSound(intervals[i].startSound, pool);
         soundMap['${i}_sound'] = soundID;
       } else {
-        soundMap['${i}_sound'] = 0;
+        soundMap['${i}_sound'] = -1;
       }
 
       if (intervals[i].halfwaySound.isNotEmpty) {
         int halfwaySoundID = await loadSound(intervals[i].halfwaySound, pool);
         soundMap['${i}_halfwaySound'] = halfwaySoundID;
       } else {
-        soundMap['${i}_halfwaySound'] = 0;
+        soundMap['${i}_halfwaySound'] = -1;
       }
 
       if (intervals[i].countdownSound.isNotEmpty) {
@@ -245,26 +246,26 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             await loadSound(intervals[i].countdownSound, pool);
         soundMap['${i}_countdownSound'] = countdownSoundID;
       } else {
-        soundMap['${i}_countdownSound'] = 0;
+        soundMap['${i}_countdownSound'] = -1;
       }
 
       if (intervals[i].endSound.isNotEmpty) {
         int endSoundID = await loadSound(intervals[i].endSound, pool);
         soundMap['${i}_endSound'] = endSoundID;
       } else {
-        soundMap['${i}_endSound'] = 0;
+        soundMap['${i}_endSound'] = -1;
       }
     }
     return soundMap;
   }
 
-  static void _registerServiceEvents(
+  static Future<void> _registerServiceEvents(
       ServiceInstance service,
       List<IntervalType> intervals,
       SharedPreferences preferences,
       Map<String, int> soundMap,
       TimerState timerState,
-      Soundpool pool) {
+      Soundpool pool) async {
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
         service.setAsForegroundService();
@@ -298,11 +299,13 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       service.stopSelf();
     });
 
+    int blankSoundId = await loadSound('blank', pool);
+
     Timer.periodic(interval, (timer) async {
       preferences.reload();
       timerState.paused = preferences.getBool('pause') ?? false;
 
-      if (!timerState.paused && timerState.currentMicroSeconds >= 0) {
+      if (!timerState.paused) {
         timerState.currentMicroSeconds -= interval.inMicroseconds;
 
         int intervalIndex = timerState.currentInterval;
@@ -312,19 +315,20 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             .contains(timerState.currentMicroSeconds)) {
           await playSound(
               soundMap["${intervalIndex}_countdownSound"]!, pool, preferences);
-        } else if (timerState.currentMicroSeconds == 1000000) {
+        } else if (timerState.currentMicroSeconds ==
+            timerState.intervalMicroSeconds ~/ 2) {
+          await playSound(
+              soundMap["${intervalIndex}_halfwaySound"]!, pool, preferences);
+        } else if (timerState.currentMicroSeconds == 700000) {
           if (intervalIndex < intervals.length - 1) {
             int soundId = soundMap["${nextIntervalIndex}_sound"]!;
             if (soundId != 0) {
-              logger.d("Playing sound for interval $nextIntervalIndex");
               await playSound(soundId, pool, preferences);
             } else if (soundMap["${intervalIndex}_endSound"]! != 0) {
-              logger.d("Playing end sound for interval $intervalIndex");
               await playSound(
                   soundMap["${intervalIndex}_endSound"]!, pool, preferences);
             }
           } else {
-            logger.d("Playing sound for end of workout");
             await playSound(
                 soundMap["${intervalIndex}_endSound"]!, pool, preferences);
           }
@@ -333,8 +337,14 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           logger.d("Advancing to next interval");
           timerState.advanceToNextInterval(intervals);
         }
+      } else if (timerState.currentMicroSeconds % 1000000 == 0) {
+        await playSound(blankSoundId, pool, preferences);
       } else if (timerState.currentMicroSeconds < 0) {
+        logger.d("All intervals completed");
         timerState.status = "End";
+      } else if (timerState.currentMicroSeconds == -3000000) {
+        timer.cancel();
+        service.stopSelf();
       }
 
       service.invoke('update', timerState.toMap());

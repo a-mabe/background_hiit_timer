@@ -38,6 +38,8 @@ class MyHomePage extends StatefulWidget {
 
 class MyHomePageState extends State<MyHomePage> {
   final CountdownController _controller = CountdownController(autoStart: true);
+  List<int> listItems = [];
+  List<int> removedItems = [];
   bool _paused = false;
   bool _changeVolume = false;
   double _volume = .8;
@@ -74,7 +76,7 @@ class MyHomePageState extends State<MyHomePage> {
         color: 0,
         intervalIndex: 2,
         startSound: "long-bell",
-        halfwaySound: "",
+        halfwaySound: "short-halfway-beep",
         countdownSound: "countdown-beep",
         endSound: ""),
     IntervalType(
@@ -96,7 +98,7 @@ class MyHomePageState extends State<MyHomePage> {
         color: 0,
         intervalIndex: 4,
         startSound: "long-bell",
-        halfwaySound: "",
+        halfwaySound: "short-halfway-beep",
         countdownSound: "",
         endSound: ""),
     IntervalType(
@@ -120,7 +122,7 @@ class MyHomePageState extends State<MyHomePage> {
         startSound: "long-rest-beep",
         countdownSound: "countdown-beep",
         endSound: "horn",
-        halfwaySound: ''),
+        halfwaySound: ""),
   ];
 
   static const Map<String, Color> intervalColors = {
@@ -137,17 +139,24 @@ class MyHomePageState extends State<MyHomePage> {
     super.initState();
     initializeAudioSession();
     loadPreferences();
+    listItems = intervals.map((interval) => interval.intervalIndex).toList();
   }
 
   Future<void> initializeAudioSession() async {
     final session = await AudioSession.instance;
+
     await session.configure(const AudioSessionConfiguration(
-      avAudioSessionCategory: AVAudioSessionCategory.ambient,
+      avAudioSessionCategory: AVAudioSessionCategory.playback,
       avAudioSessionCategoryOptions:
           AVAudioSessionCategoryOptions.mixWithOthers,
+      avAudioSessionMode: AVAudioSessionMode.defaultMode,
+      avAudioSessionRouteSharingPolicy:
+          AVAudioSessionRouteSharingPolicy.defaultPolicy,
+      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
       androidAudioAttributes: AndroidAudioAttributes(
-        contentType: AndroidAudioContentType.speech,
-        usage: AndroidAudioUsage.voiceCommunication,
+        contentType: AndroidAudioContentType.sonification,
+        flags: AndroidAudioFlags.audibilityEnforced,
+        usage: AndroidAudioUsage.notification,
       ),
       androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
       androidWillPauseWhenDucked: true,
@@ -184,10 +193,21 @@ class MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: Countdown(
         controller: _controller,
-        seconds: 30,
         intervals: intervals,
         onFinished: () {},
         build: (_, TimerState timerState) {
+          while (listItems.length + timerState.currentInterval >
+              intervals.length) {
+            removedItems.add(listItems[0]);
+            listItems.removeAt(0);
+          }
+
+          while (listItems.length + timerState.currentInterval <
+              intervals.length) {
+            listItems.insert(0, removedItems[removedItems.length - 1]);
+            removedItems.removeAt(removedItems.length - 1);
+          }
+
           return Container(
             color: getBackgroundColor(timerState.status),
             child: Column(
@@ -212,20 +232,22 @@ class MyHomePageState extends State<MyHomePage> {
                   onSkipNext: _controller.skipNext,
                   onSkipPrevious: _controller.skipPrevious,
                 ),
-                Center(
-                    child: TextButton(
-                  onPressed: () {
-                    _controller.stop();
-                  },
-                  child: const Text('Stop'),
-                )),
-                Center(
-                    child: TextButton(
-                  onPressed: () {
-                    _controller.start();
-                  },
-                  child: const Text('Start'),
-                ))
+                SizedBox(
+                  height: 220,
+                  child: ListView.builder(
+                    itemCount: listItems.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                          color: const Color.fromARGB(64, 0, 0, 0),
+                          child: ListTile(
+                            title: Text(
+                              intervals[listItems[index]].name,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ));
+                    },
+                  ),
+                )
               ],
             ),
           );

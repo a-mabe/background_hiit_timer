@@ -52,7 +52,7 @@ class ControlBarState extends State<ControlBar> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 150,
+      height: 80,
       child: Stack(
         children: [
           Row(
