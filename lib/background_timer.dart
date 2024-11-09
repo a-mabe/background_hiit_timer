@@ -154,6 +154,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         initialNotificationTitle: 'TIMER',
         initialNotificationContent: 'Initializing',
         foregroundServiceNotificationId: 888,
+        foregroundServiceTypes: [AndroidForegroundType.mediaPlayback],
       ),
       iosConfiguration: IosConfiguration(
         autoStart: true,
