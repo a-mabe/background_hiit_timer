@@ -8,7 +8,7 @@ import 'package:background_hiit_timer/background_timer.dart';
 import 'package:background_hiit_timer/background_timer_controller.dart';
 import "package:flutter_driver/driver_extension.dart";
 
-void main() {
+Future<void> main() async {
   enableFlutterDriverExtension();
   runApp(const MyApp());
 }
