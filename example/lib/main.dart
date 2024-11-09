@@ -96,7 +96,7 @@ class MyHomePageState extends State<MyHomePage> {
         time: 10,
         name: "Cooldown",
         color: 0,
-        intervalIndex: 6,
+        intervalIndex: 4,
         startSound: "long-rest-beep",
         countdownSound: "countdown-beep",
         endSound: "horn",
