@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:ui';
 import 'package:background_hiit_timer/background_timer_controller.dart';
 import 'package:background_hiit_timer/models/interval_type.dart';
@@ -9,7 +8,6 @@ import 'package:background_hiit_timer/utils/timer_state.dart';
 import 'package:background_hiit_timer/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soundpool/soundpool.dart';
 
@@ -147,9 +145,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     await dbManager.openIntervalDatabase();
     await dbManager.insertIntervals(widget.intervals);
 
-    // Initialize notification channels for Android/iOS
-    await _setupNotifications();
-
     await service.configure(
       androidConfiguration: AndroidConfiguration(
         onStart: onStart,
@@ -168,31 +163,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     );
 
     service.startService();
-  }
-
-  Future<void> _setupNotifications() async {
-    const channel = AndroidNotificationChannel(
-      'timer_foreground',
-      'TIMER',
-      description: 'This channel is used for important notifications.',
-      importance: Importance.low,
-    );
-
-    final notificationsPlugin = FlutterLocalNotificationsPlugin();
-
-    if (Platform.isIOS || Platform.isAndroid) {
-      await notificationsPlugin.initialize(
-        const InitializationSettings(
-          iOS: DarwinInitializationSettings(),
-          android: AndroidInitializationSettings('ic_bg_service_small'),
-        ),
-      );
-    }
-
-    await notificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
   }
 
   @pragma('vm:entry-point')
