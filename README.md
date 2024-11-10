@@ -7,10 +7,10 @@ A Flutter package for creating a high-intensity interval training (HIIT) timer w
 
 1. [Installation](#installation)
 1. [Basic Usage](#basic-usage)
-  1. [Example Usage](#example-usage)
+    1. [Example Usage](#example-usage)
 1. [Advanced Configuration](#Advanced-Configuration)
 1. [Contributing](#Contributing)
-  1. [Code of Conduct](#Code-of-Conduct)
+    1. [Code of Conduct](#Code-of-Conduct)
 1. [Credits](#credits)
 1. [License](#license)
 
