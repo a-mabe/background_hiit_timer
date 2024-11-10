@@ -5,7 +5,7 @@ import 'package:background_hiit_timer/background_timer_controller.dart';
 import 'package:background_hiit_timer/models/interval_type.dart';
 import 'package:background_hiit_timer/utils/database.dart';
 import 'package:background_hiit_timer/utils/log.dart';
-import 'package:background_hiit_timer/utils/timer_state.dart';
+import 'package:background_hiit_timer/models/timer_state.dart';
 import 'package:background_hiit_timer/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -215,7 +215,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         0,
         currentInterval.time * secondsFactor,
         currentInterval.time * secondsFactor,
-        0,
         volume,
         changeVolume);
 
@@ -306,7 +305,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       preferences.reload();
       timerState.paused = preferences.getBool('pause') ?? false;
 
-      if (!timerState.paused) {
+      if (timerState.currentMicroSeconds <= 0) {
+        timerState.status = "End";
+      } else if (!timerState.paused && timerState.currentMicroSeconds > 0) {
         timerState.currentMicroSeconds -= interval.inMicroseconds;
 
         int intervalIndex = timerState.currentInterval;
@@ -340,12 +341,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         }
       } else if (timerState.currentMicroSeconds % 1000000 == 0) {
         await playSound(blankSoundId, pool, preferences);
-      } else if (timerState.currentMicroSeconds < 0) {
-        logger.d("All intervals completed");
-        timerState.status = "End";
-      } else if (timerState.currentMicroSeconds == -3000000) {
-        timer.cancel();
-        service.stopSelf();
       }
 
       service.invoke('update', timerState.toMap());

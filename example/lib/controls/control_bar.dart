@@ -66,10 +66,12 @@ class ControlBarState extends State<ControlBar> {
                 onPressed: widget.onAdjustVolume,
               ),
               IconButton(
+                tooltip: 'Skip Previous',
                 icon: const Icon(Icons.skip_previous, color: Colors.white),
                 onPressed: widget.onSkipPrevious,
               ),
               IconButton(
+                tooltip: 'Pause',
                 icon: Icon(
                   widget.paused ? Icons.play_arrow : Icons.pause,
                   color: Colors.white,
@@ -77,6 +79,7 @@ class ControlBarState extends State<ControlBar> {
                 onPressed: widget.onTogglePlayPause,
               ),
               IconButton(
+                tooltip: 'Skip Next',
                 icon: const Icon(Icons.skip_next, color: Colors.white),
                 onPressed: widget.onSkipNext,
               ),

@@ -15,7 +15,7 @@ on:
     paths-ignore:
       - '**.md'
       - '**.yaml'
-      - 'doc/**'
+      - 'docs/**'
       - '.git/'
       - '.vscode/'
 

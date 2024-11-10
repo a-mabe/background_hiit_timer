@@ -1,6 +1,6 @@
 import 'package:audio_session/audio_session.dart';
 import 'package:background_hiit_timer/models/interval_type.dart';
-import 'package:background_hiit_timer/utils/timer_state.dart';
+import 'package:background_hiit_timer/models/timer_state.dart';
 import 'package:example/controls/control_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -49,7 +49,7 @@ class MyHomePageState extends State<MyHomePage> {
     IntervalType(
         id: "0",
         workoutId: "1",
-        time: 10,
+        time: 5,
         name: "Get ready",
         color: 0,
         intervalIndex: 0,
@@ -60,7 +60,7 @@ class MyHomePageState extends State<MyHomePage> {
     IntervalType(
         id: "1",
         workoutId: "1",
-        time: 10,
+        time: 5,
         name: "Warmup",
         color: 0,
         intervalIndex: 1,
@@ -71,7 +71,7 @@ class MyHomePageState extends State<MyHomePage> {
     IntervalType(
         id: "2",
         workoutId: "1",
-        time: 20,
+        time: 5,
         name: "Work",
         color: 0,
         intervalIndex: 2,
@@ -82,7 +82,7 @@ class MyHomePageState extends State<MyHomePage> {
     IntervalType(
         id: "3",
         workoutId: "1",
-        time: 10,
+        time: 5,
         name: "Rest",
         color: 0,
         intervalIndex: 3,
@@ -93,7 +93,7 @@ class MyHomePageState extends State<MyHomePage> {
     IntervalType(
         id: "4",
         workoutId: "1",
-        time: 10,
+        time: 5,
         name: "Cooldown",
         color: 0,
         intervalIndex: 4,

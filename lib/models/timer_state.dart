@@ -9,7 +9,6 @@ class TimerState {
   int currentInterval = 0;
   int currentMicroSeconds = 0;
   int intervalMicroSeconds = 0;
-  int iteration = 0;
   double volume = 80;
   bool changeVolume = false;
 
@@ -19,7 +18,6 @@ class TimerState {
       this.currentInterval,
       this.currentMicroSeconds,
       this.intervalMicroSeconds,
-      this.iteration,
       this.volume,
       this.changeVolume);
 
@@ -29,7 +27,6 @@ class TimerState {
     currentInterval = 0;
     currentMicroSeconds = 0;
     intervalMicroSeconds = 0;
-    iteration = 1;
     volume = 80;
     changeVolume = false;
   }
@@ -41,7 +38,6 @@ class TimerState {
       'currentInterval': currentInterval,
       'currentMicroSeconds': currentMicroSeconds,
       'intervalMicroSeconds': intervalMicroSeconds,
-      'iteration': iteration,
       'volume': volume,
       'changeVolume': changeVolume,
     };
@@ -56,7 +52,6 @@ class TimerState {
       map['currentInterval'] ?? 0,
       map['currentMicroSeconds'] ?? 0,
       map['intervalMicroSeconds'] ?? 0,
-      map['iteration'] ?? 1,
       volume,
       map['changeVolume'] ?? false,
     );
@@ -68,7 +63,6 @@ class TimerState {
     currentInterval = 0;
     currentMicroSeconds = intervals[0].time * secondsFactor;
     intervalMicroSeconds = intervals[0].time * secondsFactor;
-    iteration = 1;
     changeVolume = false;
   }
 
