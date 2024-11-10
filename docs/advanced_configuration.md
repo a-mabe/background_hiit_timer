@@ -7,7 +7,10 @@
     1. [Android Foreground Service Configuration](#Android-Foreground-Service-Configuration)
     1. [iOS Background Service Configuration](#iOS-Background-Service-Configuration)
 1. [SQLite](#sqflite)
-1. [Audio Session](#audio-session)
+1. [Audio](#audio)
+    1. [Audio Assets](#audio-assets)
+    1. [Audio Cues](#audio-cues)
+    1. [Audio Session](#audio-session)
 1. [Configuring the UI](#configuring-the-ui)
 1. [iOS and Android Differences](#ios-and-android-differences)
 
@@ -82,7 +85,35 @@ if (Platform.isAndroid) {
 
 The timer uses a [sqflite](https://pub.dev/packages/sqflite) database to send data to the background service. Note that the frontend and the service cannot directly communicate - data must be passed through shared preferences, a database, etc. Stored in the database is the list of timer intervals for the service to iterate through. The database is cleared before storing the next set of data on service startup.
 
-## Audio Session
+## Audio
+
+### Audio Assets
+
+This package ships with some copyright free audio assets located at [`lib/assets/audio`](../lib/assets/audio/)
+
+Set what audio to use for an interval by specifying the asset file name (no need to include `.mp3`, leave blank for no audio):
+
+```
+IntervalType(
+    ...
+    startSound: "long-bell",
+    halfwaySound: "short-halfway-beep",
+    countdownSound: "countdown-beep",
+    endSound: ""),
+```
+
+### Audio Cues
+
+There are four configurable audio cues for intervals outlined below:
+
+| Parameter Name | Description                                     |
+|---------------|-------------------------------------------------|
+| `startSound`     | Plays at the start of an interval |
+| `halfwaySound`   | Plays at the halfway point of an interval.         |
+| `countdownSound`    | Plays at the 3, 2, and 1 seconds marks to signify the interval is ending. |
+| `endSound`  | Plays at the end of an interval. If intervals are back to back, the start sound of the next interval takes precedence over the end sound of the previous interval. |
+
+### Audio Session
 
 This package currently uses the [soundpool](https://pub.dev/packages/soundpool) package to play audio. The package does not configure an audio session, leaving it up to the developer to set the audio session as they see fit. The [example](example) uses the [audio_session](https://pub.dev/packages/audio_session) package to configure the audio session so that audio from the service will play on both iOS and Android when the app is in the background. The session is also configured to not stop or duck audio from other apps.
 
