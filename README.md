@@ -2,6 +2,20 @@
 
 A Flutter package for creating a high-intensity interval training (HIIT) timer with background service capabilities.
 
+---
+## Table of Contents
+
+1. [Installation](#installation)
+1. [Basic Usage](#basic-usage)
+  1. [Example Usage](#example-usage)
+1. [Advanced Configuration](#Advanced-Configuration)
+1. [Contributing](#Contributing)
+  1. [Code of Conduct](#Code-of-Conduct)
+1. [Credits](#credits)
+1. [License](#license)
+
+---
+
 ## Installation
 
 Add `background_hiit_timer` to your `pubspec.yaml` file:
@@ -38,39 +52,9 @@ final List<IntervalType> intervals = [
         halfwaySound: "",
         countdownSound: "countdown-beep",
         endSound: ""),
-    IntervalType(
-        id: "1",
-        workoutId: "1",
-        time: 10,
-        name: "Warmup",
-        color: 0,
-        intervalIndex: 1,
-        startSound: "long-bell",
-        halfwaySound: "",
-        countdownSound: "countdown-beep",
-        endSound: ""),
-    IntervalType(
-        id: "2",
-        workoutId: "1",
-        time: 20,
-        name: "Work",
-        color: 0,
-        intervalIndex: 2,
-        startSound: "long-bell",
-        halfwaySound: "short-halfway-beep",
-        countdownSound: "countdown-beep",
-        endSound: ""),
-    IntervalType(
-        id: "3",
-        workoutId: "1",
-        time: 10,
-        name: "Rest",
-        color: 0,
-        intervalIndex: 3,
-        startSound: "long-rest-beep",
-        halfwaySound: "",
-        countdownSound: "countdown-beep",
-        endSound: ""),
+
+    ...
+
     IntervalType(
         id: "4",
         workoutId: "1",
@@ -104,13 +88,27 @@ Countdown(
 )
 ```
 
-## Example
+### Example Usage
 
 Check out the [example](example) directory in this repository for a complete example of how to use `background_hiit_timer` in a Flutter app.
+
+## Advanced Configuration
+
+For more advanced information, view [the advanced configuration documentation](./docs/advanced_configuration.md).
+
+## Contributing
+
+View the [contributing documentation](./CONTRIBUTING.md).
+
+### Code of Conduct
+
+When contributing, please keep the [Code of Conduct](./CODE_OF_CONDUCT.md) in mind.
 
 ## Credits
 
 This package is inspired by the [`timer_count_down`](https://pub.dev/packages/timer_count_down) package by [Dizoft Team](https://github.com/DizoftTeam).
+
+Shoutout to [`flutter_background_service`](https://pub.dev/packages/flutter_background_service) for making the background timer possible.
 
 ## License
 

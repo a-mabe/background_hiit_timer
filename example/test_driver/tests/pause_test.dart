@@ -34,5 +34,5 @@ void main() {
     // Find and tap the pause icon.
     print('Tapping pause icon again to unpause');
     await driver!.tap(pauseIcon);
-  }, timeout: Timeout.none);
+  }, timeout: const Timeout(Duration(minutes: 1)));
 }
