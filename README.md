@@ -46,7 +46,7 @@ final List<IntervalType> intervals = [
     IntervalType(
         id: "0",
         workoutId: "1",
-        time: 10,
+        time: 10, // in seconds
         name: "Get ready",
         color: 0,
         intervalIndex: 0,
@@ -60,7 +60,7 @@ final List<IntervalType> intervals = [
     IntervalType(
         id: "4",
         workoutId: "1",
-        time: 10,
+        time: 10, // in seconds
         name: "Cooldown",
         color: 0,
         intervalIndex: 4,
@@ -96,7 +96,7 @@ Check out the [example](example) directory in this repository for a complete exa
 
 ## Advanced Configuration
 
-For more advanced information, view [the advanced configuration documentation](./docs/advanced_configuration.md).
+For more advanced information, view [the advanced configuration documentation](./doc/advanced_configuration.md).
 
 ## Contributing
 
