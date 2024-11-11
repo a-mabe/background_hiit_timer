@@ -1,6 +1,6 @@
 # background_hiit_timer
 
-A Flutter package for creating a high-intensity interval training (HIIT) timer with background service capabilities.
+A Flutter package for creating a high-intensity interval training (HIIT) timer with background service capabilities. Originally created for [OpenHIIT](https://github.com/a-mabe/OpenHIIT).
 
 ![Screenshot 2024-11-10 at 4 22 43 PM](https://github.com/user-attachments/assets/0c990563-d8b0-4240-b11c-c865845c8ce9)
 

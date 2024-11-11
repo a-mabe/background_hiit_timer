@@ -71,7 +71,7 @@ class MyHomePageState extends State<MyHomePage> {
     IntervalType(
         id: "2",
         workoutId: "1",
-        time: 5,
+        time: 25,
         name: "Work",
         color: 0,
         intervalIndex: 2,
@@ -82,7 +82,7 @@ class MyHomePageState extends State<MyHomePage> {
     IntervalType(
         id: "3",
         workoutId: "1",
-        time: 5,
+        time: 35,
         name: "Rest",
         color: 0,
         intervalIndex: 3,
