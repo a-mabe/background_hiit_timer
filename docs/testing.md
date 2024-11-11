@@ -21,6 +21,7 @@ Integration tests focus on verifying the main functionality of the app, ensuring
   - The timer transitions through all states without error.
   - Timer pauses, resumes, and resets accurately.
   - Skip interval controls function as expected.
+- View the [Test workflow here](https://github.com/a-mabe/background_hiit_timer/actions/workflows/test.yaml).
 
 ---
 
