@@ -16,35 +16,28 @@ void main() {
 
   test('Integration Test - Timer Restart', () async {
     // Wait for "Get ready" text
-    print('Waiting for "Get ready" text');
     await driver!
         .waitFor(find.text('Get ready'), timeout: const Duration(seconds: 10));
 
     // Find and tap the skip next icon.
-    print('Tapping skip next icon');
     final nextIcon = find.byTooltip('Skip Next');
     await driver!.tap(nextIcon);
 
     // Tap the skip next icon again.
-    print('Tapping skip next icon again');
     await driver!.tap(nextIcon);
 
     // Get ready and Warmup skipped, so wait for "Work" text
-    print('Waiting for "Work" text');
     await driver!
         .waitFor(find.text('Work'), timeout: const Duration(seconds: 5));
 
     // Find and tap the skip previous icon.
-    print('Tapping skip previous icon');
     final previousIcon = find.byTooltip('Skip Previous');
     await driver!.tap(previousIcon);
 
     // Tap the skip previous icon again.
-    print('Tapping skip previous icon again');
     await driver!.tap(previousIcon);
 
     // Back on Get ready
-    print('Waiting for "Get ready" text');
     await driver!
         .waitFor(find.text('Get ready'), timeout: const Duration(seconds: 5));
   });

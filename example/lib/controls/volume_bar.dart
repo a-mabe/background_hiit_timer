@@ -5,8 +5,7 @@ class VolumeBar extends StatelessWidget {
   final Function(double) onVolumeChanged;
 
   const VolumeBar(
-      {Key? key, required this.volume, required this.onVolumeChanged})
-      : super(key: key);
+      {super.key, required this.volume, required this.onVolumeChanged});
 
   @override
   Widget build(BuildContext context) {

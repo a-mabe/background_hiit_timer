@@ -28,7 +28,9 @@ Thank you for considering contributing! Contributions of all kinds are welcome, 
 
 4. Commit your changes and push them to your forked repository.
 
-5. Submit a pull request, detailing the changes you made and explaining their purpose. Please be sure to list what you have tested, as well as the device and OS details you performed tests on.
+5. Test your changes following the [testing documentation](./doc/testing.md).
+
+6. Submit a pull request, detailing the changes you made and explaining their purpose. Please be sure to list what you have tested, as well as the device and OS details you performed tests on.
 
 ## License
 

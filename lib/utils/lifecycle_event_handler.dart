@@ -27,11 +27,6 @@ class LifecycleEventHandler extends WidgetsBindingObserver {
       case AppLifecycleState.hidden:
       // TODO: Handle this case.
     }
-    print('''
-=============================================================
-               $state
-=============================================================
-''');
   }
 
 //  @override

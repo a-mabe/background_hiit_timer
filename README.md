@@ -100,7 +100,7 @@ For more advanced information, view [the advanced configuration documentation](.
 
 ## Contributing
 
-View the [contributing documentation](./CONTRIBUTING.md).
+View the [contributing documentation](./CONTRIBUTING.md). If contributing code changes, please checkout the [testing documentation](./doc/testing.md).
 
 ### Code of Conduct
 
