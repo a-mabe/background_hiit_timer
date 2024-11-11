@@ -5,31 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2024-11-10
+
+### Changed
+- Refactored to use a SQFlite database.
+- Implemented IntervalType class - requires a list of intervals to be passed.
+- Added skip next and skip previous functions.
+- Simplified implementation.
+
 ## [1.0.0-dev.6] - 2024-08-10
 
-## Changed
+### Changed
 
 - Removed dependency on `flutter_fgbg`.
 
 ## [1.0.0-dev.5] - 2024-08-10
 
-## Changed
+### Changed
 
 - Simplified timer restart.
 
-## Fixed
+### Fixed
 
 - Fixed sound attempting to play when set to `none`.
 
 ## [1.0.0-dev.4] - 2024-07-31
 
-## Added
+### Added
 
 - Volume control for timer audio.
 
 ## [1.0.0-dev.3] - 2024-06-23
 
-## Changed
+### Changed
 
 - Upgraded dependencies.
 

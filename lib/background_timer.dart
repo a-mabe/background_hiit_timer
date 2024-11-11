@@ -1,341 +1,169 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
-import 'package:background_hiit_timer/utils/timer_config.dart';
-import 'package:background_hiit_timer/utils/timer_state.dart';
+import 'package:background_hiit_timer/background_timer_controller.dart';
+import 'package:background_hiit_timer/models/interval_type.dart';
+import 'package:background_hiit_timer/utils/database.dart';
+import 'package:background_hiit_timer/utils/log.dart';
+import 'package:background_hiit_timer/models/timer_state.dart';
+import 'package:background_hiit_timer/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:openhiit_background_service/openhiit_background_service.dart';
-import 'package:openhiit_background_service_android/openhiit_background_service_android.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:background_hiit_timer/background_timer_controller.dart';
-import 'package:background_hiit_timer/background_timer_data.dart';
 import 'package:soundpool/soundpool.dart';
 
 import 'utils/constants.dart';
-import 'utils/utils.dart';
 
-///
-/// Background service countdown interval timer.
-///
 class Countdown extends StatefulWidget {
-  /// Number of seconds in the work interval.
-  ///
-  final int workSeconds;
-
-  /// Number of seconds in the rest interval.
-  ///
-  final int restSeconds;
-
-  /// Number of seconds in the break interval.
-  ///
-  final int breakSeconds;
-
-  final int getreadySeconds;
-
-  final int warmupSeconds;
-
-  final int cooldownSeconds;
-
-  /// Number of times to repeat the timer.
-  ///
-  final int iterations;
-
-  /// Build method for the timer.
-  ///
-  final Widget Function(BuildContext, BackgroundTimerData) build;
-
-  /// Called when the timer has finished all intervals.
-  ///
+  final List<IntervalType> intervals;
+  final Widget Function(BuildContext, TimerState) build;
   final Function? onFinished;
-
-  /// Controller for the countdown timer.
-  /// Allows external control and monitoring of the countdown timer.
-  ///
   final CountdownController? controller;
 
-  /// End sound - Sound to play at session completion.
-  /// E.g. all intervals finished and timer complete.
-  ///
-  final String completeSound;
-
-  /// Work sound - Sound to play at the start of the
-  /// work interval.
-  ///
-  final String workSound;
-
-  /// Rest sound - Sound to play at the start of the
-  /// rest interval.
-  ///
-  final String restSound;
-
-  /// Halfway sound - Sound to play at the halfway point
-  /// of the work interval.
-  ///
-  final String halfwaySound;
-
-  /// Countdown sound - Sound to play at the 3, 2, and 1
-  /// second mark of each interval. Signifies the current
-  /// interval is nearing the end.
-  ///
-  final String countdownSound;
-
-  /// Number of work intervals in the session.
-  ///
-  /// The number of rest intervals will be extrapolated from
-  /// this value.
-  ///
-  final int numberOfWorkIntervals;
-
-  /// Current interval status.
-  ///
-  /// One of: start, work, rest, end.
-  ///
-  final String status;
-
-  ///
-  /// Constructor
-  ///
   const Countdown({
-    Key? key,
-    required this.workSeconds,
-    required this.restSeconds,
-    required this.numberOfWorkIntervals,
+    super.key,
+    required this.intervals,
     required this.build,
-    this.breakSeconds = 0,
-    this.getreadySeconds = 0,
-    this.warmupSeconds = 0,
-    this.cooldownSeconds = 0,
-    this.iterations = 0,
-    this.status = 'start',
-    this.completeSound = 'horn',
-    this.workSound = 'short-whistle',
-    this.restSound = 'short-rest-beep',
-    this.halfwaySound = 'short-halfway-beep',
-    this.countdownSound = 'countdown-beep',
     this.onFinished,
     this.controller,
-  }) : super(key: key);
+  });
 
   @override
   CountdownState createState() => CountdownState();
 }
 
-///
-/// State of timer
-///
 class CountdownState extends State<Countdown> with WidgetsBindingObserver {
-  /// Whether the timer is currently active.
-  ///
   bool isActive = false;
+  late SharedPreferences _preferences;
 
-  ///
-  /// Initialize the timer.
-  ///
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addObserver(this);
 
-    widget.controller?.setOnStart(_startTimer);
-    widget.controller?.setOnPause(_onTimerPaused);
-    widget.controller?.setOnResume(_onTimerResumed);
-    widget.controller?.setOnRestart(_onTimerRestart);
-    widget.controller?.isCompleted = false;
+    _initializeController();
+    _initializePreferences();
 
-    // Start the timer if autostart is enabled.
-    if ((widget.controller == null) || (widget.controller!.autoStart == true)) {
+    if (widget.controller?.autoStart ?? true) {
       _startTimer();
     }
   }
 
-  ///
-  /// On dispose, stop the timer if active.
-  ///
+  Future<void> _initializePreferences() async {
+    _preferences = await SharedPreferences.getInstance();
+  }
+
+  void _initializeController() {
+    widget.controller?.setOnStart(_startTimer);
+    widget.controller?.setOnStop(_stopTimer);
+    widget.controller?.setOnPause(_onTimerPaused);
+    widget.controller?.setOnResume(_onTimerResumed);
+    widget.controller?.setOnRestart(_onTimerRestart);
+    widget.controller?.setOnSkipNext(_onTimerSkipNext);
+    widget.controller?.setOnSkipPrevious(_onTimerSkipPrevious);
+    widget.controller?.isCompleted = false;
+  }
+
   @override
   void dispose() {
-    /// Stop timer if active.
     if (isActive) {
-      final service = OpenhiitBackgroundService();
-      service.invoke("stopService");
+      FlutterBackgroundService().invoke("stopService");
     }
-
     WidgetsBinding.instance.removeObserver(this);
-
     super.dispose();
   }
 
-  ///
-  /// On timer paused, updates the paused shared preference to true.
-  ///
   void _onTimerPaused() async {
-    /// Stop timer if currently active. Otherwise, a timer
-    /// is not currently running so we ignore the timer pause.
+    logger.d("Pausing timer");
     if (isActive) {
-      SharedPreferences preferences = await SharedPreferences.getInstance();
-      await preferences.setBool("pause", true);
+      await _preferences.setBool("pause", true);
     }
   }
 
-  ///
-  /// On timer resumed, updates the paused shared preference to false.
-  ///
   void _onTimerResumed() async {
-    /// Resume timer if currently active. Otherwise, a timer
-    /// is not currently running so we ignore the timer resume.
+    logger.d("Resuming timer");
     if (isActive) {
-      SharedPreferences preferences = await SharedPreferences.getInstance();
-      await preferences.setBool("pause", false);
+      await _preferences.setBool("pause", false);
     }
   }
 
-  ///
-  /// On timer restarted, stops the service and restarts the timer
-  /// by running _startTimer.
-  ///
   void _onTimerRestart() {
-    final service = OpenhiitBackgroundService();
-    service.invoke("restartService");
+    logger.d("Restarting timer");
+    FlutterBackgroundService().invoke("restartService");
   }
 
-  ///
-  /// Start the timer.
-  ///
+  void _onTimerSkipNext() {
+    logger.d("Skipping to next interval");
+    FlutterBackgroundService().invoke("skipNext");
+  }
+
+  void _onTimerSkipPrevious() {
+    logger.d("Skipping to previous interval");
+    FlutterBackgroundService().invoke("skipPrevious");
+  }
+
   void _startTimer() async {
-    // Set isActive to true to indicate the timer is active
-    isActive = true;
+    logger.d("Starting timer");
+    setState(() => isActive = true);
 
-    TimerConfig timerConfig = TimerConfig(
-        widget.workSeconds,
-        widget.restSeconds,
-        widget.breakSeconds,
-        widget.getreadySeconds,
-        widget.warmupSeconds,
-        widget.cooldownSeconds,
-        widget.iterations,
-        widget.workSound,
-        widget.restSound,
-        widget.halfwaySound,
-        widget.completeSound,
-        widget.countdownSound);
+    // Ensure the 'pause' shared preference is set to false when the timer starts
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.setBool("pause", false);
 
-    TimerState timerState = TimerState(
-        false, widget.numberOfWorkIntervals, 0, 0, "start", widget.iterations);
+    await _initializeService();
+    widget.controller?.isCompleted = false;
+  }
 
-    // Save timer settings to SharedPreferences
-    saveTimerPreferences(timerConfig, timerState);
-
-    // Initialize background service
-    await initializeService().then((value) {
-      widget.controller?.isCompleted = false;
-    });
+  void _stopTimer() {
+    logger.d("Stopping timer");
+    setState(() => isActive = false);
+    FlutterBackgroundService().invoke("stopService");
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Map<String, dynamic>?>(
-      stream: OpenhiitBackgroundService().on('update'),
+      stream: FlutterBackgroundService().on('update'),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          // Show loading indicator while waiting for data
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         }
 
-        // Grab the data from the snapshot
         final data = snapshot.data!;
+        final TimerState timerState = TimerState.fromMap(data);
 
-        // Check if the timer has completed
-        if (data["microSeconds"] == 0 &&
-            widget.controller?.isCompleted == false) {
-          // Invoke the onFinished callback if provided
-          if (widget.onFinished != null) {
-            widget.onFinished!();
-          }
-          widget.controller?.isCompleted = true;
-        }
-        // If not completed, ensure the isCompleted bool is set as such
-        else if (data["microSeconds"] > 0) {
-          widget.controller?.isCompleted = false;
-        }
-
-        /// Create object of data sent back from the timer
-        BackgroundTimerData backgroundTimerData = BackgroundTimerData(
-            data["microSeconds"],
-            data["status"],
-            data["numberOfWorkIntervals"],
-            data["numberOfIntervals"],
-            data["paused"],
-            data["iterations"],
-            data["changeVolume"],
-            data["volume"]);
-
-        // Return data and context to the UI
-        return widget.build(context, backgroundTimerData);
+        return widget.build(context, timerState);
       },
     );
   }
 
-  ///
-  /// Initialize background service
-  ///
-  Future<void> initializeService() async {
-    final service = OpenhiitBackgroundService();
+  Future<void> _initializeService() async {
+    final service = FlutterBackgroundService();
 
-    /// --- FOR BACKGROUND SERVICE NOTIFICATION CHANNEL ---
+    // Database setup
+    DatabaseManager dbManager = DatabaseManager();
+    await dbManager.clearDatabaseIfNotEmpty();
+    await dbManager.openIntervalDatabase();
+    await dbManager.insertIntervals(widget.intervals);
 
-    /// OPTIONAL, using custom notification channel id
-    const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      'timer_foreground', // id
-      'TIMER', // title
-      description:
-          'This channel is used for important notifications.', // description
-      importance: Importance.low, // importance must be at low or higher level
-    );
-
-    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-
-    if (Platform.isIOS || Platform.isAndroid) {
-      await flutterLocalNotificationsPlugin.initialize(
-        const InitializationSettings(
-          iOS: DarwinInitializationSettings(),
-          android: AndroidInitializationSettings('ic_bg_service_small'),
-        ),
-      );
-    }
-
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
-
-    /// --- END FOR BACKGROUND SERVICE NOTIFICATION CHANNEL ---
+    // Initialize notification channels for Android/iOS
+    await _setupNotifications();
 
     await service.configure(
       androidConfiguration: AndroidConfiguration(
-        // This will be executed when app is in foreground
-        // or background in separated isolate
-        onStart: onStart,
-
-        // auto start service
-        autoStart: true,
-        isForegroundMode: true,
-
-        notificationChannelId: 'timer_foreground',
-        initialNotificationTitle: 'TIMER',
-        initialNotificationContent: 'Initializing',
-        foregroundServiceNotificationId: 888,
-      ),
+          onStart: onStart,
+          autoStart: true,
+          autoStartOnBoot: false,
+          isForegroundMode: true,
+          notificationChannelId: 'timer_foreground',
+          initialNotificationTitle: 'TIMER',
+          initialNotificationContent: 'Initializing',
+          foregroundServiceNotificationId: 888,
+          foregroundServiceTypes: [AndroidForegroundType.mediaPlayback]),
       iosConfiguration: IosConfiguration(
-        // auto start service
         autoStart: true,
-        // this will be executed when app is in foreground in separated isolate
         onForeground: onStart,
-        // you have to enable background fetch capability on xcode project
         onBackground: onIosBackground,
       ),
     );
@@ -343,45 +171,101 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     service.startService();
   }
 
-  ///
-  /// Run on iOS background
-  ///
-  @pragma('vm:entry-point')
-  Future<bool> onIosBackground(ServiceInstance service) async {
-    WidgetsFlutterBinding.ensureInitialized();
-    DartPluginRegistrant.ensureInitialized();
+  Future<void> _setupNotifications() async {
+    const channel = AndroidNotificationChannel(
+      'timer_foreground',
+      'TIMER',
+      description: 'This channel is used for important notifications.',
+      importance: Importance.low,
+    );
 
-    return true;
+    final notificationsPlugin = FlutterLocalNotificationsPlugin();
+
+    if (Platform.isIOS || Platform.isAndroid) {
+      await notificationsPlugin.initialize(
+        const InitializationSettings(
+          iOS: DarwinInitializationSettings(),
+          android: AndroidInitializationSettings('ic_bg_service_small'),
+        ),
+      );
+    }
+
+    await notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
   }
 
-  ///
-  /// Run on service start
-  ///
   @pragma('vm:entry-point')
   static void onStart(ServiceInstance service) async {
     DartPluginRegistrant.ensureInitialized();
-
-    // get SharedPreferences instance
     SharedPreferences preferences = await SharedPreferences.getInstance();
+    double volume = preferences.getDouble("volume") ?? 80.0;
+    bool changeVolume = preferences.getBool("changeVolume") ?? false;
 
-    // Define empty timer config
-    TimerConfig timerConfig = await loadTimerPreferences(preferences);
+    Soundpool pool = Soundpool.fromOptions();
+    DatabaseManager dbManager = DatabaseManager();
+    List<IntervalType> intervals = await dbManager.getIntervals();
+
+    Map<String, int> soundMap = await _loadIntervalSounds(intervals, pool);
+    IntervalType currentInterval = intervals[0];
     TimerState timerState = TimerState(
         false,
-        preferences.getInt('numberOfWorkIntervals')!,
+        currentInterval.name,
         0,
-        preferences.getInt('getreadySeconds')! * secondsFactor,
-        "start",
-        preferences.getInt('iterations')!);
+        currentInterval.time * secondsFactor,
+        currentInterval.time * secondsFactor,
+        volume,
+        changeVolume);
 
-    // Configure the audio session so that the timer does not
-    // duck or pause other audio
-    await configureAudioSession();
+    _registerServiceEvents(
+        service, intervals, preferences, soundMap, timerState, pool);
+  }
 
-    // Configure the soundpool for the sound effects.
-    SoundpoolOptions soundpoolOptions = const SoundpoolOptions();
-    Soundpool pool = Soundpool.fromOptions(options: soundpoolOptions);
+  static Future<Map<String, int>> _loadIntervalSounds(
+      List<IntervalType> intervals, Soundpool pool) async {
+    Map<String, int> soundMap = {};
 
+    for (int i = 0; i < intervals.length; i++) {
+      if (intervals[i].startSound.isNotEmpty) {
+        int soundID = await loadSound(intervals[i].startSound, pool);
+        soundMap['${i}_sound'] = soundID;
+      } else {
+        soundMap['${i}_sound'] = -1;
+      }
+
+      if (intervals[i].halfwaySound.isNotEmpty) {
+        int halfwaySoundID = await loadSound(intervals[i].halfwaySound, pool);
+        soundMap['${i}_halfwaySound'] = halfwaySoundID;
+      } else {
+        soundMap['${i}_halfwaySound'] = -1;
+      }
+
+      if (intervals[i].countdownSound.isNotEmpty) {
+        int countdownSoundID =
+            await loadSound(intervals[i].countdownSound, pool);
+        soundMap['${i}_countdownSound'] = countdownSoundID;
+      } else {
+        soundMap['${i}_countdownSound'] = -1;
+      }
+
+      if (intervals[i].endSound.isNotEmpty) {
+        int endSoundID = await loadSound(intervals[i].endSound, pool);
+        soundMap['${i}_endSound'] = endSoundID;
+      } else {
+        soundMap['${i}_endSound'] = -1;
+      }
+    }
+    return soundMap;
+  }
+
+  static Future<void> _registerServiceEvents(
+      ServiceInstance service,
+      List<IntervalType> intervals,
+      SharedPreferences preferences,
+      Map<String, int> soundMap,
+      TimerState timerState,
+      Soundpool pool) async {
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
         service.setAsForegroundService();
@@ -392,111 +276,81 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       });
     }
 
-    service.on('restartService').listen((event) {
-      timerState = TimerState(
-          false,
-          preferences.getInt('numberOfWorkIntervals')!,
-          0,
-          preferences.getInt('getreadySeconds')! * secondsFactor,
-          "start",
-          preferences.getInt('iterations')!);
+    service.on('restartService').listen((_) {
+      timerState.reset(intervals);
     });
 
-    service.on('stopService').listen((event) {
+    service.on('skipNext').listen((_) {
+      timerState.advanceToNextInterval(intervals);
+    });
+
+    service.on('skipPrevious').listen((_) {
+      if (timerState.currentInterval > 0) {
+        timerState.currentInterval--;
+        timerState.currentMicroSeconds =
+            intervals[timerState.currentInterval].time * secondsFactor;
+        timerState.intervalMicroSeconds =
+            intervals[timerState.currentInterval].time * secondsFactor;
+        timerState.status = intervals[timerState.currentInterval].name;
+      }
+    });
+
+    service.on('stopService').listen((_) {
       service.stopSelf();
     });
 
-    int blankSoundID = await rootBundle
-        .load("packages/background_hiit_timer/lib/assets/audio/blank.mp3")
-        .then((ByteData soundData) {
-      return pool.load(soundData);
-    });
-
-    int countdownSoundID = await loadSound(timerConfig.countdownSound, pool);
-    int halfwaySoundID = await loadSound(timerConfig.halfwaySound, pool);
-    int restSoundID = await loadSound(timerConfig.restSound, pool);
-    int workSoundID = await loadSound(timerConfig.workSound, pool);
-    int completeSoundID = await loadSound(timerConfig.completeSound, pool);
+    int blankSoundId = await loadSound('blank', pool);
 
     Timer.periodic(interval, (timer) async {
-      // Refresh shared preferences
       preferences.reload();
+      timerState.paused = preferences.getBool('pause') ?? false;
 
-      // Grab the current pause state of the timer (true or false)
-      timerState.paused = preferences.getBool('pause')!;
+      if (timerState.currentMicroSeconds <= 0) {
+        timerState.status = "End";
+      } else if (!timerState.paused && timerState.currentMicroSeconds > 0) {
+        timerState.currentMicroSeconds -= interval.inMicroseconds;
 
-      // If the timer is not paused, keep counting down
-      if (!timerState.paused) {
-        /// If the timer has not been completed, then
-        /// deduct a tenth of a second from the timer
-        if (timerState.status != completeStatus) {
-          timerState.currentMicroSeconds =
-              (timerState.currentMicroSeconds - interval.inMicroseconds);
-        }
+        int intervalIndex = timerState.currentInterval;
+        int nextIntervalIndex = intervalIndex + 1;
 
-        /// If there is no more time on the timer to deduct, then
-        /// calculate the next action.
-        if (timerState.currentMicroSeconds < -500000) {
-          /// Determine timer status
-
-          /// If the status was start or break
-          if (timerState.status == startStatus ||
-              timerState.status == breakStatus) {
-            timerState = startIntervalEnd(timerState, timerConfig);
+        if ([1500000, 2500000, 3500000]
+            .contains(timerState.currentMicroSeconds)) {
+          await playSound(
+              soundMap["${intervalIndex}_countdownSound"]!, pool, preferences);
+        } else if (timerState.currentMicroSeconds ==
+            timerState.intervalMicroSeconds ~/ 2) {
+          await playSound(
+              soundMap["${intervalIndex}_halfwaySound"]!, pool, preferences);
+        } else if (timerState.currentMicroSeconds == 700000) {
+          if (intervalIndex < intervals.length - 1) {
+            int soundId = soundMap["${nextIntervalIndex}_sound"]!;
+            if (soundId != 0) {
+              await playSound(soundId, pool, preferences);
+            } else if (soundMap["${intervalIndex}_endSound"]! != 0) {
+              await playSound(
+                  soundMap["${intervalIndex}_endSound"]!, pool, preferences);
+            }
+          } else {
+            await playSound(
+                soundMap["${intervalIndex}_endSound"]!, pool, preferences);
           }
-
-          /// If the status was work
-          else if (timerState.status == workStatus ||
-              timerState.status == warmupStatus) {
-            timerState = await workIntervalEnd(timerState, timerConfig);
-          }
-
-          /// If the status was rest
-          else if (timerState.status == restStatus) {
-            timerState = restIntervalEnd(timerState, timerConfig);
-          }
-          timerState.currentOverallInterval++;
+        } else if (timerState.currentMicroSeconds == 0 &&
+            intervalIndex < intervals.length - 1) {
+          logger.d("Advancing to next interval");
+          timerState.advanceToNextInterval(intervals);
         }
-
-        /// There is still more time to deduct from the timer, so
-        /// calculate if a sound effect should play
-        else {
-          timerState = await playSoundEffectAndDetermineStatus(
-              timerConfig,
-              timerState,
-              secondsFactor,
-              timerState.currentMicroSeconds,
-              workSoundID,
-              restSoundID,
-              halfwaySoundID,
-              countdownSoundID,
-              completeSoundID,
-              blankSoundID,
-              pool,
-              preferences,
-              service);
-        }
+      } else if (timerState.currentMicroSeconds % 1000000 == 0) {
+        await playSound(blankSoundId, pool, preferences);
       }
 
-      int time = 0;
-      if (timerState.currentMicroSeconds > 0) {
-        time = (timerState.currentMicroSeconds / secondsFactor).round();
-      }
-
-      // Send data back to the UI
-      service.invoke(
-        'update',
-        {
-          "microSeconds": time,
-          "status": timerState.status,
-          "numberOfWorkIntervals": timerState.numberOfWorkIntervalsRemaining,
-          "numberOfIntervals": timerState.currentOverallInterval,
-          "paused": timerState.paused,
-          "iterations": timerState.iterations,
-          "changeVolume": preferences.getBool('changeVolume') ?? false,
-          "volume": preferences.getDouble('volume') ?? 80,
-        },
-      );
+      service.invoke('update', timerState.toMap());
     });
+  }
+
+  @pragma('vm:entry-point')
+  static Future<bool> onIosBackground(ServiceInstance service) async {
+    WidgetsFlutterBinding.ensureInitialized();
+    DartPluginRegistrant.ensureInitialized();
+    return true;
   }
 }
