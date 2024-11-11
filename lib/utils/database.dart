@@ -5,7 +5,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseManager {
-  static const String _databaseName = "openhiit_temp_timer.db";
+  static const String _databaseName = "background_service_temp_timer.db";
   static const String _intervalTableName = "CurrentTimerIntervals";
 
   // Singleton instance
