@@ -225,33 +225,48 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   static Future<Map<String, int>> _loadIntervalSounds(
       List<IntervalType> intervals, Soundpool pool) async {
     Map<String, int> soundMap = {};
+    Map<String, int> loadedSounds = {};
 
     for (int i = 0; i < intervals.length; i++) {
       if (intervals[i].startSound.isNotEmpty) {
-        int soundID = await loadSound(intervals[i].startSound, pool);
-        soundMap['${i}_sound'] = soundID;
+        if (!loadedSounds.containsKey(intervals[i].startSound)) {
+          int soundID = await loadSound(intervals[i].startSound, pool);
+          loadedSounds[intervals[i].startSound] = soundID;
+        }
+        soundMap['${i}_sound'] = loadedSounds[intervals[i].startSound]!;
       } else {
         soundMap['${i}_sound'] = -1;
       }
 
       if (intervals[i].halfwaySound.isNotEmpty) {
-        int halfwaySoundID = await loadSound(intervals[i].halfwaySound, pool);
-        soundMap['${i}_halfwaySound'] = halfwaySoundID;
+        if (!loadedSounds.containsKey(intervals[i].halfwaySound)) {
+          int halfwaySoundID = await loadSound(intervals[i].halfwaySound, pool);
+          loadedSounds[intervals[i].halfwaySound] = halfwaySoundID;
+        }
+        soundMap['${i}_halfwaySound'] =
+            loadedSounds[intervals[i].halfwaySound]!;
       } else {
         soundMap['${i}_halfwaySound'] = -1;
       }
 
       if (intervals[i].countdownSound.isNotEmpty) {
-        int countdownSoundID =
-            await loadSound(intervals[i].countdownSound, pool);
-        soundMap['${i}_countdownSound'] = countdownSoundID;
+        if (!loadedSounds.containsKey(intervals[i].countdownSound)) {
+          int countdownSoundID =
+              await loadSound(intervals[i].countdownSound, pool);
+          loadedSounds[intervals[i].countdownSound] = countdownSoundID;
+        }
+        soundMap['${i}_countdownSound'] =
+            loadedSounds[intervals[i].countdownSound]!;
       } else {
         soundMap['${i}_countdownSound'] = -1;
       }
 
       if (intervals[i].endSound.isNotEmpty) {
-        int endSoundID = await loadSound(intervals[i].endSound, pool);
-        soundMap['${i}_endSound'] = endSoundID;
+        if (!loadedSounds.containsKey(intervals[i].endSound)) {
+          int endSoundID = await loadSound(intervals[i].endSound, pool);
+          loadedSounds[intervals[i].endSound] = endSoundID;
+        }
+        soundMap['${i}_endSound'] = loadedSounds[intervals[i].endSound]!;
       } else {
         soundMap['${i}_endSound'] = -1;
       }
