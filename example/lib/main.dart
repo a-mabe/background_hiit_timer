@@ -139,6 +139,7 @@ class MyHomePageState extends State<MyHomePage> {
       androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
       androidWillPauseWhenDucked: true,
     ));
+    await session.setActive(true);
   }
 
   Future<void> loadPreferences() async {
