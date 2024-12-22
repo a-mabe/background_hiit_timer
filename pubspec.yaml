@@ -1,6 +1,6 @@
 name: background_hiit_timer
-description: Flutter background timer package developed for HIIT timers.
-version: 1.0.3
+description: Flutter background timer package developed for HIIT timers. Designed to run in the background and play audio cues on Android and iOS. 
+version: 1.0.4
 repository: https://github.com/a-mabe/background_hiit_timer
 
 funding:
