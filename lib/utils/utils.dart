@@ -6,11 +6,16 @@ import 'package:soundpool/soundpool.dart';
 Future<int> loadSound(String sound, Soundpool pool) async {
   if (sound.isNotEmpty) {
     logger.d('Loading sound $sound');
-    return await rootBundle
-        .load("packages/background_hiit_timer/lib/assets/audio/$sound.mp3")
-        .then((ByteData soundData) {
-      return pool.load(soundData);
-    });
+    try {
+      return await rootBundle
+          .load("packages/background_hiit_timer/lib/assets/audio/$sound.mp3")
+          .then((ByteData soundData) {
+        return pool.load(soundData);
+      });
+    } catch (e) {
+      logger.e('Error loading sound $sound: $e');
+      return -1;
+    }
   }
   return -1;
 }
