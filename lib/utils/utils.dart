@@ -28,5 +28,7 @@ Future playSound(
         soundId: soundID,
         volume: ((preferences.getDouble('volume') ?? 80) / 100));
     await pool.play(soundID);
+  } else {
+    logger.d('Sound ID is -1, not playing sound');
   }
 }

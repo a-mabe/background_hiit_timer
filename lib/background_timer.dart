@@ -339,9 +339,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         } else if (timerState.currentMicroSeconds == 700000) {
           if (intervalIndex < intervals.length - 1) {
             int soundId = soundMap["${nextIntervalIndex}_sound"]!;
-            if (soundId != 0) {
+            if (soundId != -1) {
               await playSound(soundId, pool, preferences);
-            } else if (soundMap["${intervalIndex}_endSound"]! != 0) {
+            } else if (soundMap["${intervalIndex}_endSound"]! != 1) {
               await playSound(
                   soundMap["${intervalIndex}_endSound"]!, pool, preferences);
             }
