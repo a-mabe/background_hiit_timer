@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:background_hiit_timer/background_timer_controller.dart';
 import 'package:background_hiit_timer/models/interval_type.dart';
 import 'package:background_hiit_timer/utils/database.dart';
@@ -11,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:soundpool/soundpool.dart';
 
 import 'utils/constants.dart';
 
@@ -203,11 +203,11 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     double volume = preferences.getDouble("volume") ?? 80.0;
     bool changeVolume = preferences.getBool("changeVolume") ?? false;
 
-    Soundpool pool = Soundpool.fromOptions();
+    // Soundpool pool = Soundpool.fromOptions();
     DatabaseManager dbManager = DatabaseManager();
     List<IntervalType> intervals = await dbManager.getIntervals();
 
-    Map<String, int> soundMap = await _loadIntervalSounds(intervals, pool);
+    // Map<String, int> soundMap = await _loadIntervalSounds(intervals, pool);
     IntervalType currentInterval = intervals[0];
     TimerState timerState = TimerState(
         false,
@@ -218,69 +218,17 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         volume,
         changeVolume);
 
-    _registerServiceEvents(
-        service, intervals, preferences, soundMap, timerState, pool);
-  }
-
-  static Future<Map<String, int>> _loadIntervalSounds(
-      List<IntervalType> intervals, Soundpool pool) async {
-    Map<String, int> soundMap = {};
-    Map<String, int> loadedSounds = {};
-
-    for (int i = 0; i < intervals.length; i++) {
-      if (intervals[i].startSound.isNotEmpty) {
-        if (!loadedSounds.containsKey(intervals[i].startSound)) {
-          int soundID = await loadSound(intervals[i].startSound, pool);
-          loadedSounds[intervals[i].startSound] = soundID;
-        }
-        soundMap['${i}_sound'] = loadedSounds[intervals[i].startSound]!;
-      } else {
-        soundMap['${i}_sound'] = -1;
-      }
-
-      if (intervals[i].halfwaySound.isNotEmpty) {
-        if (!loadedSounds.containsKey(intervals[i].halfwaySound)) {
-          int halfwaySoundID = await loadSound(intervals[i].halfwaySound, pool);
-          loadedSounds[intervals[i].halfwaySound] = halfwaySoundID;
-        }
-        soundMap['${i}_halfwaySound'] =
-            loadedSounds[intervals[i].halfwaySound]!;
-      } else {
-        soundMap['${i}_halfwaySound'] = -1;
-      }
-
-      if (intervals[i].countdownSound.isNotEmpty) {
-        if (!loadedSounds.containsKey(intervals[i].countdownSound)) {
-          int countdownSoundID =
-              await loadSound(intervals[i].countdownSound, pool);
-          loadedSounds[intervals[i].countdownSound] = countdownSoundID;
-        }
-        soundMap['${i}_countdownSound'] =
-            loadedSounds[intervals[i].countdownSound]!;
-      } else {
-        soundMap['${i}_countdownSound'] = -1;
-      }
-
-      if (intervals[i].endSound.isNotEmpty) {
-        if (!loadedSounds.containsKey(intervals[i].endSound)) {
-          int endSoundID = await loadSound(intervals[i].endSound, pool);
-          loadedSounds[intervals[i].endSound] = endSoundID;
-        }
-        soundMap['${i}_endSound'] = loadedSounds[intervals[i].endSound]!;
-      } else {
-        soundMap['${i}_endSound'] = -1;
-      }
-    }
-    return soundMap;
+    _registerServiceEvents(service, intervals, preferences, timerState);
   }
 
   static Future<void> _registerServiceEvents(
-      ServiceInstance service,
-      List<IntervalType> intervals,
-      SharedPreferences preferences,
-      Map<String, int> soundMap,
-      TimerState timerState,
-      Soundpool pool) async {
+    ServiceInstance service,
+    List<IntervalType> intervals,
+    SharedPreferences preferences,
+    // Map<String, int> soundMap,
+    TimerState timerState,
+    // Soundpool pool
+  ) async {
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
         service.setAsForegroundService();
@@ -314,7 +262,16 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       service.stopSelf();
     });
 
-    int blankSoundId = await loadSound('blank', pool);
+    final player = AudioPlayer();
+    player.setAudioContext(AudioContext(
+      android: AudioContextAndroid(
+        contentType: AndroidContentType.sonification,
+        audioFocus: AndroidAudioFocus.none,
+        usageType: AndroidUsageType.media,
+      ),
+    ));
+    player.audioCache =
+        AudioCache(prefix: 'packages/background_hiit_timer/assets/');
 
     Timer.periodic(interval, (timer) async {
       preferences.reload();
@@ -331,23 +288,24 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         if ([1500000, 2500000, 3500000]
             .contains(timerState.currentMicroSeconds)) {
           await playSound(
-              soundMap["${intervalIndex}_countdownSound"]!, pool, preferences);
+              intervals[intervalIndex].countdownSound, player, preferences);
         } else if (timerState.currentMicroSeconds ==
             timerState.intervalMicroSeconds ~/ 2) {
           await playSound(
-              soundMap["${intervalIndex}_halfwaySound"]!, pool, preferences);
+              intervals[intervalIndex].halfwaySound, player, preferences);
         } else if (timerState.currentMicroSeconds == 700000) {
           if (intervalIndex < intervals.length - 1) {
-            int soundId = soundMap["${nextIntervalIndex}_sound"]!;
-            if (soundId != -1) {
-              await playSound(soundId, pool, preferences);
-            } else if (soundMap["${intervalIndex}_endSound"]! != 1) {
+            String sound = intervals[nextIntervalIndex].startSound;
+            if (sound != "" && sound != "none") {
+              await playSound(sound, player, preferences);
+            } else if (intervals[intervalIndex].endSound != "" &&
+                intervals[intervalIndex].endSound != "none") {
               await playSound(
-                  soundMap["${intervalIndex}_endSound"]!, pool, preferences);
+                  intervals[intervalIndex].endSound, player, preferences);
             }
           } else {
             await playSound(
-                soundMap["${intervalIndex}_endSound"]!, pool, preferences);
+                intervals[intervalIndex].endSound, player, preferences);
           }
         } else if (timerState.currentMicroSeconds == 0 &&
             intervalIndex < intervals.length - 1) {
@@ -355,7 +313,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           timerState.advanceToNextInterval(intervals);
         } else if (Platform.isIOS &&
             timerState.currentMicroSeconds % 100000 == 0) {
-          await playSound(blankSoundId, pool, preferences);
+          await playSound(blankSoundFile, player, preferences);
         }
       }
 
