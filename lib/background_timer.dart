@@ -269,6 +269,12 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         audioFocus: AndroidAudioFocus.none,
         usageType: AndroidUsageType.media,
       ),
+      iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.playback,
+        options: {
+          AVAudioSessionOptions.mixWithOthers,
+        },
+      ),
     ));
     player.audioCache =
         AudioCache(prefix: 'packages/background_hiit_timer/assets/');
@@ -312,7 +318,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           logger.d("Advancing to next interval");
           timerState.advanceToNextInterval(intervals);
         } else if (Platform.isIOS &&
-            timerState.currentMicroSeconds % 100000 == 0) {
+            timerState.currentMicroSeconds % 1000000 == 0) {
           await playSound(blankSoundFile, player, preferences);
         }
       }

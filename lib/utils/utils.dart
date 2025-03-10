@@ -8,7 +8,7 @@ Future playSound(
     logger.d('Playing sound $sound');
     try {
       await player.setVolume((preferences.getDouble('volume') ?? 80) / 100);
-      await player.play(AssetSource("audio/$sound.mp3"));
+      player.play(AssetSource("audio/$sound.mp3"));
     } catch (e) {
       logger.e('Error playing sound $sound: $e');
     }
