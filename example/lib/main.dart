@@ -1,4 +1,3 @@
-import 'package:audio_session/audio_session.dart';
 import 'package:background_hiit_timer/models/interval_type.dart';
 import 'package:background_hiit_timer/models/timer_state.dart';
 import 'package:example/controls/control_bar.dart';
@@ -115,31 +114,8 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    initializeAudioSession();
     loadPreferences();
     listItems = intervals.map((interval) => interval.intervalIndex).toList();
-  }
-
-  Future<void> initializeAudioSession() async {
-    final session = await AudioSession.instance;
-
-    await session.configure(const AudioSessionConfiguration(
-      avAudioSessionCategory: AVAudioSessionCategory.playback,
-      avAudioSessionCategoryOptions:
-          AVAudioSessionCategoryOptions.mixWithOthers,
-      avAudioSessionMode: AVAudioSessionMode.defaultMode,
-      avAudioSessionRouteSharingPolicy:
-          AVAudioSessionRouteSharingPolicy.defaultPolicy,
-      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-      androidAudioAttributes: AndroidAudioAttributes(
-        contentType: AndroidAudioContentType.sonification,
-        flags: AndroidAudioFlags.audibilityEnforced,
-        usage: AndroidAudioUsage.notification,
-      ),
-      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-      androidWillPauseWhenDucked: true,
-    ));
-    await session.setActive(true);
   }
 
   Future<void> loadPreferences() async {

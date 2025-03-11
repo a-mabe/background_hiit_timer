@@ -115,34 +115,23 @@ There are four configurable audio cues for intervals outlined below:
 
 ### Audio Session
 
-This package currently uses the [soundpool](https://pub.dev/packages/soundpool) package to play audio. The package does not configure an audio session, leaving it up to the developer to set the audio session as they see fit. The [example](example) uses the [audio_session](https://pub.dev/packages/audio_session) package to configure the audio session so that audio from the service will play on both iOS and Android when the app is in the background. The session is also configured to not stop or duck audio from other apps.
-
-1. You can create a function to initialize an audio session with your desired settings. The following function sets the session configuration for the behavior in the example app described above:
+This package currently uses the [audioplayers](https://pub.dev/packages/audioplayers) package to play audio. The package does configure an audio session. By default, the session is configured so that audio from the service will play on both iOS and Android when the app is in the background. The session is also configured to not stop or duck audio from other apps.
 
 ```
-Future<void> initializeAudioSession() async {
-    final session = await AudioSession.instance;
-
-    await session.configure(const AudioSessionConfiguration(
-      avAudioSessionCategory: AVAudioSessionCategory.playback,
-      avAudioSessionCategoryOptions:
-          AVAudioSessionCategoryOptions.mixWithOthers,
-      avAudioSessionMode: AVAudioSessionMode.defaultMode,
-      avAudioSessionRouteSharingPolicy:
-          AVAudioSessionRouteSharingPolicy.defaultPolicy,
-      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-      androidAudioAttributes: AndroidAudioAttributes(
-        contentType: AndroidAudioContentType.sonification,
-        flags: AndroidAudioFlags.audibilityEnforced,
-        usage: AndroidAudioUsage.notification,
+    player.setAudioContext(AudioContext(
+      android: AudioContextAndroid(
+        contentType: AndroidContentType.sonification,
+        audioFocus: AndroidAudioFocus.none,
+        usageType: AndroidUsageType.media,
       ),
-      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-      androidWillPauseWhenDucked: true,
+      iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.playback,
+        options: {
+          AVAudioSessionOptions.mixWithOthers,
+        },
+      ),
     ));
-}
 ```
-
-Without managing the audio session, the timer background service may not play audio when the app is in the background.
 
 ## Configuring the UI
 

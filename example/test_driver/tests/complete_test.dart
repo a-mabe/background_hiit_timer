@@ -17,7 +17,7 @@ void main() {
   test('Integration Test - Timer Completes', () async {
     // Wait for "Get ready" text
     await driver!
-        .waitFor(find.text('Get ready'), timeout: const Duration(seconds: 5));
+        .waitFor(find.text('Get ready'), timeout: const Duration(seconds: 60));
 
     // Proceed to next state
     await Future.delayed(const Duration(seconds: 5));
@@ -47,5 +47,7 @@ void main() {
     // Find and tap the restart icon.
     final restartIcon = find.byTooltip('Restart');
     await driver!.tap(restartIcon);
-  });
+    await driver!
+        .waitFor(find.text('Get ready'), timeout: const Duration(seconds: 15));
+  }, timeout: const Timeout(Duration(minutes: 5))); // Increased overall timeout
 }

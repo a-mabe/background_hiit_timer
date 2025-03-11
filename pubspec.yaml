@@ -1,6 +1,6 @@
 name: background_hiit_timer
 description: Flutter background timer package developed for HIIT timers. Designed to run in the background and play audio cues on Android and iOS. 
-version: 1.0.5
+version: 1.1.0
 repository: https://github.com/a-mabe/background_hiit_timer
 
 funding:
@@ -17,12 +17,12 @@ dependencies:
   flutter_background_service: ^5.0.10
   flutter_background_service_android: ^6.2.7
   shared_preferences: ^2.2.0
-  soundpool: ^2.4.1
   logger: ^2.4.0
   sqflite_common_ffi: ^2.3.4
   sqflite: ^2.4.0
   path: ^1.9.0
   flutter_local_notifications: ^18.0.0
+  audioplayers: ^6.1.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -33,7 +33,7 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - lib/assets/audio/
+    - assets/audio/
 
   # To add assets to your package, add an assets section, like this:
   # assets:
