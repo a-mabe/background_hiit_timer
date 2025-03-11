@@ -318,7 +318,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           logger.d("Advancing to next interval");
           timerState.advanceToNextInterval(intervals);
         } else if (Platform.isIOS &&
-            timerState.currentMicroSeconds % 1000000 == 0) {
+            timerState.currentMicroSeconds % 1000000 == 0 &&
+            timerState.currentMicroSeconds > 700000) {
           await playSound(blankSoundFile, player, preferences);
         }
       }
