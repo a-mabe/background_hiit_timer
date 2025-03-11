@@ -33,6 +33,7 @@ class Countdown extends StatefulWidget {
   CountdownState createState() => CountdownState();
 }
 
+@pragma('vm:entry-point')
 class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   bool isActive = false;
   late SharedPreferences _preferences;
