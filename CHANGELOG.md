@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-3-11
+
+- Switch from soundpool to audioplayers package.
+- Audio session now set via audioplayers.
+
 ## [1.0.5] - 2025-2-09
 
 - Shorten the long-bell sound effect.

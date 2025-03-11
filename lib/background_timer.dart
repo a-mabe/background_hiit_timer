@@ -204,11 +204,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     double volume = preferences.getDouble("volume") ?? 80.0;
     bool changeVolume = preferences.getBool("changeVolume") ?? false;
 
-    // Soundpool pool = Soundpool.fromOptions();
     DatabaseManager dbManager = DatabaseManager();
     List<IntervalType> intervals = await dbManager.getIntervals();
 
-    // Map<String, int> soundMap = await _loadIntervalSounds(intervals, pool);
     IntervalType currentInterval = intervals[0];
     TimerState timerState = TimerState(
         false,
@@ -226,9 +224,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     ServiceInstance service,
     List<IntervalType> intervals,
     SharedPreferences preferences,
-    // Map<String, int> soundMap,
     TimerState timerState,
-    // Soundpool pool
   ) async {
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
