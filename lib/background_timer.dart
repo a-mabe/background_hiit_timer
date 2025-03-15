@@ -38,21 +38,43 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   bool isActive = false;
   late SharedPreferences _preferences;
 
-  static final AudioPlayer _player = AudioPlayer();
+  static AudioPlayer? _player;
 
-  static AudioPlayer get player => _player;
+  static AudioPlayer get player {
+    _player ??= AudioPlayer();
+    return _player!;
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
+    _initializeAudioContext();
     _initializeController();
     _initializePreferences();
 
     if (widget.controller?.autoStart ?? true) {
       _startTimer();
     }
+  }
+
+  Future<void> _initializeAudioContext() async {
+    await player.setAudioContext(AudioContext(
+      android: AudioContextAndroid(
+        contentType: AndroidContentType.sonification,
+        audioFocus: AndroidAudioFocus.none,
+        usageType: AndroidUsageType.media,
+      ),
+      iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.playback,
+        options: {
+          AVAudioSessionOptions.mixWithOthers,
+        },
+      ),
+    ));
+    player.audioCache =
+        AudioCache(prefix: 'packages/background_hiit_timer/assets/');
   }
 
   Future<void> _initializePreferences() async {
@@ -70,11 +92,20 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     widget.controller?.isCompleted = false;
   }
 
+  static Future<void> disposePlayer() async {
+    if (_player != null) {
+      await _player!.stop();
+      await _player!.dispose();
+      _player = null;
+    }
+  }
+
   @override
   void dispose() {
     if (isActive) {
       FlutterBackgroundService().invoke("stopService");
     }
+    disposePlayer();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -259,26 +290,10 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       }
     });
 
-    service.on('stopService').listen((_) async {
+    service.on('stopService').listen((_) {
       service.stopSelf();
-      await player.dispose();
+      disposePlayer();
     });
-
-    await player.setAudioContext(AudioContext(
-      android: AudioContextAndroid(
-        contentType: AndroidContentType.sonification,
-        audioFocus: AndroidAudioFocus.none,
-        usageType: AndroidUsageType.media,
-      ),
-      iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.playback,
-        options: {
-          AVAudioSessionOptions.mixWithOthers,
-        },
-      ),
-    ));
-    player.audioCache =
-        AudioCache(prefix: 'packages/background_hiit_timer/assets/');
 
     Timer.periodic(interval, (timer) async {
       preferences.reload();
