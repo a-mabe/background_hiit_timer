@@ -4,9 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Future playSound(
     String sound, AudioPlayer player, SharedPreferences preferences) async {
-  bool active = preferences.getBool("timer-active") ?? false;
-
-  if (sound != "" && sound != "none" && active) {
+  if (sound != "" && sound != "none") {
     logger.d('Playing sound $sound');
     try {
       await player.setVolume((preferences.getDouble('volume') ?? 80) / 100);

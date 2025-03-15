@@ -39,6 +39,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   late SharedPreferences _preferences;
 
   static AudioPlayer? _player;
+  static AudioPlayer? _player2;
 
   // static AudioPlayer get player {
   //   _player ??= AudioPlayer();
@@ -124,8 +125,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       await _player!.dispose();
       _player = null;
     }
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    await preferences.setBool("timer-active", false);
   }
 
   @override
@@ -266,7 +265,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     double volume = preferences.getDouble("volume") ?? 80.0;
     bool changeVolume = preferences.getBool("changeVolume") ?? false;
-    await preferences.setBool("timer-active", true);
 
     DatabaseManager dbManager = DatabaseManager();
     List<IntervalType> intervals = await dbManager.getIntervals();
@@ -291,20 +289,20 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     TimerState timerState,
   ) async {
     _player = AudioPlayer();
-    await _player?.setPlayerMode(PlayerMode.lowLatency);
-    // await _player?.setAudioContext(AudioContext(
-    //   android: AudioContextAndroid(
-    //     contentType: AndroidContentType.sonification,
-    //     audioFocus: AndroidAudioFocus.none,
-    //     usageType: AndroidUsageType.media,
-    //   ),
-    //   iOS: AudioContextIOS(
-    //     category: AVAudioSessionCategory.playback,
-    //     options: {
-    //       AVAudioSessionOptions.mixWithOthers,
-    //     },
-    //   ),
-    // ));
+    _player2 = AudioPlayer();
+    await _player?.setAudioContext(AudioContext(
+      android: AudioContextAndroid(
+        contentType: AndroidContentType.sonification,
+        audioFocus: AndroidAudioFocus.none,
+        usageType: AndroidUsageType.media,
+      ),
+      iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.playback,
+        options: {
+          AVAudioSessionOptions.mixWithOthers,
+        },
+      ),
+    ));
 
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
@@ -339,8 +337,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       service.stopSelf();
       disposePlayer();
     });
-
-    await Future.delayed(Duration(seconds: 5));
 
     Timer.periodic(interval, (timer) async {
       preferences.reload();
