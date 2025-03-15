@@ -38,6 +38,10 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   bool isActive = false;
   late SharedPreferences _preferences;
 
+  static final AudioPlayer _player = AudioPlayer();
+
+  static AudioPlayer get player => _player;
+
   @override
   void initState() {
     super.initState();
@@ -259,8 +263,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       service.stopSelf();
     });
 
-    final player = AudioPlayer();
-    player.setAudioContext(AudioContext(
+    await player.setAudioContext(AudioContext(
       android: AudioContextAndroid(
         contentType: AndroidContentType.sonification,
         audioFocus: AndroidAudioFocus.none,
