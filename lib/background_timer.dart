@@ -40,23 +40,23 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
   static AudioPlayer? _player;
 
-  static AudioPlayer get player {
-    _player ??= AudioPlayer();
-    _player?.setAudioContext(AudioContext(
-      android: AudioContextAndroid(
-        contentType: AndroidContentType.sonification,
-        audioFocus: AndroidAudioFocus.none,
-        usageType: AndroidUsageType.media,
-      ),
-      iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.playback,
-        options: {
-          AVAudioSessionOptions.mixWithOthers,
-        },
-      ),
-    ));
-    return _player!;
-  }
+  // static AudioPlayer get player {
+  //   _player ??= AudioPlayer();
+  //   _player?.setAudioContext(AudioContext(
+  //     android: AudioContextAndroid(
+  //       contentType: AndroidContentType.sonification,
+  //       audioFocus: AndroidAudioFocus.none,
+  //       usageType: AndroidUsageType.media,
+  //     ),
+  //     iOS: AudioContextIOS(
+  //       category: AVAudioSessionCategory.playback,
+  //       options: {
+  //         AVAudioSessionOptions.mixWithOthers,
+  //       },
+  //     ),
+  //   ));
+  //   return _player!;
+  // }
 
   @override
   void initState() {
@@ -321,52 +321,73 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       disposePlayer();
     });
 
-    Timer.periodic(interval, (timer) async {
-      preferences.reload();
-      timerState.paused = preferences.getBool('pause') ?? false;
+    if (_player != null) {
+      await _player?.stop();
+      await _player?.dispose();
+    }
+    _player = AudioPlayer();
+    _player
+        ?.setAudioContext(AudioContext(
+      android: AudioContextAndroid(
+        contentType: AndroidContentType.sonification,
+        audioFocus: AndroidAudioFocus.none,
+        usageType: AndroidUsageType.media,
+      ),
+      iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.playback,
+        options: {
+          AVAudioSessionOptions.mixWithOthers,
+        },
+      ),
+    ))
+        .whenComplete(() {
+      Timer.periodic(interval, (timer) async {
+        preferences.reload();
+        timerState.paused = preferences.getBool('pause') ?? false;
 
-      if (timerState.currentMicroSeconds <= 0) {
-        timerState.status = "End";
-      } else if (!timerState.paused && timerState.currentMicroSeconds > 0) {
-        timerState.currentMicroSeconds -= interval.inMicroseconds;
+        if (timerState.currentMicroSeconds <= 0) {
+          timerState.status = "End";
+        } else if (!timerState.paused && timerState.currentMicroSeconds > 0) {
+          timerState.currentMicroSeconds -= interval.inMicroseconds;
 
-        int intervalIndex = timerState.currentInterval;
-        int nextIntervalIndex = intervalIndex + 1;
+          int intervalIndex = timerState.currentInterval;
+          int nextIntervalIndex = intervalIndex + 1;
 
-        if ([1500000, 2500000, 3500000]
-            .contains(timerState.currentMicroSeconds)) {
-          await playSound(
-              intervals[intervalIndex].countdownSound, player, preferences);
-        } else if (timerState.currentMicroSeconds ==
-            timerState.intervalMicroSeconds ~/ 2) {
-          await playSound(
-              intervals[intervalIndex].halfwaySound, player, preferences);
-        } else if (timerState.currentMicroSeconds == 700000) {
-          if (intervalIndex < intervals.length - 1) {
-            String sound = intervals[nextIntervalIndex].startSound;
-            if (sound != "" && sound != "none") {
-              await playSound(sound, player, preferences);
-            } else if (intervals[intervalIndex].endSound != "" &&
-                intervals[intervalIndex].endSound != "none") {
-              await playSound(
-                  intervals[intervalIndex].endSound, player, preferences);
-            }
-          } else {
+          if ([1500000, 2500000, 3500000]
+              .contains(timerState.currentMicroSeconds)) {
             await playSound(
-                intervals[intervalIndex].endSound, player, preferences);
+                intervals[intervalIndex].countdownSound, _player!, preferences);
+          } else if (timerState.currentMicroSeconds ==
+              timerState.intervalMicroSeconds ~/ 2) {
+            await playSound(
+                intervals[intervalIndex].halfwaySound, _player!, preferences);
+          } else if (timerState.currentMicroSeconds == 700000) {
+            if (intervalIndex < intervals.length - 1) {
+              String sound = intervals[nextIntervalIndex].startSound;
+              if (sound != "" && sound != "none") {
+                await playSound(sound, _player!, preferences);
+              } else if (intervals[intervalIndex].endSound != "" &&
+                  intervals[intervalIndex].endSound != "none") {
+                await playSound(
+                    intervals[intervalIndex].endSound, _player!, preferences);
+              }
+            } else {
+              await playSound(
+                  intervals[intervalIndex].endSound, _player!, preferences);
+            }
+          } else if (timerState.currentMicroSeconds == 0 &&
+              intervalIndex < intervals.length - 1) {
+            logger.d("Advancing to next interval");
+            timerState.advanceToNextInterval(intervals);
+          } else if (Platform.isIOS &&
+              timerState.currentMicroSeconds % 1000000 == 0 &&
+              timerState.currentMicroSeconds > 700000) {
+            await playSound(blankSoundFile, _player!, preferences);
           }
-        } else if (timerState.currentMicroSeconds == 0 &&
-            intervalIndex < intervals.length - 1) {
-          logger.d("Advancing to next interval");
-          timerState.advanceToNextInterval(intervals);
-        } else if (Platform.isIOS &&
-            timerState.currentMicroSeconds % 1000000 == 0 &&
-            timerState.currentMicroSeconds > 700000) {
-          await playSound(blankSoundFile, player, preferences);
         }
-      }
 
-      service.invoke('update', timerState.toMap());
+        service.invoke('update', timerState.toMap());
+      });
     });
   }
 
