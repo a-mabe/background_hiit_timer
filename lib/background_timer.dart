@@ -63,23 +63,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    // print("Initializing player");
-    // // _player ??= AudioPlayer();
-    // print("Setting audio context");
-    // // _player?.setAudioContext(AudioContext(
-    // //   android: AudioContextAndroid(
-    // //     contentType: AndroidContentType.sonification,
-    // //     audioFocus: AndroidAudioFocus.none,
-    // //     usageType: AndroidUsageType.media,
-    // //   ),
-    // //   iOS: AudioContextIOS(
-    // //     category: AVAudioSessionCategory.playback,
-    // //     options: {
-    // //       AVAudioSessionOptions.mixWithOthers,
-    // //     },
-    // //   ),
-    // // ));
-    // print("Player initialized and audio context set");
     // _initializeAudioContext();
     _initializeController();
     _initializePreferences();
@@ -137,7 +120,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
   static Future<void> disposePlayer() async {
     if (_player != null) {
-      print("Player disposed");
       await _player!.stop();
       await _player!.dispose();
       _player = null;
@@ -190,24 +172,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     // Ensure the 'pause' shared preference is set to false when the timer starts
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.setBool("pause", false);
-
-    print("Initializing player");
-    _player ??= AudioPlayer();
-    print("Setting audio context");
-    _player?.setAudioContext(AudioContext(
-      android: AudioContextAndroid(
-        contentType: AndroidContentType.sonification,
-        audioFocus: AndroidAudioFocus.none,
-        usageType: AndroidUsageType.media,
-      ),
-      iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.playback,
-        options: {
-          AVAudioSessionOptions.mixWithOthers,
-        },
-      ),
-    ));
-    print("Player initialized and audio context set");
 
     await _initializeService();
     widget.controller?.isCompleted = false;
@@ -356,6 +320,21 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       service.stopSelf();
       disposePlayer();
     });
+
+    _player = AudioPlayer();
+    _player?.setAudioContext(AudioContext(
+      android: AudioContextAndroid(
+        contentType: AndroidContentType.sonification,
+        audioFocus: AndroidAudioFocus.none,
+        usageType: AndroidUsageType.media,
+      ),
+      iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.playback,
+        options: {
+          AVAudioSessionOptions.mixWithOthers,
+        },
+      ),
+    ));
 
     Timer.periodic(interval, (timer) async {
       preferences.reload();
