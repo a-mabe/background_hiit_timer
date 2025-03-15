@@ -288,6 +288,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     TimerState timerState,
   ) async {
     _player = AudioPlayer();
+    await _player?.setPlayerMode(PlayerMode.lowLatency);
     await _player?.setAudioContext(AudioContext(
       android: AudioContextAndroid(
         contentType: AndroidContentType.sonification,
