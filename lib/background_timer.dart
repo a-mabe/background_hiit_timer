@@ -259,8 +259,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       }
     });
 
-    service.on('stopService').listen((_) {
+    service.on('stopService').listen((_) async {
       service.stopSelf();
+      await player.dispose();
     });
 
     await player.setAudioContext(AudioContext(
