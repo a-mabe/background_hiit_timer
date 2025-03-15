@@ -41,7 +41,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   static AudioPlayer? _player;
 
   static AudioPlayer get player {
-    AudioPlayer.global.setAudioContext(AudioContext(
+    _player ??= AudioPlayer();
+    _player?.setAudioContext(AudioContext(
       android: AudioContextAndroid(
         contentType: AndroidContentType.sonification,
         audioFocus: AndroidAudioFocus.none,
@@ -54,7 +55,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         },
       ),
     ));
-    _player ??= AudioPlayer();
     return _player!;
   }
 
@@ -72,36 +72,36 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _initializeAudioContext() async {
-    AudioPlayer.global.setAudioContext(AudioContext(
-      android: AudioContextAndroid(
-        contentType: AndroidContentType.sonification,
-        audioFocus: AndroidAudioFocus.none,
-        usageType: AndroidUsageType.media,
-      ),
-      iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.playback,
-        options: {
-          AVAudioSessionOptions.mixWithOthers,
-        },
-      ),
-    ));
-    // await player.setAudioContext(AudioContext(
-    //   android: AudioContextAndroid(
-    //     contentType: AndroidContentType.sonification,
-    //     audioFocus: AndroidAudioFocus.none,
-    //     usageType: AndroidUsageType.media,
-    //   ),
-    //   iOS: AudioContextIOS(
-    //     category: AVAudioSessionCategory.playback,
-    //     options: {
-    //       AVAudioSessionOptions.mixWithOthers,
-    //     },
-    //   ),
-    // ));
-    player.audioCache =
-        AudioCache(prefix: 'packages/background_hiit_timer/assets/');
-  }
+  // Future<void> _initializeAudioContext() async {
+  //   AudioPlayer.global.setAudioContext(AudioContext(
+  //     android: AudioContextAndroid(
+  //       contentType: AndroidContentType.sonification,
+  //       audioFocus: AndroidAudioFocus.none,
+  //       usageType: AndroidUsageType.media,
+  //     ),
+  //     iOS: AudioContextIOS(
+  //       category: AVAudioSessionCategory.playback,
+  //       options: {
+  //         AVAudioSessionOptions.mixWithOthers,
+  //       },
+  //     ),
+  //   ));
+  //   // await player.setAudioContext(AudioContext(
+  //   //   android: AudioContextAndroid(
+  //   //     contentType: AndroidContentType.sonification,
+  //   //     audioFocus: AndroidAudioFocus.none,
+  //   //     usageType: AndroidUsageType.media,
+  //   //   ),
+  //   //   iOS: AudioContextIOS(
+  //   //     category: AVAudioSessionCategory.playback,
+  //   //     options: {
+  //   //       AVAudioSessionOptions.mixWithOthers,
+  //   //     },
+  //   //   ),
+  //   // ));
+  //   player.audioCache =
+  //       AudioCache(prefix: 'packages/background_hiit_timer/assets/');
+  // }
 
   Future<void> _initializePreferences() async {
     _preferences = await SharedPreferences.getInstance();
