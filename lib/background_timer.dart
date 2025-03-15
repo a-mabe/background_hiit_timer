@@ -63,6 +63,20 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
+    _player ??= AudioPlayer();
+    _player?.setAudioContext(AudioContext(
+      android: AudioContextAndroid(
+        contentType: AndroidContentType.sonification,
+        audioFocus: AndroidAudioFocus.none,
+        usageType: AndroidUsageType.media,
+      ),
+      iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.playback,
+        options: {
+          AVAudioSessionOptions.mixWithOthers,
+        },
+      ),
+    ));
     // _initializeAudioContext();
     _initializeController();
     _initializePreferences();
@@ -120,6 +134,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
   static Future<void> disposePlayer() async {
     if (_player != null) {
+      print("Player disposed");
       await _player!.stop();
       await _player!.dispose();
       _player = null;
@@ -321,11 +336,11 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       disposePlayer();
     });
 
-    if (_player != null) {
-      await _player?.stop();
-      await _player?.dispose();
-    }
-    _player = AudioPlayer();
+    // if (_player != null) {
+    //   await _player?.stop();
+    //   await _player?.dispose();
+    // }
+    // _player = AudioPlayer();
     _player
         ?.setAudioContext(AudioContext(
       android: AudioContextAndroid(
