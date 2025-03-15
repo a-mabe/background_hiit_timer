@@ -66,19 +66,19 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     print("Initializing player");
     _player ??= AudioPlayer();
     print("Setting audio context");
-    _player?.setAudioContext(AudioContext(
-      android: AudioContextAndroid(
-        contentType: AndroidContentType.sonification,
-        audioFocus: AndroidAudioFocus.none,
-        usageType: AndroidUsageType.media,
-      ),
-      iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.playback,
-        options: {
-          AVAudioSessionOptions.mixWithOthers,
-        },
-      ),
-    ));
+    // _player?.setAudioContext(AudioContext(
+    //   android: AudioContextAndroid(
+    //     contentType: AndroidContentType.sonification,
+    //     audioFocus: AndroidAudioFocus.none,
+    //     usageType: AndroidUsageType.media,
+    //   ),
+    //   iOS: AudioContextIOS(
+    //     category: AVAudioSessionCategory.playback,
+    //     options: {
+    //       AVAudioSessionOptions.mixWithOthers,
+    //     },
+    //   ),
+    // ));
     print("Player initialized and audio context set");
     // _initializeAudioContext();
     _initializeController();
