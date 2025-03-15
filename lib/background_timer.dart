@@ -340,6 +340,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       disposePlayer();
     });
 
+    await Future.delayed(Duration(seconds: 5));
+
     Timer.periodic(interval, (timer) async {
       preferences.reload();
       timerState.paused = preferences.getBool('pause') ?? false;
