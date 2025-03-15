@@ -201,21 +201,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   }
 
   Future<void> _initializeService() async {
-    _player = AudioPlayer();
-    await _player?.setAudioContext(AudioContext(
-      android: AudioContextAndroid(
-        contentType: AndroidContentType.sonification,
-        audioFocus: AndroidAudioFocus.none,
-        usageType: AndroidUsageType.media,
-      ),
-      iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.playback,
-        options: {
-          AVAudioSessionOptions.mixWithOthers,
-        },
-      ),
-    ));
-
     final service = FlutterBackgroundService();
 
     // Database setup
@@ -302,6 +287,21 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     SharedPreferences preferences,
     TimerState timerState,
   ) async {
+    _player = AudioPlayer();
+    await _player?.setAudioContext(AudioContext(
+      android: AudioContextAndroid(
+        contentType: AndroidContentType.sonification,
+        audioFocus: AndroidAudioFocus.none,
+        usageType: AndroidUsageType.media,
+      ),
+      iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.playback,
+        options: {
+          AVAudioSessionOptions.mixWithOthers,
+        },
+      ),
+    ));
+
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
         service.setAsForegroundService();
