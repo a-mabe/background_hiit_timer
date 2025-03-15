@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:audio_session/audio_session.dart' as audio_session;
 
 import 'utils/constants.dart';
 
@@ -303,6 +304,28 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     //     },
     //   ),
     // ));
+
+    // Future<void> initializeAudioSession() async {
+    final session = await audio_session.AudioSession.instance;
+
+    await session.configure(const audio_session.AudioSessionConfiguration(
+      avAudioSessionCategory: audio_session.AVAudioSessionCategory.playback,
+      avAudioSessionCategoryOptions:
+          audio_session.AVAudioSessionCategoryOptions.mixWithOthers,
+      avAudioSessionMode: audio_session.AVAudioSessionMode.defaultMode,
+      avAudioSessionRouteSharingPolicy:
+          audio_session.AVAudioSessionRouteSharingPolicy.defaultPolicy,
+      avAudioSessionSetActiveOptions:
+          audio_session.AVAudioSessionSetActiveOptions.none,
+      androidAudioAttributes: audio_session.AndroidAudioAttributes(
+        contentType: audio_session.AndroidAudioContentType.sonification,
+        flags: audio_session.AndroidAudioFlags.audibilityEnforced,
+        usage: audio_session.AndroidAudioUsage.notification,
+      ),
+      androidAudioFocusGainType: audio_session.AndroidAudioFocusGainType.gain,
+      androidWillPauseWhenDucked: true,
+    ));
+    // }
 
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
