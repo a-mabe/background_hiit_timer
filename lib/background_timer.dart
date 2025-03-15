@@ -124,6 +124,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       await _player!.dispose();
       _player = null;
     }
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.setBool("timer-active", false);
   }
 
   @override
@@ -264,6 +266,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     double volume = preferences.getDouble("volume") ?? 80.0;
     bool changeVolume = preferences.getBool("changeVolume") ?? false;
+    await preferences.setBool("timer-active", true);
 
     DatabaseManager dbManager = DatabaseManager();
     List<IntervalType> intervals = await dbManager.getIntervals();
