@@ -330,6 +330,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     });
 
     Timer.periodic(interval, (timer) async {
+      print("Timer is running");
+
       preferences.reload();
       timerState.paused = preferences.getBool('pause') ?? false;
 
