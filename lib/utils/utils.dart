@@ -17,7 +17,7 @@ Future playSound(
           .setAudioContext(
               AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers)
                   .build())
-          .then((value) => player.resume());
+          .then((value) => print("Context set"));
     } catch (e) {
       logger.e('Error playing sound $sound: $e');
     }
