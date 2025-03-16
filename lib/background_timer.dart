@@ -65,7 +65,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    // _initializeAudioContext();
+    _initializeAudioContext();
     _initializeController();
     _initializePreferences();
 
@@ -74,36 +74,41 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     }
   }
 
-  // Future<void> _initializeAudioContext() async {
-  //   AudioPlayer.global.setAudioContext(AudioContext(
-  //     android: AudioContextAndroid(
-  //       contentType: AndroidContentType.sonification,
-  //       audioFocus: AndroidAudioFocus.none,
-  //       usageType: AndroidUsageType.media,
-  //     ),
-  //     iOS: AudioContextIOS(
-  //       category: AVAudioSessionCategory.playback,
-  //       options: {
-  //         AVAudioSessionOptions.mixWithOthers,
-  //       },
-  //     ),
-  //   ));
-  //   // await player.setAudioContext(AudioContext(
-  //   //   android: AudioContextAndroid(
-  //   //     contentType: AndroidContentType.sonification,
-  //   //     audioFocus: AndroidAudioFocus.none,
-  //   //     usageType: AndroidUsageType.media,
-  //   //   ),
-  //   //   iOS: AudioContextIOS(
-  //   //     category: AVAudioSessionCategory.playback,
-  //   //     options: {
-  //   //       AVAudioSessionOptions.mixWithOthers,
-  //   //     },
-  //   //   ),
-  //   // ));
-  //   player.audioCache =
-  //       AudioCache(prefix: 'packages/background_hiit_timer/assets/');
-  // }
+  Future<void> _initializeAudioContext() async {
+    // AudioPlayer.global.setAudioContext(AudioContext(
+    //   android: AudioContextAndroid(
+    //     contentType: AndroidContentType.sonification,
+    //     audioFocus: AndroidAudioFocus.none,
+    //     usageType: AndroidUsageType.media,
+    //   ),
+    //   iOS: AudioContextIOS(
+    //     category: AVAudioSessionCategory.playback,
+    //     options: {
+    //       AVAudioSessionOptions.mixWithOthers,
+    //     },
+    //   ),
+    // ));
+    AudioPlayer.global.setAudioContext(AudioContextConfig(
+            focus: AudioContextConfigFocus.mixWithOthers,
+            respectSilence: true,
+            route: AudioContextConfigRoute.system)
+        .build());
+    // await player.setAudioContext(AudioContext(
+    //   android: AudioContextAndroid(
+    //     contentType: AndroidContentType.sonification,
+    //     audioFocus: AndroidAudioFocus.none,
+    //     usageType: AndroidUsageType.media,
+    //   ),
+    //   iOS: AudioContextIOS(
+    //     category: AVAudioSessionCategory.playback,
+    //     options: {
+    //       AVAudioSessionOptions.mixWithOthers,
+    //     },
+    //   ),
+    // ));
+    _player?.audioCache =
+        AudioCache(prefix: 'packages/background_hiit_timer/assets/');
+  }
 
   Future<void> _initializePreferences() async {
     _preferences = await SharedPreferences.getInstance();
