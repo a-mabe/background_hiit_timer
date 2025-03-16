@@ -200,6 +200,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   }
 
   Future<void> _initializeService() async {
+    await Future.delayed(Duration(seconds: 10));
+
     final service = FlutterBackgroundService();
 
     // Database setup
