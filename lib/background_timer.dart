@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:audio_session/audio_session.dart' as audio_session;
 
 import 'utils/constants.dart';
 
@@ -40,7 +39,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   late SharedPreferences _preferences;
 
   static AudioPlayer? _player;
-  // static AudioPlayer? _player2;
 
   // static AudioPlayer get player {
   //   _player ??= AudioPlayer();
@@ -65,7 +63,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    _initializeAudioContext();
+    // _initializeAudioContext();
     _initializeController();
     _initializePreferences();
 
@@ -74,41 +72,36 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _initializeAudioContext() async {
-    // AudioPlayer.global.setAudioContext(AudioContext(
-    //   android: AudioContextAndroid(
-    //     contentType: AndroidContentType.sonification,
-    //     audioFocus: AndroidAudioFocus.none,
-    //     usageType: AndroidUsageType.media,
-    //   ),
-    //   iOS: AudioContextIOS(
-    //     category: AVAudioSessionCategory.playback,
-    //     options: {
-    //       AVAudioSessionOptions.mixWithOthers,
-    //     },
-    //   ),
-    // ));
-    AudioPlayer.global.setAudioContext(AudioContextConfig(
-            focus: AudioContextConfigFocus.mixWithOthers,
-            respectSilence: true,
-            route: AudioContextConfigRoute.system)
-        .build());
-    // await player.setAudioContext(AudioContext(
-    //   android: AudioContextAndroid(
-    //     contentType: AndroidContentType.sonification,
-    //     audioFocus: AndroidAudioFocus.none,
-    //     usageType: AndroidUsageType.media,
-    //   ),
-    //   iOS: AudioContextIOS(
-    //     category: AVAudioSessionCategory.playback,
-    //     options: {
-    //       AVAudioSessionOptions.mixWithOthers,
-    //     },
-    //   ),
-    // ));
-    _player?.audioCache =
-        AudioCache(prefix: 'packages/background_hiit_timer/assets/');
-  }
+  // Future<void> _initializeAudioContext() async {
+  //   AudioPlayer.global.setAudioContext(AudioContext(
+  //     android: AudioContextAndroid(
+  //       contentType: AndroidContentType.sonification,
+  //       audioFocus: AndroidAudioFocus.none,
+  //       usageType: AndroidUsageType.media,
+  //     ),
+  //     iOS: AudioContextIOS(
+  //       category: AVAudioSessionCategory.playback,
+  //       options: {
+  //         AVAudioSessionOptions.mixWithOthers,
+  //       },
+  //     ),
+  //   ));
+  //   // await player.setAudioContext(AudioContext(
+  //   //   android: AudioContextAndroid(
+  //   //     contentType: AndroidContentType.sonification,
+  //   //     audioFocus: AndroidAudioFocus.none,
+  //   //     usageType: AndroidUsageType.media,
+  //   //   ),
+  //   //   iOS: AudioContextIOS(
+  //   //     category: AVAudioSessionCategory.playback,
+  //   //     options: {
+  //   //       AVAudioSessionOptions.mixWithOthers,
+  //   //     },
+  //   //   ),
+  //   // ));
+  //   player.audioCache =
+  //       AudioCache(prefix: 'packages/background_hiit_timer/assets/');
+  // }
 
   Future<void> _initializePreferences() async {
     _preferences = await SharedPreferences.getInstance();
@@ -295,42 +288,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     TimerState timerState,
   ) async {
     _player = AudioPlayer();
-    // _player2 = AudioPlayer();
-    // await _player?.setAudioContext(AudioContext(
-    //   android: AudioContextAndroid(
-    //     contentType: AndroidContentType.sonification,
-    //     audioFocus: AndroidAudioFocus.none,
-    //     usageType: AndroidUsageType.media,
-    //   ),
-    //   iOS: AudioContextIOS(
-    //     category: AVAudioSessionCategory.playback,
-    //     options: {
-    //       AVAudioSessionOptions.mixWithOthers,
-    //     },
-    //   ),
-    // ));
-
-    // Future<void> initializeAudioSession() async {
-    // final session = await audio_session.AudioSession.instance;
-
-    // await session.configure(const audio_session.AudioSessionConfiguration(
-    //   avAudioSessionCategory: audio_session.AVAudioSessionCategory.playback,
-    //   avAudioSessionCategoryOptions:
-    //       audio_session.AVAudioSessionCategoryOptions.mixWithOthers,
-    //   avAudioSessionMode: audio_session.AVAudioSessionMode.defaultMode,
-    //   avAudioSessionRouteSharingPolicy:
-    //       audio_session.AVAudioSessionRouteSharingPolicy.defaultPolicy,
-    //   avAudioSessionSetActiveOptions:
-    //       audio_session.AVAudioSessionSetActiveOptions.none,
-    //   androidAudioAttributes: audio_session.AndroidAudioAttributes(
-    //     contentType: audio_session.AndroidAudioContentType.sonification,
-    //     flags: audio_session.AndroidAudioFlags.audibilityEnforced,
-    //     usage: audio_session.AndroidAudioUsage.notification,
-    //   ),
-    //   androidAudioFocusGainType: audio_session.AndroidAudioFocusGainType.gain,
-    //   androidWillPauseWhenDucked: true,
-    // ));
-    // }
 
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
