@@ -40,7 +40,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   late SharedPreferences _preferences;
 
   static AudioPlayer? _player;
-  static AudioPlayer? _player2;
+  // static AudioPlayer? _player2;
 
   // static AudioPlayer get player {
   //   _player ??= AudioPlayer();
@@ -290,7 +290,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     TimerState timerState,
   ) async {
     _player = AudioPlayer();
-    _player2 = AudioPlayer();
+    // _player2 = AudioPlayer();
     // await _player?.setAudioContext(AudioContext(
     //   android: AudioContextAndroid(
     //     contentType: AndroidContentType.sonification,
@@ -306,25 +306,25 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     // ));
 
     // Future<void> initializeAudioSession() async {
-    final session = await audio_session.AudioSession.instance;
+    // final session = await audio_session.AudioSession.instance;
 
-    await session.configure(const audio_session.AudioSessionConfiguration(
-      avAudioSessionCategory: audio_session.AVAudioSessionCategory.playback,
-      avAudioSessionCategoryOptions:
-          audio_session.AVAudioSessionCategoryOptions.mixWithOthers,
-      avAudioSessionMode: audio_session.AVAudioSessionMode.defaultMode,
-      avAudioSessionRouteSharingPolicy:
-          audio_session.AVAudioSessionRouteSharingPolicy.defaultPolicy,
-      avAudioSessionSetActiveOptions:
-          audio_session.AVAudioSessionSetActiveOptions.none,
-      androidAudioAttributes: audio_session.AndroidAudioAttributes(
-        contentType: audio_session.AndroidAudioContentType.sonification,
-        flags: audio_session.AndroidAudioFlags.audibilityEnforced,
-        usage: audio_session.AndroidAudioUsage.notification,
-      ),
-      androidAudioFocusGainType: audio_session.AndroidAudioFocusGainType.gain,
-      androidWillPauseWhenDucked: true,
-    ));
+    // await session.configure(const audio_session.AudioSessionConfiguration(
+    //   avAudioSessionCategory: audio_session.AVAudioSessionCategory.playback,
+    //   avAudioSessionCategoryOptions:
+    //       audio_session.AVAudioSessionCategoryOptions.mixWithOthers,
+    //   avAudioSessionMode: audio_session.AVAudioSessionMode.defaultMode,
+    //   avAudioSessionRouteSharingPolicy:
+    //       audio_session.AVAudioSessionRouteSharingPolicy.defaultPolicy,
+    //   avAudioSessionSetActiveOptions:
+    //       audio_session.AVAudioSessionSetActiveOptions.none,
+    //   androidAudioAttributes: audio_session.AndroidAudioAttributes(
+    //     contentType: audio_session.AndroidAudioContentType.sonification,
+    //     flags: audio_session.AndroidAudioFlags.audibilityEnforced,
+    //     usage: audio_session.AndroidAudioUsage.notification,
+    //   ),
+    //   androidAudioFocusGainType: audio_session.AndroidAudioFocusGainType.gain,
+    //   androidWillPauseWhenDucked: true,
+    // ));
     // }
 
     if (service is AndroidServiceInstance) {
