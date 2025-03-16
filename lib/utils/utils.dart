@@ -13,6 +13,7 @@ Future playSound(
         AssetSource("audio/$sound.mp3"),
         volume: (preferences.getDouble('volume') ?? 80) / 100,
       );
+      await player.stop();
       // await player.play(AssetSource("audio/$sound.mp3"),
       //     ctx: AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers)
       //         .build());
