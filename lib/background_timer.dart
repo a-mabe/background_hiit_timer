@@ -374,7 +374,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         } else if (Platform.isIOS &&
             timerState.currentMicroSeconds % 1000000 == 0 &&
             timerState.currentMicroSeconds > 700000) {
-          await playSound(blankSoundFile, _player!, preferences);
+          // await playSound(blankSoundFile, _player!, preferences);
         }
       }
 
