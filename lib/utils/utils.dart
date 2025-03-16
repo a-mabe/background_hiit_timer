@@ -15,8 +15,7 @@ Future playSound(
       await player.setSourceAsset("audio/$sound.mp3");
       await player
           .setAudioContext(
-              AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers)
-                  .build())
+              AudioContextConfig(focus: AudioContextConfigFocus.gain).build())
           .then((value) => player.resume());
     } catch (e) {
       logger.e('Error playing sound $sound: $e');
