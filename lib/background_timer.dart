@@ -293,6 +293,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers)
             .build());
 
+    _player?.audioCache =
+        AudioCache(prefix: 'packages/background_hiit_timer/assets/');
+
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
         service.setAsForegroundService();
