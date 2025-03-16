@@ -289,11 +289,9 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   ) async {
     _player = AudioPlayer();
 
-    _player?.setAudioContext(AudioContextConfig(
-            focus: AudioContextConfigFocus.mixWithOthers,
-            respectSilence: true,
-            route: AudioContextConfigRoute.system)
-        .build());
+    await _player?.setAudioContext(
+        AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers)
+            .build());
 
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
