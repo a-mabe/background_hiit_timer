@@ -9,19 +9,8 @@ Future playSound(
     try {
       await player.setVolume((preferences.getDouble('volume') ?? 80) / 100);
       await player.play(AssetSource("audio/$sound.mp3"),
-          ctx: AudioContext(
-            android: AudioContextAndroid(
-              contentType: AndroidContentType.sonification,
-              audioFocus: AndroidAudioFocus.none,
-              usageType: AndroidUsageType.media,
-            ),
-            iOS: AudioContextIOS(
-              category: AVAudioSessionCategory.playback,
-              options: {
-                AVAudioSessionOptions.mixWithOthers,
-              },
-            ),
-          ));
+          ctx: AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers)
+              .build());
     } catch (e) {
       logger.e('Error playing sound $sound: $e');
     }
