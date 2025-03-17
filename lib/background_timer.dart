@@ -305,6 +305,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       for (var sound in sounds) {
         if (sound.isNotEmpty &&
             sound != "none" &&
+            sound != "" &&
             !soundPlayers.containsKey(sound)) {
           AudioPlayer player = AudioPlayer();
           await player.setAudioContext(AudioContext(
@@ -322,6 +323,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           ));
           player.audioCache =
               AudioCache(prefix: 'packages/background_hiit_timer/assets/');
+          print("Adding player for sound $sound");
           soundPlayers[sound] = player;
         }
       }
