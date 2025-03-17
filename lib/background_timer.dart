@@ -347,25 +347,24 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
         if ([1500000, 2500000, 3500000]
             .contains(timerState.currentMicroSeconds)) {
-          await playSound(
+          playSound(
               intervals[intervalIndex].countdownSound, _player!, preferences);
         } else if (timerState.currentMicroSeconds ==
             timerState.intervalMicroSeconds ~/ 2) {
-          await playSound(
+          playSound(
               intervals[intervalIndex].halfwaySound, _player!, preferences);
         } else if (timerState.currentMicroSeconds == 700000) {
           if (intervalIndex < intervals.length - 1) {
             String sound = intervals[nextIntervalIndex].startSound;
             if (sound != "" && sound != "none") {
-              await playSound(sound, _player!, preferences);
+              playSound(sound, _player!, preferences);
             } else if (intervals[intervalIndex].endSound != "" &&
                 intervals[intervalIndex].endSound != "none") {
-              await playSound(
+              playSound(
                   intervals[intervalIndex].endSound, _player!, preferences);
             }
           } else {
-            await playSound(
-                intervals[intervalIndex].endSound, _player!, preferences);
+            playSound(intervals[intervalIndex].endSound, _player!, preferences);
           }
         } else if (timerState.currentMicroSeconds == 0 &&
             intervalIndex < intervals.length - 1) {
@@ -374,7 +373,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         } else if (Platform.isIOS &&
             timerState.currentMicroSeconds % 1000000 == 0 &&
             timerState.currentMicroSeconds > 700000) {
-          await playSound(blankSoundFile, _player!, preferences);
+          playSound(blankSoundFile, _player!, preferences);
         }
       }
 
