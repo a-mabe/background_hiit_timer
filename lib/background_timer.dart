@@ -441,6 +441,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
         if ([1500000, 2500000, 3500000]
             .contains(timerState.currentMicroSeconds)) {
+          logger.d(
+              "Playing sound at ${soundPlayers[intervals[intervalIndex].countdownSound]!}");
           playSound(
               intervals[intervalIndex].countdownSound,
               soundPlayers[intervals[intervalIndex].countdownSound]!,
