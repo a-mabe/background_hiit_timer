@@ -294,6 +294,18 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers)
             .build());
 
+    _player?.onPlayerStateChanged.listen((PlayerState state) {
+      print("Audio Player State: $state");
+    });
+
+    _player?.onPositionChanged.listen((Duration position) {
+      print("Audio Position: $position");
+    });
+
+    _player?.onDurationChanged.listen((Duration duration) {
+      print("Audio Duration: $duration");
+    });
+
     _player?.audioCache =
         AudioCache(prefix: 'packages/background_hiit_timer/assets/');
 
