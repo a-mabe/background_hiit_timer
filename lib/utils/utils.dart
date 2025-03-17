@@ -7,12 +7,23 @@ Future<void> playSound(
   if (sound != "" && sound != "none") {
     logger.d('Playing sound $sound');
     try {
-      await player.setVolume((preferences.getDouble('volume') ?? 80) / 100);
+      AudioPlayer _player = AudioPlayer();
+
+      await _player.setAudioContext(
+          AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers)
+              .build());
+
+      _player.audioCache =
+          AudioCache(prefix: 'packages/background_hiit_timer/assets/');
+
+      await _player.setVolume((preferences.getDouble('volume') ?? 80) / 100);
       print("playing sound");
-      await player.play(
-        AssetSource("audio/$sound.mp3"),
-        volume: (preferences.getDouble('volume') ?? 80) / 100,
-      );
+      await _player
+          .play(
+            AssetSource("audio/$sound.mp3"),
+            volume: (preferences.getDouble('volume') ?? 80) / 100,
+          )
+          .then((value) => _player.dispose());
       // await player.stop();
       // await player.play(AssetSource("audio/$sound.mp3"),
       //     ctx: AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers)
