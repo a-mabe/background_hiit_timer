@@ -324,6 +324,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
           player.audioCache =
               AudioCache(prefix: 'packages/background_hiit_timer/assets/');
           print("Adding player for sound $sound");
+          await player.setSourceAsset("audio/$sound.mp3");
           soundPlayers[sound] = player;
         }
       }
