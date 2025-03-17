@@ -290,6 +290,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   ) async {
     _player = AudioPlayer();
 
+    AudioLogger.logLevel = AudioLogLevel.info;
+
     await _player?.setAudioContext(
         AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers)
             .build());
@@ -304,6 +306,15 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
     _player?.onDurationChanged.listen((Duration duration) {
       print("Audio Duration: $duration");
+    });
+
+    _player?.onPlayerComplete.listen((event) {
+      print("Audio completed playing.");
+      // Ensure session cleanup happens when playback finishes
+    });
+
+    _player?.onLog.listen((event) {
+      print("Audio Log: $event");
     });
 
     _player?.audioCache =
