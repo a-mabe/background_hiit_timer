@@ -38,7 +38,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   bool isActive = false;
   late SharedPreferences _preferences;
 
-  static AudioPlayer? _player;
+  static Map<String, AudioPlayer> soundPlayers = {};
 
   // static AudioPlayer get player {
   //   _player ??= AudioPlayer();
@@ -119,10 +119,15 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   }
 
   static Future<void> disposePlayer() async {
-    if (_player != null) {
-      await _player!.stop();
-      await _player!.dispose();
-      _player = null;
+    // if (_player != null) {
+    //   await _player!.stop();
+    //   await _player!.dispose();
+    //   _player = null;
+    // }
+
+    for (var player in soundPlayers.values) {
+      await player.stop();
+      await player.dispose();
     }
   }
 
@@ -288,9 +293,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     SharedPreferences preferences,
     TimerState timerState,
   ) async {
-    // Create a map to store unique sounds and their corresponding AudioPlayers
-    Map<String, AudioPlayer> soundPlayers = {};
-
     // Iterate over intervals to create AudioPlayers for unique sounds
     for (var interval in intervals) {
       List<String> sounds = [
@@ -383,8 +385,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     //   print("Audio Log: $event");
     // });
 
-    _player?.audioCache =
-        AudioCache(prefix: 'packages/background_hiit_timer/assets/');
+    // _player?.audioCache =
+    //     AudioCache(prefix: 'packages/background_hiit_timer/assets/');
 
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
