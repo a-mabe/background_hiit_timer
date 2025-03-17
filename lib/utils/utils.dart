@@ -9,10 +9,11 @@ Future<void> playSound(
     try {
       await player.setVolume((preferences.getDouble('volume') ?? 80) / 100);
       print("playing sound");
-      await player.play(
-        AssetSource("audio/$sound.mp3"),
-        volume: (preferences.getDouble('volume') ?? 80) / 100,
-      );
+      await player.resume();
+      // await player.play(
+      //   AssetSource("audio/$sound.mp3"),
+      //   volume: (preferences.getDouble('volume') ?? 80) / 100,
+      // );
       // await player.stop();
       // await player.play(AssetSource("audio/$sound.mp3"),
       //     ctx: AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers)
