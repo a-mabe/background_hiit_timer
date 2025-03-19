@@ -268,9 +268,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       ),
       iOS: AudioContextIOS(
         category: AVAudioSessionCategory.ambient,
-        options: {
-          AVAudioSessionOptions.mixWithOthers,
-        },
       ),
     ));
     player.audioCache =
