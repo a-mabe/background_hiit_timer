@@ -22,7 +22,12 @@ dependencies:
   sqflite: ^2.4.0
   path: ^1.9.0
   flutter_local_notifications: ^18.0.0
-  audioplayers: ^6.1.2
+  audioplayers:
+    git:
+      url: https://github.com/a-mabe/audioplayers.git
+      ref: test
+      path: packages/audioplayers
+  audio_session: ^0.1.25
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

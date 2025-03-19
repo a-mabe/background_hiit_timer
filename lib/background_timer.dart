@@ -38,11 +38,32 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   bool isActive = false;
   late SharedPreferences _preferences;
 
+  static AudioPlayer? _player;
+
+  // static AudioPlayer get player {
+  //   _player ??= AudioPlayer();
+  //   _player?.setAudioContext(AudioContext(
+  //     android: AudioContextAndroid(
+  //       contentType: AndroidContentType.sonification,
+  //       audioFocus: AndroidAudioFocus.none,
+  //       usageType: AndroidUsageType.media,
+  //     ),
+  //     iOS: AudioContextIOS(
+  //       category: AVAudioSessionCategory.playback,
+  //       options: {
+  //         AVAudioSessionOptions.mixWithOthers,
+  //       },
+  //     ),
+  //   ));
+  //   return _player!;
+  // }
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
+    // _initializeAudioContext();
     _initializeController();
     _initializePreferences();
 
@@ -50,6 +71,37 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       _startTimer();
     }
   }
+
+  // Future<void> _initializeAudioContext() async {
+  //   AudioPlayer.global.setAudioContext(AudioContext(
+  //     android: AudioContextAndroid(
+  //       contentType: AndroidContentType.sonification,
+  //       audioFocus: AndroidAudioFocus.none,
+  //       usageType: AndroidUsageType.media,
+  //     ),
+  //     iOS: AudioContextIOS(
+  //       category: AVAudioSessionCategory.playback,
+  //       options: {
+  //         AVAudioSessionOptions.mixWithOthers,
+  //       },
+  //     ),
+  //   ));
+  //   // await player.setAudioContext(AudioContext(
+  //   //   android: AudioContextAndroid(
+  //   //     contentType: AndroidContentType.sonification,
+  //   //     audioFocus: AndroidAudioFocus.none,
+  //   //     usageType: AndroidUsageType.media,
+  //   //   ),
+  //   //   iOS: AudioContextIOS(
+  //   //     category: AVAudioSessionCategory.playback,
+  //   //     options: {
+  //   //       AVAudioSessionOptions.mixWithOthers,
+  //   //     },
+  //   //   ),
+  //   // ));
+  //   player.audioCache =
+  //       AudioCache(prefix: 'packages/background_hiit_timer/assets/');
+  // }
 
   Future<void> _initializePreferences() async {
     _preferences = await SharedPreferences.getInstance();
@@ -66,11 +118,19 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     widget.controller?.isCompleted = false;
   }
 
+  static Future<void> disposePlayer() async {
+    if (_player != null) {
+      await _player!.stop();
+      await _player!.dispose();
+      _player = null;
+    }
+  }
+
   @override
   void dispose() {
-    if (isActive) {
-      FlutterBackgroundService().invoke("stopService");
-    }
+    print("Stopping service");
+    disposePlayer();
+    FlutterBackgroundService().invoke("stopService");
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -140,6 +200,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   }
 
   Future<void> _initializeService() async {
+    await Future.delayed(Duration(seconds: 10));
+
     final service = FlutterBackgroundService();
 
     // Database setup
@@ -226,6 +288,17 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     SharedPreferences preferences,
     TimerState timerState,
   ) async {
+    _player = AudioPlayer();
+
+    await _player?.setReleaseMode(ReleaseMode.stop);
+
+    await _player?.setAudioContext(
+        AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers)
+            .build());
+
+    _player?.audioCache =
+        AudioCache(prefix: 'packages/background_hiit_timer/assets/');
+
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
         service.setAsForegroundService();
@@ -257,26 +330,12 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
     service.on('stopService').listen((_) {
       service.stopSelf();
+      disposePlayer();
     });
 
-    final player = AudioPlayer();
-    player.setAudioContext(AudioContext(
-      android: AudioContextAndroid(
-        contentType: AndroidContentType.sonification,
-        audioFocus: AndroidAudioFocus.none,
-        usageType: AndroidUsageType.media,
-      ),
-      iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.playback,
-        options: {
-          AVAudioSessionOptions.mixWithOthers,
-        },
-      ),
-    ));
-    player.audioCache =
-        AudioCache(prefix: 'packages/background_hiit_timer/assets/');
-
     Timer.periodic(interval, (timer) async {
+      print("Timer is running");
+
       preferences.reload();
       timerState.paused = preferences.getBool('pause') ?? false;
 
@@ -291,24 +350,24 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         if ([1500000, 2500000, 3500000]
             .contains(timerState.currentMicroSeconds)) {
           await playSound(
-              intervals[intervalIndex].countdownSound, player, preferences);
+              intervals[intervalIndex].countdownSound, _player!, preferences);
         } else if (timerState.currentMicroSeconds ==
             timerState.intervalMicroSeconds ~/ 2) {
           await playSound(
-              intervals[intervalIndex].halfwaySound, player, preferences);
+              intervals[intervalIndex].halfwaySound, _player!, preferences);
         } else if (timerState.currentMicroSeconds == 700000) {
           if (intervalIndex < intervals.length - 1) {
             String sound = intervals[nextIntervalIndex].startSound;
             if (sound != "" && sound != "none") {
-              await playSound(sound, player, preferences);
+              await playSound(sound, _player!, preferences);
             } else if (intervals[intervalIndex].endSound != "" &&
                 intervals[intervalIndex].endSound != "none") {
               await playSound(
-                  intervals[intervalIndex].endSound, player, preferences);
+                  intervals[intervalIndex].endSound, _player!, preferences);
             }
           } else {
             await playSound(
-                intervals[intervalIndex].endSound, player, preferences);
+                intervals[intervalIndex].endSound, _player!, preferences);
           }
         } else if (timerState.currentMicroSeconds == 0 &&
             intervalIndex < intervals.length - 1) {
@@ -317,7 +376,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         } else if (Platform.isIOS &&
             timerState.currentMicroSeconds % 1000000 == 0 &&
             timerState.currentMicroSeconds > 700000) {
-          await playSound(blankSoundFile, player, preferences);
+          await playSound(blankSoundFile, _player!, preferences);
         }
       }
 
