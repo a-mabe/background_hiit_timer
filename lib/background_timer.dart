@@ -20,6 +20,7 @@ class Countdown extends StatefulWidget {
   final Widget Function(BuildContext, TimerState) build;
   final Function? onFinished;
   final CountdownController? controller;
+  final AudioPlayer player;
 
   const Countdown({
     super.key,
@@ -27,6 +28,7 @@ class Countdown extends StatefulWidget {
     required this.build,
     this.onFinished,
     this.controller,
+    required this.player,
   });
 
   @override
@@ -37,6 +39,7 @@ class Countdown extends StatefulWidget {
 class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   bool isActive = false;
   late SharedPreferences _preferences;
+  static AudioPlayer? player;
 
   @override
   void initState() {
@@ -45,6 +48,8 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
 
     _initializeController();
     _initializePreferences();
+
+    player = widget.player;
 
     if (widget.controller?.autoStart ?? true) {
       _startTimer();
@@ -259,18 +264,18 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       service.stopSelf();
     });
 
-    final player = AudioPlayer();
-    player.setAudioContext(AudioContext(
-      android: AudioContextAndroid(
-        contentType: AndroidContentType.sonification,
-        audioFocus: AndroidAudioFocus.none,
-        usageType: AndroidUsageType.media,
-      ),
-      iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.ambient,
-      ),
-    ));
-    player.audioCache =
+    // final player = AudioPlayer();
+    // player.setAudioContext(AudioContext(
+    //   android: AudioContextAndroid(
+    //     contentType: AndroidContentType.sonification,
+    //     audioFocus: AndroidAudioFocus.none,
+    //     usageType: AndroidUsageType.media,
+    //   ),
+    //   iOS: AudioContextIOS(
+    //     category: AVAudioSessionCategory.ambient,
+    //   ),
+    // ));
+    player?.audioCache =
         AudioCache(prefix: 'packages/background_hiit_timer/assets/');
 
     Timer.periodic(interval, (timer) async {
@@ -288,24 +293,24 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         if ([1500000, 2500000, 3500000]
             .contains(timerState.currentMicroSeconds)) {
           await playSound(
-              intervals[intervalIndex].countdownSound, player, preferences);
+              intervals[intervalIndex].countdownSound, player!, preferences);
         } else if (timerState.currentMicroSeconds ==
             timerState.intervalMicroSeconds ~/ 2) {
           await playSound(
-              intervals[intervalIndex].halfwaySound, player, preferences);
+              intervals[intervalIndex].halfwaySound, player!, preferences);
         } else if (timerState.currentMicroSeconds == 700000) {
           if (intervalIndex < intervals.length - 1) {
             String sound = intervals[nextIntervalIndex].startSound;
             if (sound != "" && sound != "none") {
-              await playSound(sound, player, preferences);
+              await playSound(sound, player!, preferences);
             } else if (intervals[intervalIndex].endSound != "" &&
                 intervals[intervalIndex].endSound != "none") {
               await playSound(
-                  intervals[intervalIndex].endSound, player, preferences);
+                  intervals[intervalIndex].endSound, player!, preferences);
             }
           } else {
             await playSound(
-                intervals[intervalIndex].endSound, player, preferences);
+                intervals[intervalIndex].endSound, player!, preferences);
           }
         } else if (timerState.currentMicroSeconds == 0 &&
             intervalIndex < intervals.length - 1) {
@@ -314,7 +319,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         } else if (Platform.isIOS &&
             timerState.currentMicroSeconds % 1000000 == 0 &&
             timerState.currentMicroSeconds > 700000) {
-          await playSound(blankSoundFile, player, preferences);
+          await playSound(blankSoundFile, player!, preferences);
         }
       }
 
