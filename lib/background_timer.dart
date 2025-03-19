@@ -267,7 +267,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         usageType: AndroidUsageType.media,
       ),
       iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.playback,
+        category: AVAudioSessionCategory.ambient,
         options: {
           AVAudioSessionOptions.mixWithOthers,
         },
