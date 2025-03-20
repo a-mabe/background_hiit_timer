@@ -226,6 +226,24 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     SharedPreferences preferences,
     TimerState timerState,
   ) async {
+    final player = AudioPlayer();
+    await player.setAudioContext(AudioContext(
+      android: AudioContextAndroid(
+        contentType: AndroidContentType.sonification,
+        audioFocus: AndroidAudioFocus.none,
+        usageType: AndroidUsageType.media,
+      ),
+      iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.playback,
+        options: {
+          AVAudioSessionOptions.mixWithOthers,
+        },
+      ),
+    ));
+    await player.setReleaseMode(ReleaseMode.stop);
+    player.audioCache =
+        AudioCache(prefix: 'packages/background_hiit_timer/assets/');
+
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
         service.setAsForegroundService();
@@ -255,26 +273,10 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
       }
     });
 
-    service.on('stopService').listen((_) {
+    service.on('stopService').listen((_) async {
+      await player.dispose();
       service.stopSelf();
     });
-
-    final player = AudioPlayer();
-    player.setAudioContext(AudioContext(
-      android: AudioContextAndroid(
-        contentType: AndroidContentType.sonification,
-        audioFocus: AndroidAudioFocus.none,
-        usageType: AndroidUsageType.media,
-      ),
-      iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.playback,
-        options: {
-          AVAudioSessionOptions.mixWithOthers,
-        },
-      ),
-    ));
-    player.audioCache =
-        AudioCache(prefix: 'packages/background_hiit_timer/assets/');
 
     Timer.periodic(interval, (timer) async {
       preferences.reload();
