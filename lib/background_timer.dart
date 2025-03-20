@@ -226,8 +226,10 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     SharedPreferences preferences,
     TimerState timerState,
   ) async {
+    print("Service started");
     Future.delayed(
-      const Duration(seconds: 5),
+      const Duration(seconds: 10),
+      () => print("waited 10 seconds"),
     );
 
     final player = AudioPlayer();
