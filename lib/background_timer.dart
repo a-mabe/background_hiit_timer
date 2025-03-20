@@ -227,25 +227,27 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     TimerState timerState,
   ) async {
     print("Service started");
+
+    final player = AudioPlayer();
+    await player.setAudioContext(AudioContext(
+      android: AudioContextAndroid(
+        contentType: AndroidContentType.sonification,
+        audioFocus: AndroidAudioFocus.none,
+        usageType: AndroidUsageType.media,
+      ),
+      iOS: AudioContextIOS(
+        category: AVAudioSessionCategory.playback,
+        options: {
+          AVAudioSessionOptions.mixWithOthers,
+        },
+      ),
+    ));
+
     await Future.delayed(
       const Duration(seconds: 10),
       () => print("waited 10 seconds"),
     );
 
-    final player = AudioPlayer();
-    // await player.setAudioContext(AudioContext(
-    //   android: AudioContextAndroid(
-    //     contentType: AndroidContentType.sonification,
-    //     audioFocus: AndroidAudioFocus.none,
-    //     usageType: AndroidUsageType.media,
-    //   ),
-    //   iOS: AudioContextIOS(
-    //     category: AVAudioSessionCategory.playback,
-    //     options: {
-    //       AVAudioSessionOptions.mixWithOthers,
-    //     },
-    //   ),
-    // ));
     await player.setPlayerMode(PlayerMode.lowLatency);
     await player.setReleaseMode(ReleaseMode.stop);
     player.audioCache =
