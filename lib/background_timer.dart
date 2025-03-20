@@ -227,7 +227,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     TimerState timerState,
   ) async {
     print("Service started");
-    Future.delayed(
+    await Future.delayed(
       const Duration(seconds: 10),
       () => print("waited 10 seconds"),
     );
