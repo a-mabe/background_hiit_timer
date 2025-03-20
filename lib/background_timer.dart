@@ -227,22 +227,35 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     TimerState timerState,
   ) async {
     final player = AudioPlayer();
-    await player.setAudioContext(AudioContext(
-      android: AudioContextAndroid(
-        contentType: AndroidContentType.sonification,
-        audioFocus: AndroidAudioFocus.none,
-        usageType: AndroidUsageType.media,
-      ),
-      iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.playback,
-        options: {
-          AVAudioSessionOptions.mixWithOthers,
-        },
-      ),
-    ));
+    // await player.setAudioContext(AudioContext(
+    //   android: AudioContextAndroid(
+    //     contentType: AndroidContentType.sonification,
+    //     audioFocus: AndroidAudioFocus.none,
+    //     usageType: AndroidUsageType.media,
+    //   ),
+    //   iOS: AudioContextIOS(
+    //     category: AVAudioSessionCategory.playback,
+    //     options: {
+    //       AVAudioSessionOptions.mixWithOthers,
+    //     },
+    //   ),
+    // ));
+    await player.setPlayerMode(PlayerMode.lowLatency);
     await player.setReleaseMode(ReleaseMode.stop);
     player.audioCache =
         AudioCache(prefix: 'packages/background_hiit_timer/assets/');
+
+    player.onPlayerComplete.listen((event) {
+      print("Audio playback completed");
+    });
+
+    player.onPlayerStateChanged.listen((state) {
+      print("Player state changed: $state");
+    });
+
+    player.onLog.listen((log) {
+      print("Audio log: $log");
+    });
 
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
@@ -274,7 +287,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     });
 
     service.on('stopService').listen((_) async {
-      await player.dispose();
+      // await player.dispose();
       service.stopSelf();
     });
 
