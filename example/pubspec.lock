@@ -38,6 +38,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
+  audioplayers:
+    dependency: transitive
+    description:
+      path: "packages/audioplayers"
+      ref: test3
+      resolved-ref: c87f19822e07d5c98ed094088e15b499e6b5d2b3
+      url: "https://github.com/a-mabe/audioplayers.git"
+    source: git
+    version: "6.4.0"
   audioplayers_android:
     dependency: transitive
     description:
@@ -46,6 +55,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.2.0"
+  audioplayers_darwin:
+    dependency: transitive
+    description:
+      path: "packages/audioplayers_darwin"
+      ref: test3
+      resolved-ref: c87f19822e07d5c98ed094088e15b499e6b5d2b3
+      url: "https://github.com/a-mabe/audioplayers.git"
+    source: git
+    version: "6.2.0"
   audioplayers_linux:
     dependency: transitive
     description:
@@ -438,22 +456,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.2"
-  openhiit_audioplayers:
-    dependency: transitive
-    description:
-      name: openhiit_audioplayers
-      sha256: "646ccbe1ac6c46234fdf2e9d794ec6486316ade8cadbd66c59e707becfab4eb8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
-  openhiit_audioplayers_darwin:
-    dependency: transitive
-    description:
-      name: openhiit_audioplayers_darwin
-      sha256: "10c7c546e116ff14938844f7148b37ade2314df90946bd3081183a16329d3172"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.3"
   package_config:
     dependency: transitive
     description:

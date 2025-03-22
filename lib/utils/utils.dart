@@ -1,4 +1,4 @@
-import 'package:audioplayers/audioplayers.dart';
+import 'package:openhiit_audioplayers/openhiit_audioplayers.dart';
 import 'package:background_hiit_timer/utils/log.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
