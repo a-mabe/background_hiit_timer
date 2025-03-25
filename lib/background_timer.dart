@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:openhiit_audioplayers/openhiit_audioplayers.dart';
 import 'package:background_hiit_timer/background_timer_controller.dart';
 import 'package:background_hiit_timer/models/interval_type.dart';
 import 'package:background_hiit_timer/utils/database.dart';
@@ -226,6 +226,10 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     SharedPreferences preferences,
     TimerState timerState,
   ) async {
+    await AudioPlayer.global.setAudioContext(
+        AudioContextConfig(focus: AudioContextConfigFocus.mixWithOthers)
+            .build());
+
     if (service is AndroidServiceInstance) {
       service.on('setAsForeground').listen((event) {
         service.setAsForegroundService();
@@ -260,19 +264,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     });
 
     final player = AudioPlayer();
-    player.setAudioContext(AudioContext(
-      android: AudioContextAndroid(
-        contentType: AndroidContentType.sonification,
-        audioFocus: AndroidAudioFocus.none,
-        usageType: AndroidUsageType.media,
-      ),
-      iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.playback,
-        options: {
-          AVAudioSessionOptions.mixWithOthers,
-        },
-      ),
-    ));
     player.audioCache =
         AudioCache(prefix: 'packages/background_hiit_timer/assets/');
 
