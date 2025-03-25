@@ -264,19 +264,6 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     });
 
     final player = AudioPlayer();
-    player.setAudioContext(AudioContext(
-      android: AudioContextAndroid(
-        contentType: AndroidContentType.sonification,
-        audioFocus: AndroidAudioFocus.none,
-        usageType: AndroidUsageType.media,
-      ),
-      iOS: AudioContextIOS(
-        category: AVAudioSessionCategory.playback,
-        options: {
-          AVAudioSessionOptions.mixWithOthers,
-        },
-      ),
-    ));
     player.audioCache =
         AudioCache(prefix: 'packages/background_hiit_timer/assets/');
 
