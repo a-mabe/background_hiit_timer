@@ -266,6 +266,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
     final player = AudioPlayer();
     player.audioCache =
         AudioCache(prefix: 'packages/background_hiit_timer/assets/');
+    await player.setPlayerMode(PlayerMode.lowLatency);
 
     Timer.periodic(interval, (timer) async {
       preferences.reload();
@@ -305,8 +306,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             intervalIndex < intervals.length - 1) {
           logger.d("Advancing to next interval");
           timerState.advanceToNextInterval(intervals);
-        } else if (Platform.isIOS &&
-            timerState.currentMicroSeconds % 1000000 == 0 &&
+        } else if (timerState.currentMicroSeconds % 1000000 == 0 &&
             timerState.currentMicroSeconds > 700000) {
           await playSound(blankSoundFile, player, preferences);
         }
