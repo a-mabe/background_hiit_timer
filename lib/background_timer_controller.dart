@@ -46,86 +46,86 @@ class CountdownController {
   CountdownController({this.autoStart = false});
 
   /// Run timer
-  start() {
+  void start() {
     if (onStart != null) {
       onStart!();
     }
   }
 
   /// Set onStart callback.
-  setOnStart(VoidCallback onStart) {
+  void setOnStart(VoidCallback onStart) {
     this.onStart = onStart;
   }
 
   /// Stop timer
-  stop() {
+  void stop() {
     if (onStop != null) {
       onStop!();
     }
   }
 
   /// Set onStop callback.
-  setOnStop(VoidCallback onStop) {
+  void setOnStop(VoidCallback onStop) {
     this.onStop = onStop;
   }
 
   /// Set timer pause.
-  pause() async {
+  Future<void> pause() async {
     if (onPause != null) {
       onPause!();
     }
   }
 
   /// Set onPause callback.
-  setOnPause(VoidCallback onPause) {
+  void setOnPause(VoidCallback onPause) {
     this.onPause = onPause;
   }
 
   /// Resume from pause.
-  resume() {
+  void resume() {
     if (onResume != null) {
       onResume!();
     }
   }
 
   /// Set onResume callback.
-  setOnResume(VoidCallback onResume) {
+  void setOnResume(VoidCallback onResume) {
     this.onResume = onResume;
   }
 
   /// Restart timer, starts things fresh.
-  restart() {
+  void restart() {
     if (onRestart != null) {
       onRestart!();
     }
   }
 
   /// set onRestart callback.
-  setOnRestart(VoidCallback onRestart) {
+  void setOnRestart(VoidCallback onRestart) {
     this.onRestart = onRestart;
   }
 
   /// Skip to the next interval.
-  skipNext() {
+  void skipNext() {
     if (onSkipNext != null) {
       onSkipNext!();
     }
   }
 
   /// Set onSkipNext callback.
-  setOnSkipNext(VoidCallback onSkipNext) {
+  void setOnSkipNext(VoidCallback onSkipNext) {
     this.onSkipNext = onSkipNext;
   }
 
   /// Skip to the previous interval.
-  skipPrevious() {
+  void skipPrevious() {
     if (onSkipPrevious != null) {
       onSkipPrevious!();
     }
   }
 
   /// Set onSkipPrevious callback.
-  setOnSkipPrevious(VoidCallback onSkipPrevious) {
+  void setOnSkipPrevious(VoidCallback onSkipPrevious) {
     this.onSkipPrevious = onSkipPrevious;
   }
 }
