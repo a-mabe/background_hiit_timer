@@ -1,12 +1,11 @@
 PODS:
-  - device_info_plus (0.0.1):
+  - audioplayers_darwin (0.0.1):
     - Flutter
+    - FlutterMacOS
   - Flutter (1.0.0)
   - flutter_background_service_ios (0.0.3):
     - Flutter
   - flutter_local_notifications (0.0.1):
-    - Flutter
-  - openhiit_audioplayers_darwin (0.0.1):
     - Flutter
   - path_provider_foundation (0.0.1):
     - Flutter
@@ -19,26 +18,23 @@ PODS:
     - FlutterMacOS
 
 DEPENDENCIES:
-  - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
+  - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/darwin`)
   - Flutter (from `Flutter`)
   - flutter_background_service_ios (from `.symlinks/plugins/flutter_background_service_ios/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
-  - openhiit_audioplayers_darwin (from `.symlinks/plugins/openhiit_audioplayers_darwin/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
 
 EXTERNAL SOURCES:
-  device_info_plus:
-    :path: ".symlinks/plugins/device_info_plus/ios"
+  audioplayers_darwin:
+    :path: ".symlinks/plugins/audioplayers_darwin/darwin"
   Flutter:
     :path: Flutter
   flutter_background_service_ios:
     :path: ".symlinks/plugins/flutter_background_service_ios/ios"
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
-  openhiit_audioplayers_darwin:
-    :path: ".symlinks/plugins/openhiit_audioplayers_darwin/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   shared_preferences_foundation:
@@ -47,15 +43,14 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/sqflite_darwin/darwin"
 
 SPEC CHECKSUMS:
-  device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
-  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  audioplayers_darwin: 4f9ca89d92d3d21cec7ec580e78ca888e5fb68bd
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_background_service_ios: 00d31bdff7b4bfe06d32375df358abe0329cf87e
-  flutter_local_notifications: 395056b3175ba4f08480a7c5de30cd36d69827e4
-  openhiit_audioplayers_darwin: f35507d2bc072e85ec1666b6623bc947897d07a2
-  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
-  shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
+  flutter_local_notifications: a5a732f069baa862e728d839dd2ebb904737effb
+  path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
+  shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
 
-PODFILE CHECKSUM: 30f8ec3cb135c39a41dbdc3f40009442f2639040
+PODFILE CHECKSUM: 1849596bfb2d89f9dcbe11448dfd654551944b2b
 
 COCOAPODS: 1.16.2

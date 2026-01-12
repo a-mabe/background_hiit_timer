@@ -33,6 +33,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.13.0"
+  audioplayers:
+    dependency: transitive
+    description:
+      path: "packages/audioplayers"
+      ref: "feat/1937-audiocontextios"
+      resolved-ref: a3c1bbba867e6ee7b6144550967d1fe4c7311800
+      url: "https://github.com/a-mabe/audioplayers.git"
+    source: git
+    version: "6.5.1"
   audioplayers_android:
     dependency: transitive
     description:
@@ -41,6 +50,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.2.1"
+  audioplayers_darwin:
+    dependency: transitive
+    description:
+      name: audioplayers_darwin
+      sha256: "0811d6924904ca13f9ef90d19081e4a87f7297ddc19fc3d31f60af1aaafee333"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.3.0"
   audioplayers_linux:
     dependency: transitive
     description:
@@ -425,22 +442,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.2"
-  openhiit_audioplayers:
-    dependency: transitive
-    description:
-      name: openhiit_audioplayers
-      sha256: c5b765b9f3e8b9f2b6fe1323671a0eb0a363ac6ac173ed4b4240b49b681f83c0
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.1"
-  openhiit_audioplayers_darwin:
-    dependency: transitive
-    description:
-      name: openhiit_audioplayers_darwin
-      sha256: f11b1cd5f109ba9f4245b1c64c9b7828f76ca77062b3a8750acc01c72fedb413
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.8"
   package_config:
     dependency: transitive
     description:

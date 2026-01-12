@@ -20,7 +20,16 @@ dependencies:
   sqflite: ^2.4.0
   path: ^1.9.0
   flutter_local_notifications: ^19.5.0
-  openhiit_audioplayers: ^1.0.0
+  audioplayers:
+    git:
+      url: https://github.com/a-mabe/audioplayers.git
+      path: packages/audioplayers
+      ref: feat/1937-audiocontextios
+  audioplayers_platform_interface:
+    git:
+      url: https://github.com/a-mabe/audioplayers.git
+      path: packages/audioplayers_platform_interface
+      ref: feat/1937-audiocontextios
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
