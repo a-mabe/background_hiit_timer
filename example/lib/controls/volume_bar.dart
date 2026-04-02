@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
 class VolumeBar extends StatelessWidget {
-  final double volume;
+  final double volume; // 0.0–1.0
   final Function(double) onVolumeChanged;
 
-  const VolumeBar(
-      {super.key, required this.volume, required this.onVolumeChanged});
+  const VolumeBar({
+    super.key,
+    required this.volume,
+    required this.onVolumeChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
