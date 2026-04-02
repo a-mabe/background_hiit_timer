@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:audio_service/audio_service.dart';
-import 'package:openhiit_audioplayers/openhiit_audioplayers.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:background_hiit_timer/models/interval_type.dart';
 import 'package:background_hiit_timer/models/timer_state.dart';
 import 'package:background_hiit_timer/utils/constants.dart';

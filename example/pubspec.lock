@@ -65,6 +65,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.3"
+  audioplayers:
+    dependency: transitive
+    description:
+      name: audioplayers
+      sha256: a72dd459d1a48f61a6fb9c0134dba26597c9236af40639ff0eb70eb4e0baab70
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.6.0"
   audioplayers_android:
     dependency: transitive
     description:
@@ -73,6 +81,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.2.1"
+  audioplayers_darwin:
+    dependency: transitive
+    description:
+      name: audioplayers_darwin
+      sha256: c994b3bb3a921e4904ac40e013fbc94488e824fd7c1de6326f549943b0b44a91
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.4.0"
   audioplayers_linux:
     dependency: transitive
     description:
@@ -93,18 +109,18 @@ packages:
     dependency: transitive
     description:
       name: audioplayers_web
-      sha256: "1c0f17cec68455556775f1e50ca85c40c05c714a99c5eb1d2d57cc17ba5522d7"
+      sha256: faa8fa6587f996a6f604433b53af44c57a1407d4fe8dff5766cf63d6875e8de9
       url: "https://pub.dev"
     source: hosted
-    version: "5.1.1"
+    version: "5.2.0"
   audioplayers_windows:
     dependency: transitive
     description:
       name: audioplayers_windows
-      sha256: "4048797865105b26d47628e6abb49231ea5de84884160229251f37dfcbe52fd7"
+      sha256: bafff2b38b6f6d331887558ba6e0a01c9c208d9dbb3ad0005234db065122a734
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.1"
+    version: "4.3.0"
   background_hiit_timer:
     dependency: "direct main"
     description:
@@ -176,14 +192,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.7"
-  dbus:
-    dependency: transitive
-    description:
-      name: dbus
-      sha256: "79e0c23480ff85dc68de79e2cd6334add97e48f7f4865d17686dd6ea81a47e8c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.11"
   fake_async:
     dependency: transitive
     description:
@@ -221,38 +229,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_background_service:
-    dependency: transitive
-    description:
-      name: flutter_background_service
-      sha256: "70a1c185b1fa1a44f8f14ecd6c86f6e50366e3562f00b2fa5a54df39b3324d3d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.1.0"
-  flutter_background_service_android:
-    dependency: transitive
-    description:
-      name: flutter_background_service_android
-      sha256: ca0793d4cd19f1e194a130918401a3d0b1076c81236f7273458ae96987944a87
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.3.1"
-  flutter_background_service_ios:
-    dependency: transitive
-    description:
-      name: flutter_background_service_ios
-      sha256: "6037ffd45c4d019dab0975c7feb1d31012dd697e25edc05505a4a9b0c7dc9fba"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.3"
-  flutter_background_service_platform_interface:
-    dependency: transitive
-    description:
-      name: flutter_background_service_platform_interface
-      sha256: ca74aa95789a8304f4d3f57f07ba404faa86bed6e415f83e8edea6ad8b904a41
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.1.2"
   flutter_cache_manager:
     dependency: transitive
     description:
@@ -274,38 +250,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.0"
-  flutter_local_notifications:
-    dependency: transitive
-    description:
-      name: flutter_local_notifications
-      sha256: "19ffb0a8bb7407875555e5e98d7343a633bb73707bae6c6a5f37c90014077875"
-      url: "https://pub.dev"
-    source: hosted
-    version: "19.5.0"
-  flutter_local_notifications_linux:
-    dependency: transitive
-    description:
-      name: flutter_local_notifications_linux
-      sha256: e3c277b2daab8e36ac5a6820536668d07e83851aeeb79c446e525a70710770a5
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.0.0"
-  flutter_local_notifications_platform_interface:
-    dependency: transitive
-    description:
-      name: flutter_local_notifications_platform_interface
-      sha256: "277d25d960c15674ce78ca97f57d0bae2ee401c844b6ac80fcd972a9c99d09fe"
-      url: "https://pub.dev"
-    source: hosted
-    version: "9.1.0"
-  flutter_local_notifications_windows:
-    dependency: transitive
-    description:
-      name: flutter_local_notifications_windows
-      sha256: "8d658f0d367c48bd420e7cf2d26655e2d1130147bca1eea917e576ca76668aaf"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.3"
   flutter_test:
     dependency: transitive
     description: flutter
@@ -465,22 +409,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.2"
-  openhiit_audioplayers:
-    dependency: transitive
-    description:
-      name: openhiit_audioplayers
-      sha256: c5b765b9f3e8b9f2b6fe1323671a0eb0a363ac6ac173ed4b4240b49b681f83c0
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.1"
-  openhiit_audioplayers_darwin:
-    dependency: transitive
-    description:
-      name: openhiit_audioplayers_darwin
-      sha256: f11b1cd5f109ba9f4245b1c64c9b7828f76ca77062b3a8750acc01c72fedb413
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.8"
   package_config:
     dependency: transitive
     description:
@@ -545,14 +473,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
-  petitparser:
-    dependency: transitive
-    description:
-      name: petitparser
-      sha256: "1a97266a94f7350d30ae522c0af07890c70b8e62c71e8e3920d1db4d23c057d1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "7.0.1"
   platform:
     dependency: transitive
     description:
@@ -830,14 +750,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.12"
-  timezone:
-    dependency: transitive
-    description:
-      name: timezone
-      sha256: dd14a3b83cfd7cb19e7888f1cbc20f258b8d71b54c06f79ac585f14093a287d1
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.10.1"
   typed_data:
     dependency: transitive
     description:
@@ -926,14 +838,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
-  xml:
-    dependency: transitive
-    description:
-      name: xml
-      sha256: "971043b3a0d3da28727e40ed3e0b5d18b742fa5a68665cca88e74b7876d5e025"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.6.1"
   yaml:
     dependency: transitive
     description:
