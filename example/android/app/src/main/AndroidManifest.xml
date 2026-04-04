@@ -7,11 +7,13 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <service
-            android:name="id.flutter.flutter_background_service.BackgroundService"
+            android:name="com.ryanheise.audioservice.AudioService"
             android:exported="true"
-            android:foregroundServiceType="mediaPlayback"
-            tools:replace="android:stopWithTask"
-            android:stopWithTask="true"/>
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -38,5 +40,8 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data
+            android:name="com.dexterous.flutterlocalnotifications.default_notification_icon"
+            android:resource="@drawable/ic_launcher"/>
     </application>
 </manifest>

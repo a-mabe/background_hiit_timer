@@ -1,16 +1,16 @@
 import 'package:example/controls/volume_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class ControlBar extends StatefulWidget {
+class ControlBar extends StatelessWidget {
   final VoidCallback onRestart;
   final VoidCallback onTogglePlayPause;
   final VoidCallback onAdjustVolume;
   final VoidCallback onSkipNext;
   final VoidCallback onSkipPrevious;
+  final Function(double) onVolumeChanged;
   final bool paused;
   final bool changeVolume;
-  final double volume;
+  final double volume; // 0.0–1.0
 
   const ControlBar({
     super.key,
@@ -19,35 +19,11 @@ class ControlBar extends StatefulWidget {
     required this.onAdjustVolume,
     required this.onSkipNext,
     required this.onSkipPrevious,
+    required this.onVolumeChanged,
     required this.paused,
     required this.changeVolume,
     required this.volume,
   });
-
-  @override
-  ControlBarState createState() => ControlBarState();
-}
-
-class ControlBarState extends State<ControlBar> {
-  double _currentSliderValue = .8;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadVolume();
-  }
-
-  Future<void> _loadVolume() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _currentSliderValue = (prefs.getDouble('volume') ?? 80) / 100;
-    });
-  }
-
-  Future<void> _saveVolume(double value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('volume', value * 100);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,46 +36,38 @@ class ControlBarState extends State<ControlBar> {
             children: [
               IconButton(
                 icon: Icon(
-                  widget.changeVolume ? Icons.close : Icons.volume_up,
+                  changeVolume ? Icons.close : Icons.volume_up,
                   color: Colors.white,
                 ),
-                onPressed: widget.onAdjustVolume,
+                onPressed: onAdjustVolume,
               ),
               IconButton(
                 tooltip: 'Skip Previous',
                 icon: const Icon(Icons.skip_previous, color: Colors.white),
-                onPressed: widget.onSkipPrevious,
+                onPressed: onSkipPrevious,
               ),
               IconButton(
-                tooltip: 'Pause',
+                tooltip: paused ? 'Play' : 'Pause',
                 icon: Icon(
-                  widget.paused ? Icons.play_arrow : Icons.pause,
+                  paused ? Icons.play_arrow : Icons.pause,
                   color: Colors.white,
                 ),
-                onPressed: widget.onTogglePlayPause,
+                onPressed: onTogglePlayPause,
               ),
               IconButton(
                 tooltip: 'Skip Next',
                 icon: const Icon(Icons.skip_next, color: Colors.white),
-                onPressed: widget.onSkipNext,
+                onPressed: onSkipNext,
               ),
               IconButton(
                 tooltip: 'Restart',
                 icon: const Icon(Icons.restart_alt, color: Colors.white),
-                onPressed: widget.onRestart,
+                onPressed: onRestart,
               ),
             ],
           ),
-          if (widget.changeVolume)
-            VolumeBar(
-              volume: _currentSliderValue,
-              onVolumeChanged: (double value) {
-                setState(() {
-                  _currentSliderValue = value;
-                });
-                _saveVolume(value);
-              },
-            ),
+          if (changeVolume)
+            VolumeBar(volume: volume, onVolumeChanged: onVolumeChanged),
         ],
       ),
     );
