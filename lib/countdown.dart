@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:background_hiit_timer/countdown_controller.dart';
@@ -7,6 +8,7 @@ import 'package:background_hiit_timer/models/interval_type.dart';
 import 'package:background_hiit_timer/models/timer_state.dart';
 import 'package:background_hiit_timer/utils/log.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class Countdown extends StatefulWidget {
   final List<IntervalType> intervals;
@@ -22,20 +24,74 @@ class Countdown extends StatefulWidget {
     this.controller,
   });
 
+  // ── Static handler shared across all Countdown instances ──────────────────
+
+  static HiitAudioHandler? _handler;
+  static HiitAudioHandler? get handler => _handler;
+
+  /// Must be called in main() before runApp().
+  ///
+  /// ```dart
+  /// void main() async {
+  ///   WidgetsFlutterBinding.ensureInitialized();
+  ///   await Countdown.initialize();
+  ///   runApp(MyApp());
+  /// }
+  /// ```
+  static Future<void> initialize({
+    String notificationChannelName = 'HIIT Timer',
+    String androidNotificationIcon = 'drawable/ic_bg_service_small',
+    Color notificationColor = Colors.black,
+    bool androidStopForegroundOnPause = true,
+  }) async {
+    if (_handler != null) return;
+
+    // Request notification permission before initialising the handler
+    if (Platform.isIOS) {
+      final plugin = FlutterLocalNotificationsPlugin();
+      await plugin
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(alert: true, badge: false, sound: false);
+    }
+
+    if (Platform.isAndroid) {
+      final plugin = FlutterLocalNotificationsPlugin();
+      await plugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.requestNotificationsPermission();
+    }
+
+    logger.d('Countdown.initialize — registering HiitAudioHandler');
+
+    _handler = await AudioService.init(
+      builder: () => HiitAudioHandler(),
+      config: AudioServiceConfig(
+        androidNotificationChannelId: 'hiit_timer',
+        androidNotificationChannelName: notificationChannelName,
+        androidNotificationOngoing: true,
+        androidStopForegroundOnPause: androidStopForegroundOnPause,
+        notificationColor: notificationColor,
+        androidNotificationIcon: androidNotificationIcon,
+      ),
+    );
+  }
+
   @override
   CountdownState createState() => CountdownState();
 }
 
-class CountdownState extends State<Countdown> {
-  static HiitAudioHandler? _handler;
-
-  static HiitAudioHandler? get handler => _handler;
-
+class CountdownState extends State<Countdown> with WidgetsBindingObserver {
   bool _isActive = false;
+
+  // Convenience getter so we're not typing Countdown._handler everywhere
+  HiitAudioHandler? get _handler => Countdown._handler;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initController();
     if (widget.controller?.autoStart ?? true) {
       _startTimer();
@@ -44,10 +100,18 @@ class CountdownState extends State<Countdown> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     if (_isActive) {
       _handler?.stopTimer();
     }
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.detached) {
+      _handler?.stopTimer();
+    }
   }
 
   void _initController() {
@@ -61,29 +125,16 @@ class CountdownState extends State<Countdown> {
     widget.controller?.isCompleted = false;
   }
 
-  Future<void> _ensureHandler() async {
-    if (_handler != null) return;
-
-    logger.d('Initialising HiitAudioHandler via AudioService');
-
-    _handler = await AudioService.init(
-      builder: () => HiitAudioHandler(),
-      config: AudioServiceConfig(
-        androidNotificationChannelName: 'HIIT Timer',
-        androidNotificationOngoing: true,
-        androidStopForegroundOnPause: true,
-        notificationColor: Color(0xFF000000),
-        androidNotificationIcon: 'drawable/ic_bg_service_small',
-      ),
-    );
-  }
-
   void _startTimer() async {
     logger.d('_startTimer');
-    await _ensureHandler();
+
+    if (_handler == null) {
+      throw StateError(
+        'Countdown.initialize() must be called in main() before using the timer.',
+      );
+    }
 
     const double defaultVolume = 80.0;
-
     await _handler!.startTimer(widget.intervals, defaultVolume);
     setState(() => _isActive = true);
     widget.controller?.isCompleted = false;
@@ -123,23 +174,24 @@ class CountdownState extends State<Countdown> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<TimerState>(
-        stream: _handler?.timerStateStream ?? const Stream.empty(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData || !_isActive) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      stream: _handler?.timerStateStream ?? const Stream.empty(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || !_isActive) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          final timerState = snapshot.data!;
+        final timerState = snapshot.data!;
 
-          if (timerState.status == "End" &&
-              widget.controller?.isCompleted == false) {
-            widget.controller?.isCompleted = true;
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              widget.onFinished?.call();
-            });
-          }
+        if (timerState.status == "End" &&
+            widget.controller?.isCompleted == false) {
+          widget.controller?.isCompleted = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            widget.onFinished?.call();
+          });
+        }
 
-          return widget.build(context, timerState);
-        });
+        return widget.build(context, timerState);
+      },
+    );
   }
 }

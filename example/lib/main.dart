@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Countdown.initialize();
   runApp(const MyApp());
 }
 
@@ -140,8 +141,7 @@ class MyHomePageState extends State<MyHomePage> {
   /// immediately without restarting the timer.
   void _onVolumeChanged(double value) {
     setState(() => _volume = value);
-    // Convert 0–1 slider value to the 0–100 scale the handler uses.
-    CountdownState.handler?.customAction(kActionSetVolume, {
+    Countdown.handler?.customAction(kActionSetVolume, {
       'volume': value * 100,
     });
   }

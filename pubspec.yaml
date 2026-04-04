@@ -17,6 +17,7 @@ dependencies:
   path: ^1.9.0
   audio_service: ^0.18.18
   audioplayers: ^6.6.0
+  flutter_local_notifications: ^21.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
