@@ -4,6 +4,10 @@ A Flutter package for creating a high-intensity interval training (HIIT) timer w
 
 ![Screenshot 2024-11-10 at 4 22 43 PM](https://github.com/user-attachments/assets/0c990563-d8b0-4240-b11c-c865845c8ce9)
 
+## Roadmap
+
+🚀 Check out the [roadmap](https://github.com/users/a-mabe/projects/4) to see what's next.
+
 ---
 ## Table of Contents
 
