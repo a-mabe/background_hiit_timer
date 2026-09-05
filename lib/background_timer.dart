@@ -214,6 +214,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         0,
         currentInterval.time * secondsFactor,
         currentInterval.time * secondsFactor,
+        intervals.fold(0, (previous, interval) => previous + interval.time) * secondsFactor,
         volume,
         changeVolume);
 
@@ -255,6 +256,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
             intervals[timerState.currentInterval].time * secondsFactor;
         timerState.intervalMicroSeconds =
             intervals[timerState.currentInterval].time * secondsFactor;
+        timerState.totalRemainingMicroSeconds = intervals.sublist(timerState.currentInterval).fold(0, (previous, interval) => previous + interval.time) * secondsFactor;
         timerState.status = intervals[timerState.currentInterval].name;
       }
     });
@@ -276,6 +278,7 @@ class CountdownState extends State<Countdown> with WidgetsBindingObserver {
         timerState.status = "End";
       } else if (!timerState.paused && timerState.currentMicroSeconds > 0) {
         timerState.currentMicroSeconds -= interval.inMicroseconds;
+        timerState.totalRemainingMicroSeconds -= interval.inMicroseconds;
 
         int intervalIndex = timerState.currentInterval;
         int nextIntervalIndex = intervalIndex + 1;
